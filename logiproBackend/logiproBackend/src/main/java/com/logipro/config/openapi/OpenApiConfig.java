@@ -3,6 +3,7 @@ package com.logipro.config.openapi;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,12 +14,18 @@ import org.springframework.context.annotation.Configuration;
                 description = "Sprint 1 — Gestión de Usuarios"
         )
 )
-@SecurityScheme(
-        name = "basicAuth",
-        type = SecuritySchemeType.HTTP,
-        scheme = "basic"
-)
+@SecuritySchemes({
+        @SecurityScheme(
+                name = "basicAuth",
+                type = SecuritySchemeType.HTTP,
+                scheme = "basic"
+        ),
+        @SecurityScheme(
+                name = "bearerAuth",
+                type = SecuritySchemeType.HTTP,
+                scheme = "bearer",
+                bearerFormat = "JWT"
+        )
+})
 @Configuration
-public class OpenApiConfig {
-
-}
+public class OpenApiConfig {}

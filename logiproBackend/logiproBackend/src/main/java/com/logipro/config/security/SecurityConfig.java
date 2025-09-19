@@ -1,105 +1,91 @@
 package com.logipro.config.security;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.logipro.config.security.jwt.JwtAuthFilter;
+import com.logipro.config.security.jwt.JwtService;
+import com.logipro.users.infrastructure.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    // Rutas de Swagger sin autenticación
     private static final String[] SWAGGER_WHITELIST = {
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html"
+            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
     };
-    // exponemos Authentication manager para usarlo en el controlador
+
+    private final UsuarioRepository usuarioRepository;
 
     @Bean
-    public AuthenticationManager authenticationManager (AuthenticationConfiguration configuration) throws Exception{
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Usamos BCryptPasswordEncoder para manejo de contraseñas
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(JpaUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // Habilitar cors
-                .cors(Customizer.withDefaults())
+    public JwtAuthFilter jwtAuthFilter(JwtService jwtService, UsuarioRepository usuarioRepository) {
+        return new JwtAuthFilter(jwtService, usuarioRepository);
+    }
 
-                .csrf(csrf -> csrf.disable()) // API REST
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter, AuthenticationProvider authenticationProvider) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Configuración de CORS
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-
-                        // Permitimos preflight CORS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Swagger
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
-
-                        // Endpoints de autenticacion publicos
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/auth/logout-all").permitAll()
-
-                        // Usuarios
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/registrar").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET,  "/api/usuarios/**").authenticated()
-
-                        // Resto
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()); // Basic Auth
+                .httpBasic(Customizer.withDefaults())
+                .authenticationProvider(authenticationProvider);
+
+        // El filtro JWT debe ignorar /auth/** internamente (JwtAuthFilter lo suele hacer chequeando la ruta)
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
-    // configuracion CORS
-    @Bean
-    CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.allowed-origins:http://localhost:5173}") String allowedOrigins
-    ) {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList(
-                "Authorization", "Content-Type", "Accept", "Cache-Control", "Pragma", "X-Requested-With"
-        ));
-        config.setExposedHeaders(Arrays.asList("Authorization"));
-        config.setAllowCredentials(false); // no usamos cookies
-        config.setMaxAge(3600L);
-
+    // Configuración personalizada de CORS
+    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true); // Permite credenciales (como cookies o autenticación)
+        config.addAllowedOrigin("http://localhost:5173"); // Permite solicitudes desde este origen
+        config.addAllowedMethod("*"); // Permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.)
+        config.addAllowedHeader("*"); // Permite todos los encabezados
+        source.registerCorsConfiguration("/**", config); // Aplica esta configuración a todas las rutas
         return source;
-    }
-
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    UserDetailsService users(PasswordEncoder encoder) {
-        UserDetails admin = User.withUsername("admin")
-                .password(encoder.encode("admin123"))
-                .roles("ADMIN") // equivale a ROLE_ADMIN
-                .build();
-        return new InMemoryUserDetailsManager(admin);
     }
 }

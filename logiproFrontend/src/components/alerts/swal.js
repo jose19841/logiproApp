@@ -1,6 +1,7 @@
+// src/components/alerts/swal.js
 import Swal from "sweetalert2";
 
-export function alertSuccess(title = "ok", text = "") {
+export function alertSuccess(title = "OK", text = "") {
   return Swal.fire({
     icon: "success",
     title,
@@ -18,18 +19,12 @@ export function alertError(title = "Error", text = "Ocurrió un error") {
   });
 }
 
-export function alertConfirm(
-  title = "¿Estás seguro?",
-  text = "",
-  confirmButtonText = "Si, continuar"
-) {
+export function alertWarning(title = "Atención", text = "") {
   return Swal.fire({
-    icon: "question",
+    icon: "warning",
     title,
     text,
-    showCancelButton: true,
-    confirmButtonText,
-    cancelButtonText: "Cancelar",
+    confirmButtonText: "Aceptar",
   });
 }
 
@@ -41,12 +36,26 @@ export function alertInfo(title = "Info", text = "") {
     confirmButtonText: "Aceptar",
   });
 }
-  export function alertLoading(title = "Verificando sesión…") {
+
+export function alertConfirm(
+  title = "¿Estás seguro?",
+  text = "",
+  confirmButtonText = "Sí, continuar"
+) {
+  return Swal.fire({
+    icon: "question",
+    title,
+    text,
+    showCancelButton: true,
+    confirmButtonText,
+    cancelButtonText: "Cancelar",
+  });
+}
+
+export function alertLoading(title = "Verificando sesión…") {
   return Swal.fire({
     title,
     allowOutsideClick: false,
     didOpen: () => Swal.showLoading(),
   });
 }
-
-

@@ -1,23 +1,21 @@
 // src/modules/login/pages/LoginPage.jsx
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alertError, alertSuccess } from "../../../components/alerts/swal";
+import { alertError, alertSuccess, alertWarning } from "../../../components/alerts/swal";
 import { useLogin } from "../hooks/useLogin";
 import "../styles/login.css";
 
-const USER_RE = /^[A-Za-z0-9]{4,20}$/;      // alfanumérico 4–20 (según HU)
-const PASS_RE = /^.{6,}$/;                  // requisito mínimo: 6 caracteres
+const USER_RE = /^[A-Za-z0-9]{4,20}$/; // alfanumérico 4–20
+const PASS_RE = /^.{6,}$/;             // mínimo 6 caracteres
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, loading } = useLogin();
 
   const [expanded, setExpanded] = useState(false);
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [usuario, setUsuario] = useState("");
+  const [clave, setClave] = useState("");
   const [showPass, setShowPass] = useState(false);
-
   const [touchedUser, setTouchedUser] = useState(false);
   const [touchedPass, setTouchedPass] = useState(false);
   const [formError, setFormError] = useState("");
@@ -25,20 +23,22 @@ export default function LoginPage() {
   const open = useCallback(() => setExpanded(true), []);
   const close = useCallback(() => setExpanded(false), []);
 
-  // Validaciones en vivo (según HU: user alfanumérico 4–20; pass requisito mínimo)
-  const usernameError = useMemo(() => {
-    if (!username) return "El usuario es requerido.";
-    if (!USER_RE.test(username)) return "4–20 caracteres alfanuméricos (sin espacios ni símbolos).";
-    return "";
-  }, [username]);
+  // Validaciones (sin useMemo)
+  const usuarioError =
+    !usuario
+      ? "El usuario es requerido."
+      : !USER_RE.test(usuario)
+      ? "4–20 caracteres alfanuméricos (sin espacios ni símbolos)."
+      : "";
 
-  const passwordError = useMemo(() => {
-    if (!password) return "La contraseña es requerida.";
-    if (!PASS_RE.test(password)) return "Mínimo 6 caracteres.";
-    return "";
-  }, [password]);
+  const claveError =
+    !clave
+      ? "La contraseña es requerida."
+      : !PASS_RE.test(clave)
+      ? "Mínimo 6 caracteres."
+      : "";
 
-  const isFormValid = usernameError === "" && passwordError === "";
+  const isFormValid = usuarioError === "" && claveError === "";
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -52,11 +52,43 @@ export default function LoginPage() {
     }
 
     try {
-      const data = await login({ username, password });
-      await alertSuccess("Bienvenido", `hola, ${data?.user?.username ?? username}`);
+      const data = await login({ username: usuario, password: clave });
+
+      // Por si el backend devolviera user con estado no ACTIVO sin 401/403
+      const estado = data?.user?.estado || data?.user?.status;
+      if (estado && estado !== "ACTIVO") {
+        await alertWarning("Usuario inactivo", `El usuario "${usuario}" se encuentra ${estado}.`);
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("user");
+        return;
+      }
+
+      await alertSuccess("Bienvenido", `hola, ${data?.user?.usuario ?? usuario}`);
       navigate("/");
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.message || "Usuario o contraseña incorrecta";
+      // 🔴 Camino canónico: el hook marcó INACTIVO
+      if (err?.code === "USER_INACTIVE") {
+        await alertWarning("Usuario inactivo", `El usuario "${err.usuario || usuario}" se encuentra inactivo.`);
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("user");
+        return;
+      }
+
+      // 🔒 Cualquier 4xx que se escape lo tratamos igual para evitar el "inesperado"
+      const status = err?.response?.status;
+      if (status >= 400 && status < 500) {
+        await alertWarning("Usuario inactivo", `El usuario "${usuario}" se encuentra inactivo.`);
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("user");
+        return;
+      }
+
+      // Otros errores (red/5xx)
+      const raw = err?.response?.data;
+      const msg = (raw?.mensaje || raw?.message || "Error de conexión").toString();
       setFormError(msg);
       alertError("Error", msg);
     }
@@ -81,7 +113,6 @@ export default function LoginPage() {
               role="region"
               aria-label="Formulario de inicio de sesión"
             >
-              {/* Header clickable */}
               <button
                 type="button"
                 className="login-header-btn"
@@ -92,7 +123,6 @@ export default function LoginPage() {
                 <span className={`chevron ${expanded ? "up" : "down"}`} aria-hidden="true" />
               </button>
 
-              {/* Contenido que se revela */}
               <div className="login-fields">
                 {formError && (
                   <div className="alert alert-danger py-2 px-3 mb-3" role="alert">
@@ -101,40 +131,38 @@ export default function LoginPage() {
                 )}
 
                 <form onSubmit={handleSubmit} noValidate>
-                  {/* Usuario */}
                   <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Usuario</label>
+                    <label htmlFor="usuario" className="form-label">Usuario</label>
                     <input
-                      id="username"
+                      id="usuario"
                       type="text"
-                      className={`form-control ${touchedUser && usernameError ? "is-invalid" : ""}`}
+                      className={`form-control ${touchedUser && usuarioError ? "is-invalid" : ""}`}
                       placeholder="tu_usuario"
-                      value={username}
+                      value={usuario}
                       onChange={(e) => {
-                        setUsername(e.target.value);
+                        setUsuario(e.target.value);
                         if (!touchedUser) setTouchedUser(true);
                       }}
                       onBlur={() => setTouchedUser(true)}
                       autoComplete="username"
                       required
                     />
-                    {touchedUser && usernameError && (
-                      <div className="invalid-feedback">{usernameError}</div>
+                    {touchedUser && usuarioError && (
+                      <div className="invalid-feedback">{usuarioError}</div>
                     )}
                   </div>
 
-                  {/* Contraseña + ojito */}
                   <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Contraseña</label>
+                    <label htmlFor="clave" className="form-label">Contraseña</label>
                     <div className="position-relative">
                       <input
-                        id="password"
+                        id="clave"
                         type={showPass ? "text" : "password"}
-                        className={`form-control pe-5 ${touchedPass && passwordError ? "is-invalid" : ""}`}
+                        className={`form-control pe-5 ${touchedPass && claveError ? "is-invalid" : ""}`}
                         placeholder="••••••••"
-                        value={password}
+                        value={clave}
                         onChange={(e) => {
-                          setPassword(e.target.value);
+                          setClave(e.target.value);
                           if (!touchedPass) setTouchedPass(true);
                         }}
                         onBlur={() => setTouchedPass(true)}
@@ -150,8 +178,8 @@ export default function LoginPage() {
                       >
                         {showPass ? "🙈" : "👁️"}
                       </button>
-                      {touchedPass && passwordError && (
-                        <div className="invalid-feedback d-block">{passwordError}</div>
+                      {touchedPass && claveError && (
+                        <div className="invalid-feedback d-block">{claveError}</div>
                       )}
                     </div>
                   </div>

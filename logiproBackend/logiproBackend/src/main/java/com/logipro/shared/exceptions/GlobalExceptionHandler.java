@@ -72,5 +72,16 @@ public class GlobalExceptionHandler {
         if (detalles != null) body.put("detalles", detalles);
         return ResponseEntity.status(status).body(body);
     }
+    // 4xx/5xx definidos con ResponseStatusException (respeta código y mensaje)
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatus(
+            org.springframework.web.server.ResponseStatusException ex,
+            jakarta.servlet.http.HttpServletRequest req
+    ) {
+        var status = org.springframework.http.HttpStatus.valueOf(ex.getStatusCode().value());
+        var reason = ex.getReason(); // p.ej. "Usuario inactivo" o "Usuario o contraseña incorrectos"
+        return build(status, status.getReasonPhrase(), reason, req.getRequestURI(), null);
+    }
+
 }
 

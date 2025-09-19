@@ -1,36 +1,41 @@
 // src/modules/login/hooks/useLogin.js
 import { useCallback, useState } from "react";
-import { setAccessToken } from "../../../auth/session";
-import apiClient from "../../../services/apiClient"; // ajustá si tu path es distinto
+import { setUser } from "../../../auth/session";
+import { login as loginApi } from "../../../services/auth.api";
 
 export function useLogin() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  const login = useCallback(async ({ username, password }) => {
+  const login = useCallback(async (creds) => {
+    // soporta {usuario, clave} o {username, password}
+    const usuario = creds?.usuario ?? creds?.username ?? "";
+    const clave   = creds?.clave   ?? creds?.password ?? "";
+
     setLoading(true);
-    setError(null);
     try {
-      const { data } = await apiClient.post("/auth/login", { username, password });
-
-      // Guardar tokens
-      if (data?.accessToken) setAccessToken(data.accessToken); // memoria
-      if (data?.refreshToken) sessionStorage.setItem("refreshToken", data.refreshToken); // pestaña
-
-      // Guardar usuario (para header/perfil)
-      if (data?.user) {
-        sessionStorage.setItem("user", JSON.stringify(data.user));
-      }
-
-      return data; // { accessToken, refreshToken, user }
+      const res = await loginApi(usuario, clave);
+      if (res?.user) setUser(res.user);
+      return res;
     } catch (err) {
-      const msg = err?.response?.data?.message || "Credenciales inválidas o error de conexión";
-      setError(msg);
-      throw new Error(msg);
+      // 🔴 Normalizamos INACTIVO: 401/403 o mensajes típicos del backend
+      const status = err?.response?.status;
+      const raw = err?.response?.data;
+      const msg = (raw?.mensaje || raw?.message || "").toString();
+
+      const esNoActivoPorStatus = status === 401 || status === 403;
+      const esNoActivoPorMensaje = /inactiv|suspendid|registrad/i.test(msg);
+
+      if (esNoActivoPorStatus || esNoActivoPorMensaje) {
+        const e = new Error("Usuario inactivo");
+        e.code = "USER_INACTIVE";
+        e.usuario = usuario;
+        throw e;
+      }
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  return { login, loading, error };
+  return { login, loading };
 }

@@ -8,17 +8,17 @@ import java.time.Instant;
 
 @Entity
 @Table(
-        name="refresh_tokens",
+        name = "refresh_tokens",
         uniqueConstraints = @UniqueConstraint(name = "uk_refresh_jti", columnNames = "jti"),
         indexes = {
-                @Index(name="idx_refresh_user", columnList = "user_id"),
+                @Index(name = "idx_refresh_user", columnList = "user_id"),
                 @Index(name = "idx_refresh_expires", columnList = "expires_at")
         }
-
 )
 @Getter
 @Setter
 public class RefreshTokenEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,10 +27,11 @@ public class RefreshTokenEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    // identificador del token (jti) que guardamos en validacion/rotacion
+    // identificador del token (jti) que guardamos en validación/rotación
     @Column(name = "jti", nullable = false, length = 64)
     private String jti;
 
+    // fechas en UTC, Hibernate se encarga del mapeo con TIMESTAMP/DATETIME
     @Column(name = "issued_at", nullable = false)
     private Instant issuedAt;
 

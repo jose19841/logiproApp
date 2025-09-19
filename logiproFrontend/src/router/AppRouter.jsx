@@ -6,9 +6,14 @@ import MainLayout from "../layout/MainLayout";
 // Página de login
 import LoginPage from "../modules/login/pages/LoginPage";
 
-// 👉 Importamos tu Dashboard real
+// Dashboard
 import Dashboard from "../modules/dashboard/pages/DashboardPage.jsx";
 
+// Users
+import UserCreateForm from "../modules/users/components/UserCreateForm"; // alta
+import UserDetail from "../modules/users/pages/UserDetail.jsx"; // detalle
+import UserEdit from "../modules/users/pages/UserEdit.jsx"; // edición
+import UserPage from "../modules/users/pages/UserPage.jsx"; // ⬅️ página con check de ADMIN + SweetAlert2 + UserList
 
 export default function AppRouter() {
   return (
@@ -27,6 +32,12 @@ export default function AppRouter() {
         }
       >
         <Route index element={<Dashboard />} />
+
+        {/* Usuarios */}
+        <Route path="usuarios" element={<UserPage />} />
+        <Route path="usuarios/nuevo" element={<UserCreateForm variant="card" />} />
+        <Route path="usuarios/:id" element={<UserDetail />} />
+        <Route path="usuarios/:id/editar" element={<UserEdit />} />
       </Route>
 
       {/* Fallback */}

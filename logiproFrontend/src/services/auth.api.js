@@ -1,14 +1,16 @@
-import { clearAccessToken, setAccessToken } from "../auth/session";
+import { clearAccessToken, setAccessToken, setUser } from "../auth/session";
 import apiClient from "./apiClient";
 
 // 👉 URL base ya la maneja apiClient con VITE_API_URL
 
 // Login: recibe credenciales, guarda tokens y devuelve user
-export async function login(username, password) {
-  const { data } = await apiClient.post("/auth/login", { username, password });
+export async function login(usuario, clave) {
+  // el backend espera {usuario, clave}
+  const { data } = await apiClient.post("/auth/login", { usuario, clave });
 
   if (data?.accessToken) setAccessToken(data.accessToken);
   if (data?.refreshToken) sessionStorage.setItem("refreshToken", data.refreshToken);
+  if (data?.user) setUser(data.user);
 
   return data; // { accessToken, refreshToken, user }
 }
