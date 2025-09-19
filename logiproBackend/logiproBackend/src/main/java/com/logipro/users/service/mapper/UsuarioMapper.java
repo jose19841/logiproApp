@@ -13,6 +13,12 @@ public class UsuarioMapper {
         return UsuarioResponseDTO.builder()
                 .id(u.getId())
                 .usuario(u.getUsuario())
+                .nombre(u.getNombre())           // ← AGREGADO
+                .apellido(u.getApellido())       // ← AGREGADO
+                .email(u.getEmail())             // ← AGREGADO
+                .telefono(u.getTelefono())       // ← AGREGADO
+                .domicilio(u.getDomicilio())     // ← AGREGADO
+                .dni(u.getDni())                 // ← AGREGADO
                 .rol(u.getRol() != null ? u.getRol().getNombre() : null)
                 .estado(u.getEstado())
                 .build();

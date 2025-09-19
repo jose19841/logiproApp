@@ -5,12 +5,13 @@ import { changeUserState, fetchUsers } from "../services/userList";
 
 /**
  * Hook de listado de usuarios.
- * Encapsula: carga, mapeo de filas, errores, refresh y cambio de estado.
+ * Encapsula: carga, mapeo de filas, errores, refresh, cambio de estado y UI states.
  */
 export default function useList() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [showStatesFor, setShowStatesFor] = useState(null); // Control de menú expandido
 
   const mapRows = useCallback((data) => {
     return (Array.isArray(data) ? data : []).map((u) => ({
@@ -20,6 +21,9 @@ export default function useList() {
       apellido: u.apellido,
       nombreCompleto: `${u.nombre ?? ""} ${u.apellido ?? ""}`.trim(),
       email: u.email,
+      telefono: u.telefono,
+      domicilio: u.domicilio,
+      dni: u.dni,
       rol: u.rol?.nombre || u.rol || "-",
       // Estados válidos del backend: REGISTRADO | ACTIVO | INACTIVO | SUSPENDIDO
       estado: u.estado || u.status || "REGISTRADO",
@@ -64,6 +68,8 @@ export default function useList() {
         await changeUserState(row.id, nuevoEstado);
         await alertSuccess("Estado actualizado", `El usuario ahora está ${nuevoEstado}.`);
         loadData();
+        // Cerrar el menú después del cambio
+        setShowStatesFor(null);
       } catch (e) {
         console.error(e);
         alertError("No se pudo cambiar el estado.");
@@ -72,11 +78,17 @@ export default function useList() {
     [loadData]
   );
 
+  const toggleStatesMenu = useCallback((userId) => {
+    setShowStatesFor(showStatesFor === userId ? null : userId);
+  }, [showStatesFor]);
+
   return {
     rows,
     loading,
     err,
     reload: loadData,
     changeState: handleChangeState,
+    showStatesFor,
+    toggleStatesMenu,
   };
 }
