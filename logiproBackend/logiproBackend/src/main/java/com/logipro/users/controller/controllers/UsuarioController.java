@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.logipro.users.controller.dto.CambiarClaveRequestDTO;
+import com.logipro.users.infrastructure.UsuarioRepository;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -27,6 +30,8 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
+
 
     @Operation(
             summary = "Registrar usuario",
@@ -103,4 +108,43 @@ public class UsuarioController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+    @Operation(
+            summary = "Cambiar mi clave",
+            description = "Permite al usuario autenticado cambiar su propia clave validando la clave actual.",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Cambio de clave exitoso"),
+                    @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+            }
+    )
+    @PutMapping("/mi-clave")
+    public ResponseEntity<Void> cambiarMiClave(@Valid @RequestBody CambiarClaveRequestDTO request,
+                                               Authentication auth) {
+        // Validación de confirmación
+        if (!request.getNuevaClave().equals(request.getConfirmarClave())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        // Debe estar autenticado
+        if (auth == null || !auth.isAuthenticated() || auth.getName() == null || auth.getName().isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // auth.getName() → devuelve el login (en tu caso el campo "usuario")
+        String login = auth.getName();
+
+        var usuarioOpt = usuarioRepository.findByUsuario(login);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            var usuario = usuarioOpt.get();
+            usuarioService.cambiarMiClave(usuario.getId(), request.getClaveActual(), request.getNuevaClave());
+            return ResponseEntity.noContent().build(); // 204
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }

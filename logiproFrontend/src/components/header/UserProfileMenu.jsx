@@ -1,16 +1,31 @@
-// src/components/header/UserProfileMenu.jsx
+// src/components/user/UserProfileMenu.jsx
+import { useNavigate } from "react-router-dom";
 import useProfile from "../../hooks/useProfile";
+import ChangePasswordModal from "../../modules/users/components/ChangePasswordModal";
+import { logout } from "../../services/auth.api"; // logout silencioso
 
 export default function UserProfileMenu() {
-  const { user, initial, logoutAll } = useProfile();
+  const { user } = useProfile(); // ⬅️ NO tomamos 'initial' del hook
+  const navigate = useNavigate();
   if (!user) return null;
 
-  // Ajustá este ancho si querés más/menos (dropdown y botón usan el mismo)
+  // Inicial robusta local: 1er char en mayúscula o "?"
+  const initial =
+    (user?.usuario?.toString().trim().charAt(0).toUpperCase()) || "?";
+
   const WIDTH = 260;
+
+  const handleAfterPasswordChange = async () => {
+    try {
+      await logout(); // revoca refresh en backend y limpia cliente
+    } finally {
+      navigate("/login", { replace: true }); // directo al login
+    }
+  };
 
   return (
     <div className="dropdown" style={{ width: WIDTH }}>
-      {/* Botón: azul, ancho fijo, A grande a la izquierda */}
+      {/* Botón principal */}
       <button
         className="btn d-flex align-items-center gap-2 w-100 px-3 py-2"
         type="button"
@@ -28,13 +43,12 @@ export default function UserProfileMenu() {
         <span className="fw-semibold text-truncate">{user.usuario}</span>
       </button>
 
-      {/* Menú: mismo ancho que el botón */}
+      {/* Dropdown */}
       <ul
         className="dropdown-menu p-0 overflow-hidden show-on-click"
         aria-labelledby="userMenuButton"
         style={{ width: WIDTH }}
       >
-        {/* Encabezado azul con usuario/rol en blanco */}
         <li
           className="text-center py-3"
           style={{ backgroundColor: "var(--bs-primary)", color: "#fff" }}
@@ -45,21 +59,39 @@ export default function UserProfileMenu() {
           </div>
         </li>
 
-        {/* Separador fino (blanco translúcido sobre azul) */}
         <li style={{ borderTop: "1px solid rgba(255,255,255,.25)" }} />
 
-        {/* Botón Cerrar sesión: fondo azul, texto rojo, ancho completo */}
+        {/* Botón cambiar contraseña */}
+        <li>
+          <button
+            type="button"
+            className="btn w-100 rounded-0 fw-bold border-0 py-3"
+            style={{ backgroundColor: "var(--bs-primary)", color: "#fff" }}
+            data-bs-toggle="modal"
+            data-bs-target="#changePasswordModal"
+          >
+            Cambiar contraseña
+          </button>
+        </li>
+
+        {/* Cerrar sesión manual (si querés mantenerlo) */}
         <li>
           <button
             type="button"
             className="btn w-100 rounded-0 fw-bold border-0 py-3"
             style={{ backgroundColor: "var(--bs-primary)", color: "var(--bs-danger)" }}
-            onClick={logoutAll}
+            onClick={async () => {
+              await logout();
+              navigate("/login", { replace: true });
+            }}
           >
             Cerrar sesión
           </button>
         </li>
       </ul>
+
+      {/* Modal de cambio de clave */}
+      <ChangePasswordModal id="changePasswordModal" onDone={handleAfterPasswordChange} />
     </div>
   );
 }

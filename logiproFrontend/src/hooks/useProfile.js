@@ -1,3 +1,4 @@
+// src/hooks/useProfile.js
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUser, subscribe } from "../auth/session";
@@ -13,16 +14,14 @@ export default function useProfile() {
     return () => unsub();
   }, []);
 
-  // Calcula la inicial a partir del username
+  // ✅ Inicial robusta: siempre string, 1er char en mayúscula, fallback "?"
   const initial = useMemo(() => {
-    return user?.usuario?.charAt(0)?.toUpperCase() || "?";
-  }, [user]);
+    const u = typeof user?.usuario === "string" ? user.usuario : "";
+    return (u.trim().slice(0, 1).toUpperCase() || "?");
+  }, [user?.usuario]);
 
   const logoutAll = async () => {
-    const res = await alertConfirm(
-      "¿Cerrar sesión?",
-      "Se cerrará tu sesión en todos los dispositivos."
-    );
+    const res = await alertConfirm("¿Cerrar sesión?", "Se cerrará tu sesión en todos los dispositivos.");
     if (!res.isConfirmed) return { ok: false, cancelled: true };
 
     try {

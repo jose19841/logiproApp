@@ -1,9 +1,7 @@
 package com.logipro.auth.controller;
 
-import com.logipro.auth.dto.LoginRequestDTO;
-import com.logipro.auth.dto.LoginResponseDTO;
-import com.logipro.auth.dto.RefreshRequestDTO;
-import com.logipro.auth.dto.LogoutRequestDTO;
+import com.logipro.auth.dto.*;
+import com.logipro.auth.service.PasswordResetService;
 import com.logipro.config.security.jwt.JwtService;
 import com.logipro.config.security.jwt.RefreshTokenService;
 import com.logipro.users.domain.Usuario;
@@ -29,10 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -50,7 +45,7 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
-
+    private final PasswordResetService passwordResetService;
     @Operation(
             summary = "Iniciar sesión",
             description = "Autentica a un usuario y devuelve tokens de acceso, refresh y datos del usuario.",
@@ -145,5 +140,40 @@ public class AuthController {
         long userId = claims.sub();
         refreshTokenService.revokeAllForUser(userId);
         return ResponseEntity.noContent().build();
+    }
+    // ===================== RECUPERACIÓN DE CONTRASEÑA =====================
+
+    @Operation(summary = "Solicitud de recuperación", description = "Inicia el flujo de recuperación de contraseña.")
+    @PostMapping("/forgot")
+    public ResponseEntity<ApiMessageDTO> forgot(@Valid @RequestBody ForgotPasswordRequestDTO req,
+                                                @RequestHeader(value = "X-Forwarded-For", required = false) String xff,
+                                                @RequestHeader(value = "User-Agent", required = false) String ua,
+                                                @RequestHeader(value = "X-Real-IP", required = false) String xRealIp) {
+
+        String ip = firstNonEmpty(xff, xRealIp, "0.0.0.0");
+        passwordResetService.solicitarReset(req.getIdentifier(), ip, ua);
+
+        return ResponseEntity.ok(new ApiMessageDTO(
+                "Si existe una cuenta asociada, se envió un correo con instrucciones."
+        ));
+    }
+
+    @Operation(summary = "Confirmar recuperación", description = "Confirma el cambio de contraseña con el token enviado por email.")
+    @PostMapping("/reset")
+    public ResponseEntity<?> reset(@Valid @RequestBody ResetPasswordRequestDTO req) {
+        try {
+            passwordResetService.confirmarReset(req.getToken(), req.getNuevaClave());
+            return ResponseEntity.noContent().build(); // 204
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(new ApiMessageDTO("Token inválido o expirado"));
+        }
+    }
+
+    private static String firstNonEmpty(String... values) {
+        if (values == null) return null;
+        for (String v : values) {
+            if (v != null && !v.isBlank()) return v;
+        }
+        return null;
     }
 }

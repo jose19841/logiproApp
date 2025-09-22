@@ -6,7 +6,7 @@ import { useLogin } from "../hooks/useLogin";
 import "../styles/login.css";
 
 const USER_RE = /^[A-Za-z0-9]{4,20}$/; // alfanumérico 4–20
-const PASS_RE = /^.{6,}$/;             // mínimo 6 caracteres
+const PASS_RE = /^.{8,}$/;             // mínimo 8 caracteres
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function LoginPage() {
   const open = useCallback(() => setExpanded(true), []);
   const close = useCallback(() => setExpanded(false), []);
 
-  // Validaciones (sin useMemo)
+  // Validaciones
   const usuarioError =
     !usuario
       ? "El usuario es requerido."
@@ -35,7 +35,7 @@ export default function LoginPage() {
     !clave
       ? "La contraseña es requerida."
       : !PASS_RE.test(clave)
-      ? "Mínimo 6 caracteres."
+      ? "Mínimo 8 caracteres."
       : "";
 
   const isFormValid = usuarioError === "" && claveError === "";
@@ -54,7 +54,7 @@ export default function LoginPage() {
     try {
       const data = await login({ username: usuario, password: clave });
 
-      // Por si el backend devolviera user con estado no ACTIVO sin 401/403
+      // Chequeo adicional: si el backend devolviera user con estado no ACTIVO
       const estado = data?.user?.estado || data?.user?.status;
       if (estado && estado !== "ACTIVO") {
         await alertWarning("Usuario inactivo", `El usuario "${usuario}" se encuentra ${estado}.`);
@@ -67,26 +67,32 @@ export default function LoginPage() {
       await alertSuccess("Bienvenido", `hola, ${data?.user?.usuario ?? usuario}`);
       navigate("/");
     } catch (err) {
-      // 🔴 Camino canónico: el hook marcó INACTIVO
+      // ⚠️ Usuario inactivo (403 o mensaje explícito)
       if (err?.code === "USER_INACTIVE") {
-        await alertWarning("Usuario inactivo", `El usuario "${err.usuario || usuario}" se encuentra inactivo.`);
+        await alertWarning(
+          "Usuario inactivo",
+          `El usuario "${err.usuario || usuario}" se encuentra inactivo.`
+        );
         sessionStorage.removeItem("accessToken");
         sessionStorage.removeItem("refreshToken");
         sessionStorage.removeItem("user");
         return;
       }
 
-      // 🔒 Cualquier 4xx que se escape lo tratamos igual para evitar el "inesperado"
-      const status = err?.response?.status;
+      // 🔐 Credenciales inválidas (401)
+      if (err?.code === "BAD_CREDENTIALS") {
+        await alertError("Credenciales inválidas", "Usuario o contraseña incorrectos.");
+        return;
+      }
+
+      // Otros errores de cliente (4xx genérico)
+      const status = err?.status || err?.response?.status;
       if (status >= 400 && status < 500) {
-        await alertWarning("Usuario inactivo", `El usuario "${usuario}" se encuentra inactivo.`);
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("refreshToken");
-        sessionStorage.removeItem("user");
+        await alertWarning("Error de validación", "Hubo un error en la solicitud.");
         return;
       }
 
-      // Otros errores (red/5xx)
+      // Otros errores (5xx, red, etc.)
       const raw = err?.response?.data;
       const msg = (raw?.mensaje || raw?.message || "Error de conexión").toString();
       setFormError(msg);

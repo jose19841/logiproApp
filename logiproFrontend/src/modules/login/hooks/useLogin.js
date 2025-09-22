@@ -17,13 +17,14 @@ export function useLogin() {
       if (res?.user) setUser(res.user);
       return res;
     } catch (err) {
-      // 🔴 Normalizamos INACTIVO: 401/403 o mensajes típicos del backend
+      // Normalizamos errores para la UI
       const status = err?.response?.status;
       const raw = err?.response?.data;
       const msg = (raw?.mensaje || raw?.message || "").toString();
 
-      const esNoActivoPorStatus = status === 401 || status === 403;
-      const esNoActivoPorMensaje = /inactiv|suspendid|registrad/i.test(msg);
+      // 🚫 Usuario inactivo/suspendido: SOLO 403 o mensaje explícito
+      const esNoActivoPorStatus = status === 403; // <- clave: solo 403 = inactivo
+      const esNoActivoPorMensaje = /inactiv|suspendid/i.test(msg);
 
       if (esNoActivoPorStatus || esNoActivoPorMensaje) {
         const e = new Error("Usuario inactivo");
@@ -31,6 +32,24 @@ export function useLogin() {
         e.usuario = usuario;
         throw e;
       }
+
+      // 🔐 Credenciales inválidas (clave o usuario)
+      if (status === 401) {
+        const e = new Error("Usuario o contraseña incorrectos");
+        e.code = "BAD_CREDENTIALS";
+        e.usuario = usuario;
+        throw e;
+      }
+
+      // Otros 4xx: mantener error original para que la página decida
+      if (status >= 400 && status < 500) {
+        const e = new Error(msg || "Error en la solicitud");
+        e.code = "CLIENT_ERROR";
+        e.status = status;
+        throw e;
+      }
+
+      // Resto (5xx, red, etc.)
       throw err;
     } finally {
       setLoading(false);

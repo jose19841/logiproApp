@@ -6,10 +6,7 @@ import com.logipro.users.domain.Usuario;
 import com.logipro.users.domain.UserStatus;
 import com.logipro.users.infrastructure.UsuarioRepository;
 import com.logipro.users.service.mapper.UsuarioMapper;
-import com.logipro.users.service.usecase.BuscarUsuarioUseCase;
-import com.logipro.users.service.usecase.RegistrarUsuarioUsecase;
-import com.logipro.users.service.usecase.ListarUsuarioUsecase;
-import com.logipro.users.service.usecase.ActualizarUsuarioUsecase; // 👈 nuevo import
+import com.logipro.users.service.usecase.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +24,9 @@ public class UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final UsuarioRepository usuarioRepository;
     private final ListarUsuarioUsecase listarUsuarioUseCase;
-    private final ActualizarUsuarioUsecase actualizarUsuarioUsecase; // 👈 nuevo campo
+    private final ActualizarUsuarioUsecase actualizarUsuarioUsecase;
+    private final CambiarClaveUsecase cambiarClaveUsecase;           // admin / sin validar clave actual
+    private final CambiarMiClaveUsecase cambiarMiClaveUsecase;       // self-service / valida clave actual
 
     @Transactional
     public UsuarioResponseDTO registrar(RegistrarUsuarioRequestDTO dto) {
@@ -57,7 +56,7 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
-    // 👇 Nuevo: orquestación de actualización usando el usecase existente (sin nuevos DTOs)
+    // orquestación de actualización usando el usecase existente (sin nuevos DTOs)
     @Transactional
     public Optional<UsuarioResponseDTO> actualizar(Long id, RegistrarUsuarioRequestDTO dto) {
         return actualizarUsuarioUsecase.actualizar(id, dto)
@@ -71,5 +70,17 @@ public class UsuarioService {
             usuarioRepository.save(u);
             return usuarioMapper.toResponse(u);
         });
+    }
+
+    // === Admin / soporte: setear nueva clave sin validar la actual (ya existente) ===
+    @Transactional
+    public void cambiarClave(Long id, String nuevaClave) {
+        cambiarClaveUsecase.cambiarClave(id, nuevaClave);
+    }
+
+    // === Self-service: usuario autenticado cambia su propia clave (valida claveActual) ===
+    @Transactional
+    public void cambiarMiClave(Long id, String claveActual, String nuevaClave) {
+        cambiarMiClaveUsecase.cambiarMiClave(id, claveActual, nuevaClave);
     }
 }
