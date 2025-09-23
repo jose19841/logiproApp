@@ -1,6 +1,18 @@
-target/
+# --- Build outputs ---
+/target/
+
+# --- IDEs ---
 .idea/
 *.iml
+.vscode/
+
+# --- Logs ---
 *.log
+
+# --- Env files (datos sensibles) ---
 .env
+.env.*
+!*.example   # permite subir .env.example pero no los reales
+
+# --- Maven Wrapper ---
 .mvn/wrapper/maven-wrapper.jar
