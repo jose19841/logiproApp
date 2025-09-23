@@ -1,6 +1,6 @@
 // src/modules/login/pages/LoginPage.jsx
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { alertError, alertSuccess, alertWarning } from "../../../components/alerts/swal";
 import { useLogin } from "../hooks/useLogin";
 import "../styles/login.css";
@@ -203,9 +203,9 @@ export default function LoginPage() {
                 </form>
 
                 <div className="text-center mt-3">
-                  <a className="forgot-link" href="/recuperar">
+                  <Link className="forgot-link" to="/recuperar">
                     ¿Olvidaste tu contraseña?
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

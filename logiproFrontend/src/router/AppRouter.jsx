@@ -6,6 +6,11 @@ import MainLayout from "../layout/MainLayout";
 // Página de login
 import LoginPage from "../modules/login/pages/LoginPage";
 
+// Password flow (recuperación / cambio)
+import ChangePasswordPage from "../modules/login/pages/ChangePasswordPage.jsx";
+import RecoverPage from "../modules/login/pages/RecoverPage.jsx";
+import ResetPage from "../modules/login/pages/ResetPage.jsx";
+
 // Dashboard
 import Dashboard from "../modules/dashboard/pages/DashboardPage.jsx";
 
@@ -20,7 +25,8 @@ export default function AppRouter() {
     <Routes>
       {/* Públicas */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/recuperar" element={<div />} />
+      <Route path="/recuperar" element={<RecoverPage />} />
+      <Route path="/reset" element={<ResetPage />} />
 
       {/* Privadas */}
       <Route
@@ -38,6 +44,9 @@ export default function AppRouter() {
         <Route path="usuarios/nuevo" element={<UserCreateForm variant="card" />} />
         <Route path="usuarios/:id" element={<UserDetail />} />
         <Route path="usuarios/:id/editar" element={<UserEdit />} />
+
+        {/* Cuenta / Seguridad */}
+        <Route path="cambiar-clave" element={<ChangePasswordPage />} />
       </Route>
 
       {/* Fallback */}

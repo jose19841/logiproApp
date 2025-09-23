@@ -1,6 +1,6 @@
 import { getAccessToken } from "../auth/session";
-import { refresh } from "../modules/login/services/auth.service";
 import apiClient from "./apiClient";
+import { refresh } from "./auth.api";
 
 /** 
  * Wrapper simple sobre apiClient.
