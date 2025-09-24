@@ -144,8 +144,9 @@ export default function UserList() {
 
   return (
     <div className="container-fluid">
+      {/* Toolbar (sin título) */}
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h4 className="mb-0">Usuarios</h4>
+        <div /> {/* spacer para empujar los botones a la derecha */}
         <div className="d-flex gap-2">
           <button
             className="btn btn-primary"

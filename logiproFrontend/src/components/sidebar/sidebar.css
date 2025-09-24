@@ -85,3 +85,16 @@
 .sidebar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.2);
 }
+/* --- Header del sidebar centrado --- */
+.sidebar .p-3.border-bottom {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* centra horizontal */
+  justify-content: center;
+  text-align: center;
+}
+
+.sidebar .p-3.border-bottom .fw-bold { line-height: 1.1; }
+.sidebar .p-3.border-bottom small { margin-top: 2px; }
+

@@ -54,7 +54,6 @@ export default function LoginPage() {
     try {
       const data = await login({ username: usuario, password: clave });
 
-      // Chequeo adicional: si el backend devolviera user con estado no ACTIVO
       const estado = data?.user?.estado || data?.user?.status;
       if (estado && estado !== "ACTIVO") {
         await alertWarning("Usuario inactivo", `El usuario "${usuario}" se encuentra ${estado}.`);
@@ -67,32 +66,25 @@ export default function LoginPage() {
       await alertSuccess("Bienvenido", `hola, ${data?.user?.usuario ?? usuario}`);
       navigate("/");
     } catch (err) {
-      // ⚠️ Usuario inactivo (403 o mensaje explícito)
       if (err?.code === "USER_INACTIVE") {
-        await alertWarning(
-          "Usuario inactivo",
-          `El usuario "${err.usuario || usuario}" se encuentra inactivo.`
-        );
+        await alertWarning("Usuario inactivo", `El usuario "${err.usuario || usuario}" se encuentra inactivo.`);
         sessionStorage.removeItem("accessToken");
         sessionStorage.removeItem("refreshToken");
         sessionStorage.removeItem("user");
         return;
       }
 
-      // 🔐 Credenciales inválidas (401)
       if (err?.code === "BAD_CREDENTIALS") {
         await alertError("Credenciales inválidas", "Usuario o contraseña incorrectos.");
         return;
       }
 
-      // Otros errores de cliente (4xx genérico)
       const status = err?.status || err?.response?.status;
       if (status >= 400 && status < 500) {
         await alertWarning("Error de validación", "Hubo un error en la solicitud.");
         return;
       }
 
-      // Otros errores (5xx, red, etc.)
       const raw = err?.response?.data;
       const msg = (raw?.mensaje || raw?.message || "Error de conexión").toString();
       setFormError(msg);
@@ -160,6 +152,7 @@ export default function LoginPage() {
 
                   <div className="mb-3">
                     <label htmlFor="clave" className="form-label">Contraseña</label>
+                    {/* ✅ el error sale FUERA del contenedor relativo para que el ojito no se mueva */}
                     <div className="position-relative">
                       <input
                         id="clave"
@@ -184,10 +177,10 @@ export default function LoginPage() {
                       >
                         {showPass ? "🙈" : "👁️"}
                       </button>
-                      {touchedPass && claveError && (
-                        <div className="invalid-feedback d-block">{claveError}</div>
-                      )}
                     </div>
+                    {touchedPass && claveError && (
+                      <div className="invalid-feedback d-block mt-1">{claveError}</div>
+                    )}
                   </div>
 
                   <button
