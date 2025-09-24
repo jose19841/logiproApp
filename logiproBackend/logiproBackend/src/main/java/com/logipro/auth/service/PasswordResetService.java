@@ -2,9 +2,10 @@ package com.logipro.auth.service;
 
 import com.logipro.auth.domain.PasswordResetTokenEntity;
 import com.logipro.auth.infrastructure.PasswordResetTokenRepository;
-import com.logipro.shared.mail.MailService;
-import com.logipro.users.controller.dto.UsuarioResponseDTO;
-import com.logipro.users.service.UsuarioService; // si tu paquete/clase difiere, decime y lo cambio
+import com.logipro.shared.email.MailService;
+import com.logipro.users.domain.Usuario;
+import com.logipro.users.infrastructure.UsuarioRepository;
+import com.logipro.users.service.UsuarioService; // seguimos usando el cambio de clave del servicio
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository tokenRepository;
     private final MailService mailService;
     private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository; // ✅ agregado
 
     @Value("${app.frontend.reset-url:http://localhost:5173/reset}")
     private String frontendResetUrl;
@@ -32,21 +34,22 @@ public class PasswordResetService {
     private int ttlMinutes;
 
     /**
-     * Paso 1: solicitar reset (no revela si el usuario existe).
-     * identifier: username del usuario (según tu UsuarioService actual).
+     * Paso 1: solicitar reset (acepta usuario o email).
      */
     @Transactional
     public void solicitarReset(String identifier, String ip, String ua) {
-        // Usamos el método real disponible en tu UsuarioService
-        Optional<UsuarioResponseDTO> dtoOpt = usuarioService.buscarPorUsuario(identifier);
-
-        if (dtoOpt.isEmpty()) {
-            // No revelamos existencia de usuario.
+        // ✅ Buscar por usuario O email sin revelar existencia
+        Optional<Usuario> userOpt = usuarioRepository.findByUsuarioOrEmail(identifier, identifier);
+        if (userOpt.isEmpty()) {
+            // Importante: no revelar si existe o no
             return;
         }
 
-        UsuarioResponseDTO dto = dtoOpt.get();
-        UsuarioMin user = new UsuarioMin(dto.getId(), dto.getEmail());
+        Usuario user = userOpt.get();
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            // Si por alguna razón el usuario no tiene email válido, no hacemos nada (silencioso)
+            return;
+        }
 
         // Generar token opaco (crudo) + hash (persistimos solo el hash)
         String rawToken = UUID.randomUUID().toString();
@@ -55,23 +58,23 @@ public class PasswordResetService {
         Instant now = Instant.now();
         Instant expires = now.plus(Duration.ofMinutes(ttlMinutes));
 
-        // Sin Lombok builder para evitar dependencias aquí
-        PasswordResetTokenEntity entity = new PasswordResetTokenEntity();
-        entity.setUserId(user.id());
-        entity.setJti(UUID.randomUUID().toString());
-        entity.setTokenHash(tokenHash);
-        entity.setExpiresAt(expires);
-        entity.setRequestedIp(ip);
-        entity.setRequestedUserAgent(ua);
+        PasswordResetTokenEntity entity = PasswordResetTokenEntity.builder()
+                .userId(user.getId())
+                .jti(UUID.randomUUID().toString())
+                .tokenHash(tokenHash)
+                .expiresAt(expires)
+                .requestedIp(ip)
+                .requestedUserAgent(ua)
+                .build();
 
         tokenRepository.save(entity);
 
-        // Armar URL para el front
+        // Armar URL para el front (token va solo en el enlace, no se guarda en claro)
         String sep = frontendResetUrl.contains("?") ? "&" : "?";
         String resetUrl = frontendResetUrl + sep + "token=" + rawToken;
 
         // Enviar correo
-        mailService.sendPasswordResetLink(user.email(), resetUrl);
+        mailService.sendPasswordResetLink(user.getEmail(), resetUrl);
     }
 
     /**
@@ -86,7 +89,7 @@ public class PasswordResetService {
                 .findByTokenHashAndUsedAtIsNullAndExpiresAtAfter(tokenHash, now)
                 .orElseThrow(() -> new IllegalArgumentException("Token inválido o expirado"));
 
-        // Cambiar contraseña con tu servicio de usuarios (ajustá si tu método se llama distinto)
+        // Cambiar clave mediante el servicio (aplica hashing/validaciones propias)
         usuarioService.cambiarClave(token.getUserId(), nuevaClave);
 
         // Marcar token como usado e invalidar otros tokens del usuario
@@ -104,6 +107,4 @@ public class PasswordResetService {
             throw new IllegalStateException("SHA-256 no disponible", e);
         }
     }
-
-    private record UsuarioMin(Long id, String email) {}
 }

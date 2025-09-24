@@ -33,7 +33,7 @@ export default function RequireAuth({ children }) {
             return;
           }
         } catch {
-          // cae al redirect
+          
         }
         Swal.close();
         alertError("Sesión expirada", "Por favor inicia sesión de nuevo");
@@ -62,7 +62,7 @@ export default function RequireAuth({ children }) {
   }, [navigate, location]);
 
   if (checking) {
-    // mientras espera, no renderiza nada (el Swal ya está en pantalla)
+    
     return null;
   }
 

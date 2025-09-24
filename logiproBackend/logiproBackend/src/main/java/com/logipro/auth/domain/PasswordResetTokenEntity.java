@@ -1,6 +1,12 @@
 package com.logipro.auth.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Setter;
+
 import java.time.Instant;
 
 @Entity
@@ -11,6 +17,11 @@ import java.time.Instant;
                 @Index(name = "idx_prt_user_id", columnList = "user_id")
         }
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PasswordResetTokenEntity {
 
     @Id
@@ -21,11 +32,11 @@ public class PasswordResetTokenEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    /** JTI (identificador lógico del token), útil para auditoría */
+    /** JTI (identificador lógico del token)*/
     @Column(name = "jti", nullable = false, length = 64)
     private String jti;
 
-    /** Hash del token (NUNCA guardar el token en claro) */
+    /** Hash del token */
     @Column(name = "token_hash", nullable = false, length = 64, unique = true)
     private String tokenHash;
 
@@ -37,7 +48,7 @@ public class PasswordResetTokenEntity {
     @Column(name = "used_at")
     private Instant usedAt;
 
-    /** Auditoría opcional */
+
     @Column(name = "requested_ip", length = 64)
     private String requestedIp;
 
@@ -53,67 +64,5 @@ public class PasswordResetTokenEntity {
         if (createdAt == null) {
             createdAt = Instant.now();
         }
-    }
-
-    // ===== Getters & Setters =====
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getJti() {
-        return jti;
-    }
-    public void setJti(String jti) {
-        this.jti = jti;
-    }
-
-    public String getTokenHash() {
-        return tokenHash;
-    }
-    public void setTokenHash(String tokenHash) {
-        this.tokenHash = tokenHash;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-    public void setExpiresAt(Instant expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public Instant getUsedAt() {
-        return usedAt;
-    }
-    public void setUsedAt(Instant usedAt) {
-        this.usedAt = usedAt;
-    }
-
-    public String getRequestedIp() {
-        return requestedIp;
-    }
-    public void setRequestedIp(String requestedIp) {
-        this.requestedIp = requestedIp;
-    }
-
-    public String getRequestedUserAgent() {
-        return requestedUserAgent;
-    }
-    public void setRequestedUserAgent(String requestedUserAgent) {
-        this.requestedUserAgent = requestedUserAgent;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 }

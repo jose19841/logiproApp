@@ -1,4 +1,4 @@
-// src/components/modal/Modal.jsx
+
 import PropTypes from "prop-types";
 
 export default function Modal({ id, title, children, onClose, footer }) {

@@ -1,10 +1,6 @@
-package com.logipro.shared.mail;
+package com.logipro.shared.email;
 
-/**
- * Servicio de envío de correos.
- * Mantiene la abstracción para no acoplar la aplicación a una implementación específica.
- * Implementaciones típicas: JavaMail (SMTP).
- */
+
 public interface MailService {
     /**
      * Envía el enlace de restablecimiento de contraseña al destinatario.

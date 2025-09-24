@@ -1,4 +1,4 @@
-// src/components/sidebar/Sidebar.jsx
+
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./sidebar.css";

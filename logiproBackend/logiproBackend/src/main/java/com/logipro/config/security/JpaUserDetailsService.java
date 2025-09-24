@@ -30,7 +30,7 @@ public class JpaUserDetailsService implements UserDetailsService {
         if (roleName.startsWith("ROLE_")) {
             roleName = roleName.substring(5);
         }
-        roleName = roleName.toUpperCase(); // Aseguramos que esté en mayúsculas
+        roleName = roleName.toUpperCase();
 
         return User.withUsername(u.getUsuario())
                 .password(u.getClave()) // Usamos la clave directamente, ya está codificada

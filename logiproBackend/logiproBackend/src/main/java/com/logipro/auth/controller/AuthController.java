@@ -46,6 +46,7 @@ public class AuthController {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
     private final PasswordResetService passwordResetService;
+
     @Operation(
             summary = "Iniciar sesión",
             description = "Autentica a un usuario y devuelve tokens de acceso, refresh y datos del usuario.",
@@ -143,7 +144,10 @@ public class AuthController {
     }
     // ===================== RECUPERACIÓN DE CONTRASEÑA =====================
 
-    @Operation(summary = "Solicitud de recuperación", description = "Inicia el flujo de recuperación de contraseña.")
+    @Operation(
+            summary = "Solicitud de recuperación (usuario o email)",
+            description = "Inicia el flujo de recuperación de contraseña aceptando un identificador que puede ser nombre de usuario o email."
+    )
     @PostMapping("/forgot")
     public ResponseEntity<ApiMessageDTO> forgot(@Valid @RequestBody ForgotPasswordRequestDTO req,
                                                 @RequestHeader(value = "X-Forwarded-For", required = false) String xff,
@@ -151,14 +155,20 @@ public class AuthController {
                                                 @RequestHeader(value = "X-Real-IP", required = false) String xRealIp) {
 
         String ip = firstNonEmpty(xff, xRealIp, "0.0.0.0");
-        passwordResetService.solicitarReset(req.getIdentifier(), ip, ua);
+        String userAgent = (ua == null || ua.isBlank()) ? "unknown" : ua;
 
+        passwordResetService.solicitarReset(req.getIdentifier(), ip, userAgent);
+
+        // Siempre el mismo 200 para no filtrar existencia de cuentas
         return ResponseEntity.ok(new ApiMessageDTO(
                 "Si existe una cuenta asociada, se envió un correo con instrucciones."
         ));
     }
 
-    @Operation(summary = "Confirmar recuperación", description = "Confirma el cambio de contraseña con el token enviado por email.")
+    @Operation(
+            summary = "Confirmar recuperación",
+            description = "Confirma el cambio de contraseña con el token enviado por email."
+    )
     @PostMapping("/reset")
     public ResponseEntity<?> reset(@Valid @RequestBody ResetPasswordRequestDTO req) {
         try {

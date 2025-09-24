@@ -1,5 +1,4 @@
-// src/auth/session.js
-// Maneja tokens y usuario en memoria + sessionStorage (con fallback a localStorage)
+
 
 let accessToken = null;
 const listeners = new Set();

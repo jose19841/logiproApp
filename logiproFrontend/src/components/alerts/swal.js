@@ -1,4 +1,4 @@
-// src/components/alerts/swal.js
+
 import Swal from "sweetalert2";
 
 export function alertSuccess(title = "OK", text = "") {

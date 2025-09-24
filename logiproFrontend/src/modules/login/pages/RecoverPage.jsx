@@ -38,12 +38,17 @@ export default function RecoverPage() {
       setSubmitting(true);
 
       // Normalización del identificador:
-      // - Si parece email, lo mandamos en minúsculas y sin espacios.
-      // - Si es usuario, solo trim (respetamos mayúsc/minúsculas del username).
+      // - Si parece email, a minúsculas y sin espacios.
+      // - Si es usuario, solo trim.
       const trimmed = identifier.trim();
       const normalized = trimmed.includes("@") ? trimmed.toLowerCase() : trimmed;
 
+      // Si tu recoverPassword espera un string, esto está OK:
       await recoverPassword(normalized);
+
+      // Si en tu API espera un objeto { identifier }, usá esta variante:
+      // await recoverPassword({ identifier: normalized });
+
       await alertSuccess(
         "Solicitud enviada",
         "Si existe una cuenta asociada, se envió un correo con instrucciones."
@@ -83,16 +88,16 @@ export default function RecoverPage() {
 
                 <form onSubmit={handleSubmit} noValidate>
                   <div className="mb-3">
-                    <label htmlFor="identifier" className="form-label">Usuario o email</label>
+                    <label htmlFor="identifier" className="form-label">Ingrese Usuario o email</label>
                     <input
                       id="identifier"
                       type="text"
                       className={`form-control ${touched && idError ? "is-invalid" : ""}`}
-                      placeholder="tu_usuario o tu@email.com"
+                      placeholder="Ingresa tu Usuario o tu email"
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
                       onBlur={() => setTouched(true)}
-                      autoComplete="username email"
+                      autoComplete="username"
                       required
                     />
                     {touched && idError && (
@@ -107,7 +112,7 @@ export default function RecoverPage() {
                     aria-busy={submitting}
                     style={{ borderRadius: "var(--radius)" }}
                   >
-                    {submitting ? "Enviando..." : "Enviar instrucciones"}
+                    {submitting ? "Enviando..." : "Restablecer mi contraseña"}
                   </button>
                 </form>
 

@@ -23,10 +23,7 @@ public class JwtService {
     @Value("${app.jwt.issuer}")
     private String issuer;
 
-    /**
-     * Puede venir como texto “largo”, Base64 o Base64URL. Intentamos en ese orden.
-     * Recomendado: 32+ bytes (256 bits) para HS256.
-     */
+
     @Value("${app.jwt.secret}")
     private String rawSecret;
 
@@ -52,7 +49,7 @@ public class JwtService {
             throw new IllegalStateException("app.jwt.secret no puede estar vacío");
         }
 
-        // === Clave HMAC: intentamos Base64, luego Base64URL, luego texto plano UTF-8 ===
+
         try {
             byte[] keyBytes;
             try {

@@ -75,9 +75,7 @@ public class SecurityConfig {
                         // Cualquier otro
                         .anyRequest().authenticated()
                 )
-                // ✅ Deshabilitamos Basic Auth
-                .httpBasic().disable()
-                // ✅ Opcional: devolvemos JSON limpio en vez de challenge Basic
+
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) -> {
                     res.setStatus(401);
                     res.setContentType("application/json");

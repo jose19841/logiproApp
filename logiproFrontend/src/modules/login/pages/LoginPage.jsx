@@ -143,7 +143,7 @@ export default function LoginPage() {
                       id="usuario"
                       type="text"
                       className={`form-control ${touchedUser && usuarioError ? "is-invalid" : ""}`}
-                      placeholder="tu_usuario"
+                      placeholder="Ingrese Nombre De Usuario"
                       value={usuario}
                       onChange={(e) => {
                         setUsuario(e.target.value);

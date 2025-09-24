@@ -1,15 +1,15 @@
-// src/components/user/UserProfileMenu.jsx
+
 import { useNavigate } from "react-router-dom";
 import useProfile from "../../hooks/useProfile";
 import ChangePasswordModal from "../../modules/users/components/ChangePasswordModal";
-import { logout } from "../../services/auth.api"; // logout silencioso
+import { logout } from "../../services/auth.api"; 
 
 export default function UserProfileMenu() {
-  const { user } = useProfile(); // ⬅️ NO tomamos 'initial' del hook
+  const { user } = useProfile(); 
   const navigate = useNavigate();
   if (!user) return null;
 
-  // Inicial robusta local: 1er char en mayúscula o "?"
+  
   const initial =
     (user?.usuario?.toString().trim().charAt(0).toUpperCase()) || "?";
 
@@ -74,7 +74,7 @@ export default function UserProfileMenu() {
           </button>
         </li>
 
-        {/* Cerrar sesión manual (si querés mantenerlo) */}
+        {/* Cerrar sesión manual */}
         <li>
           <button
             type="button"

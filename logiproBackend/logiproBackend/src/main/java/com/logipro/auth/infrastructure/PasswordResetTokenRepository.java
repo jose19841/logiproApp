@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetTokenEntity, Long> {
-    /** Busca por hash (nunca por el token en claro). */
+    /** Busca por hash  */
     Optional<PasswordResetTokenEntity> findByTokenHash(String tokenHash);
 
     /** Válido: no usado y no expirado. */
@@ -21,7 +21,7 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
     /** Limpieza de expirados. */
     int deleteByExpiresAtBefore(Instant now);
 
-    /** Invalidar todos los tokens de un usuario (p.ej., tras un reset). */
+    /** Invalidar todos los tokens de un usuario (tras un reset). */
     int deleteByUserId(Long userId);
 }
 

@@ -1,25 +1,7 @@
 // src/components/DataTable.jsx
 import { useMemo, useState } from "react";
 
-/**
- * DataTable (Bootstrap 5)
- * Tabla genérica reutilizable.
- *
- * Props:
- * - columns: Array<{
- *     key: string;              // clave del dato (ej. "nombre", "email")
- *     label: string;            // texto de cabecera
- *     align?: "start"|"center"|"end";
- *     sortable?: boolean;       // habilita ordenamiento
- *     render?: (value, row) => React.ReactNode; // render custom por celda
- *   }>
- * - data: Array<object>
- * - loading?: boolean
- * - error?: string
- * - emptyMessage?: string
- * - onRowClick?: (row) => void
- * - rowKey?: string | ((row) => string|number) // key estable del <tr>
- */
+
 export default function DataTable({
   columns = [],
   data = [],
@@ -41,7 +23,7 @@ export default function DataTable({
       const av = a?.[col.key];
       const bv = b?.[col.key];
 
-      // numérico si se puede
+     
       const aNum = av !== null && av !== undefined && !isNaN(Number(av));
       const bNum = bv !== null && bv !== undefined && !isNaN(Number(bv));
       if (aNum && bNum) return (Number(av) - Number(bv)) * dir;
