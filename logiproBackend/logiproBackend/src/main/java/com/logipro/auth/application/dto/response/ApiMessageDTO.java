@@ -1,4 +1,4 @@
-package com.logipro.auth.dto;
+package com.logipro.auth.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

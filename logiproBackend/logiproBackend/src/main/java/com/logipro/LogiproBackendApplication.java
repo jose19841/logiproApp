@@ -10,4 +10,5 @@ public class LogiproBackendApplication {
 		SpringApplication.run(LogiproBackendApplication.class, args);
 	}
 
+
 }

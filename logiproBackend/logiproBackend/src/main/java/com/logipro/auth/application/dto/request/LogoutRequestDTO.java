@@ -1,4 +1,4 @@
-package com.logipro.auth.dto;
+package com.logipro.auth.application.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;
@@ -7,18 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Credenciales que envía el usuario para autenticarse.
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequestDTO {
+public class LogoutRequestDTO {
 
     @NotBlank
-    private String usuario;
-
-    @NotBlank
-    private String clave;
+    private String refreshToken;
 }

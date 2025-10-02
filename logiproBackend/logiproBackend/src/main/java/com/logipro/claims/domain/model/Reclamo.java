@@ -1,4 +1,4 @@
-package com.logipro.claims.domain;
+package com.logipro.claims.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;

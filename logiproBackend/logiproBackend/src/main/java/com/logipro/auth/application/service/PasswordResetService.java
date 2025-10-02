@@ -1,11 +1,11 @@
-package com.logipro.auth.service;
+package com.logipro.auth.application.service;
 
-import com.logipro.auth.domain.PasswordResetTokenEntity;
-import com.logipro.auth.infrastructure.PasswordResetTokenRepository;
+import com.logipro.auth.domain.model.PasswordResetTokenEntity;
+import com.logipro.auth.infrastructure.persistence.JpaPasswordResetTokenRepository;
 import com.logipro.shared.email.MailService;
 import com.logipro.users.domain.model.Usuario;
 import com.logipro.users.domain.repository.UsuarioRepository;
-import com.logipro.users.service.UsuarioService; // seguimos usando el cambio de clave del servicio
+import com.logipro.users.application.service.UsuarioService; // seguimos usando el cambio de clave del servicio
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PasswordResetService {
 
-    private final PasswordResetTokenRepository tokenRepository;
+    private final JpaPasswordResetTokenRepository tokenRepository;
     private final MailService mailService;
     private final UsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository; // ✅ agregado

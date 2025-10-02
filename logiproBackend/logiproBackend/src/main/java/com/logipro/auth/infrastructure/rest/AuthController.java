@@ -1,7 +1,8 @@
-package com.logipro.auth.controller;
+package com.logipro.auth.infrastructure.rest;
 
-import com.logipro.auth.dto.*;
-import com.logipro.auth.service.PasswordResetService;
+import com.logipro.auth.application.dto.request.*;
+import com.logipro.auth.application.dto.response.*;
+import com.logipro.auth.application.service.PasswordResetService;
 import com.logipro.config.security.jwt.JwtService;
 import com.logipro.config.security.jwt.RefreshTokenService;
 import com.logipro.users.domain.model.Usuario;

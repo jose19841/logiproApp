@@ -1,6 +1,6 @@
-package com.logipro.auth.infrastructure;
+package com.logipro.auth.infrastructure.persistence;
 
-import com.logipro.auth.domain.PasswordResetTokenEntity;
+import com.logipro.auth.domain.model.PasswordResetTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Repository
-public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetTokenEntity, Long> {
+public interface JpaPasswordResetTokenRepository extends JpaRepository<PasswordResetTokenEntity, Long> {
     /** Busca por hash  */
     Optional<PasswordResetTokenEntity> findByTokenHash(String tokenHash);
 

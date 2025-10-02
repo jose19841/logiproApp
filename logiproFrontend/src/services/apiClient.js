@@ -1,9 +1,2 @@
-import axios from "axios";
-
-const apiClient = axios.create({
-    baseURL: "http://localhost:8080", // puerto fijo
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
-export default apiClient;
+// STUB temporal - redirige a nueva ubicación
+export { default } from '@shared/services/apiClient'

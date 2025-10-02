@@ -3,7 +3,7 @@ package com.logipro.users.infrastructure.rest;
 import com.logipro.users.application.dto.request.RegistrarUsuarioRequestDTO;
 import com.logipro.users.application.dto.response.UsuarioResponseDTO;
 import com.logipro.users.domain.model.UserStatus;
-import com.logipro.users.service.UsuarioService;
+import com.logipro.users.application.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

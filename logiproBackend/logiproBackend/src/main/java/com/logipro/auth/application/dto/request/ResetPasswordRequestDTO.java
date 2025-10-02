@@ -1,4 +1,4 @@
-package com.logipro.auth.dto;
+package com.logipro.auth.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
