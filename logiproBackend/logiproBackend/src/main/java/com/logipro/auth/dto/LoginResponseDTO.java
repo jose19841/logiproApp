@@ -1,6 +1,6 @@
 package com.logipro.auth.dto;
 
-import com.logipro.users.controller.dto.UsuarioResponseDTO;
+import com.logipro.users.application.dto.response.UsuarioResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

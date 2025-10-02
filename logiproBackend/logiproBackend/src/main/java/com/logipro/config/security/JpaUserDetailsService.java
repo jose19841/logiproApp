@@ -1,8 +1,8 @@
 package com.logipro.config.security;
 
-import com.logipro.users.domain.UserStatus;
-import com.logipro.users.domain.Usuario;
-import com.logipro.users.infrastructure.UsuarioRepository;
+import com.logipro.users.domain.model.UserStatus;
+import com.logipro.users.domain.model.Usuario;
+import com.logipro.users.domain.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -3,8 +3,8 @@ package com.logipro.auth.service;
 import com.logipro.auth.domain.PasswordResetTokenEntity;
 import com.logipro.auth.infrastructure.PasswordResetTokenRepository;
 import com.logipro.shared.email.MailService;
-import com.logipro.users.domain.Usuario;
-import com.logipro.users.infrastructure.UsuarioRepository;
+import com.logipro.users.domain.model.Usuario;
+import com.logipro.users.domain.repository.UsuarioRepository;
 import com.logipro.users.service.UsuarioService; // seguimos usando el cambio de clave del servicio
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

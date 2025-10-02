@@ -1,12 +1,12 @@
 package com.logipro.users.service;
 
-import com.logipro.users.controller.dto.RegistrarUsuarioRequestDTO;
-import com.logipro.users.controller.dto.UsuarioResponseDTO;
-import com.logipro.users.domain.Usuario;
-import com.logipro.users.domain.UserStatus;
-import com.logipro.users.infrastructure.UsuarioRepository;
-import com.logipro.users.service.mapper.UsuarioMapper;
-import com.logipro.users.service.usecase.*;
+import com.logipro.users.application.dto.request.RegistrarUsuarioRequestDTO;
+import com.logipro.users.application.dto.response.UsuarioResponseDTO;
+import com.logipro.users.domain.model.Usuario;
+import com.logipro.users.domain.model.UserStatus;
+import com.logipro.users.domain.repository.UsuarioRepository;
+import com.logipro.users.application.mapper.UsuarioMapper;
+import com.logipro.users.application.usecase.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

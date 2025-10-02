@@ -1,7 +1,7 @@
 package com.logipro.config.security.jwt;
 
 import com.logipro.config.security.jwt.model.RefreshTokenEntity;   // (lo creamos en el siguiente paso)
-import com.logipro.config.security.jwt.repo.RefreshTokenRepository;
+import com.logipro.config.security.jwt.repository.RefreshTokenRepository;
 import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,8 +1,8 @@
 package com.logipro.config.security.jwt;
 
-import com.logipro.users.domain.UserStatus;
-import com.logipro.users.domain.Usuario;
-import com.logipro.users.infrastructure.UsuarioRepository;
+import com.logipro.users.domain.model.UserStatus;
+import com.logipro.users.domain.model.Usuario;
+import com.logipro.users.domain.repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

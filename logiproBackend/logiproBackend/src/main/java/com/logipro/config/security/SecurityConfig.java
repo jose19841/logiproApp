@@ -2,7 +2,7 @@ package com.logipro.config.security;
 
 import com.logipro.config.security.jwt.JwtAuthFilter;
 import com.logipro.config.security.jwt.JwtService;
-import com.logipro.users.infrastructure.UsuarioRepository;
+import com.logipro.users.domain.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

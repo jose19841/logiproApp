@@ -4,10 +4,10 @@ import com.logipro.auth.dto.*;
 import com.logipro.auth.service.PasswordResetService;
 import com.logipro.config.security.jwt.JwtService;
 import com.logipro.config.security.jwt.RefreshTokenService;
-import com.logipro.users.domain.Usuario;
-import com.logipro.users.infrastructure.UsuarioRepository;
-import com.logipro.users.controller.dto.UsuarioResponseDTO;
-import com.logipro.users.service.mapper.UsuarioMapper;
+import com.logipro.users.domain.model.Usuario;
+import com.logipro.users.domain.repository.UsuarioRepository;
+import com.logipro.users.application.dto.response.UsuarioResponseDTO;
+import com.logipro.users.application.mapper.UsuarioMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -72,7 +72,7 @@ public class AuthController {
             // Authorities resueltas por Spring Security (ROLE_*)
             List<String> roles = auth.getAuthorities().stream()
                     .map(a -> {
-                        String r = a.getAuthority();        // ej: ROLE_ADMIN
+                        String r = a.getAuthority();
                         return r.startsWith("ROLE_") ? r.substring(5) : r;
                     })
                     .collect(Collectors.toList());

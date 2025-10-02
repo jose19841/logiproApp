@@ -1,8 +1,8 @@
 package com.logipro.users.controller.controllers;
 
-import com.logipro.users.controller.dto.RegistrarUsuarioRequestDTO;
-import com.logipro.users.controller.dto.UsuarioResponseDTO;
-import com.logipro.users.domain.UserStatus;
+import com.logipro.users.application.dto.request.RegistrarUsuarioRequestDTO;
+import com.logipro.users.application.dto.response.UsuarioResponseDTO;
+import com.logipro.users.domain.model.UserStatus;
 import com.logipro.users.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.logipro.users.controller.dto.CambiarClaveRequestDTO;
-import com.logipro.users.infrastructure.UsuarioRepository;
+import com.logipro.users.application.dto.request.CambiarClaveRequestDTO;
+import com.logipro.users.domain.repository.UsuarioRepository;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
