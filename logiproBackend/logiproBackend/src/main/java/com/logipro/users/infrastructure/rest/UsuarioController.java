@@ -1,4 +1,4 @@
-package com.logipro.users.controller.controllers;
+package com.logipro.users.infrastructure.rest;
 
 import com.logipro.users.application.dto.request.RegistrarUsuarioRequestDTO;
 import com.logipro.users.application.dto.response.UsuarioResponseDTO;
