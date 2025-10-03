@@ -12,7 +12,7 @@ import RecoverPage from "@/modules/login/pages/RecoverPage.jsx";
 import ResetPage from "@/modules/login/pages/ResetPage.jsx";
 
 // Dashboard
-import Dashboard from "@/modules/dashboard/pages/DashboardPage.jsx";
+import Dashboard from "@/features/dashboard/pages/DashboardPage";
 
 // Users
 import UserCreateForm from "@/modules/users/components/UserCreateForm"; // alta
