@@ -2,6 +2,51 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useEdit from "@/features/users/hooks/useEdit";
 
+const PERSONAL_FIELDS = [
+  { name: "nombre", label: "Nombre", type: "text", maxLength: 100, required: true },
+  { name: "apellido", label: "Apellido", type: "text", maxLength: 100, required: true },
+  { name: "dni", label: "DNI", type: "text", maxLength: 25, required: true },
+  { name: "telefono", label: "Teléfono", type: "text", maxLength: 25 },
+  { name: "email", label: "Email", type: "email", maxLength: 100 },
+  { name: "domicilio", label: "Domicilio", type: "text", maxLength: 100 }
+];
+
+const Field = ({ field, value, onChange, disabled }) => (
+  <div className="col-md-6 col-lg-4">
+    <div className="mb-2">
+      <label className="form-label">{field.label}</label>
+      <input
+        type={field.type || "text"}
+        className="form-control"
+        name={field.name}
+        value={value}
+        onChange={onChange}
+        maxLength={field.maxLength}
+        minLength={field.minLength}
+        required={field.required}
+        disabled={disabled}
+      />
+      {field.helpText && <div className="form-text">{field.helpText}</div>}
+    </div>
+  </div>
+);
+
+const ButtonGroup = ({ id, saving, navigate }) => (
+  <div className="d-flex gap-2">
+    <button
+      type="button"
+      className="btn btn-outline-secondary"
+      onClick={() => navigate(`/usuarios/${id}`)}
+      disabled={saving}
+    >
+      Volver
+    </button>
+    <button type="submit" className="btn btn-primary" disabled={saving}>
+      {saving ? "Guardando..." : "Guardar cambios"}
+    </button>
+  </div>
+);
+
 export default function UserEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -26,127 +71,28 @@ export default function UserEdit() {
     );
   }
 
-  async function onSubmit(e) {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const ok = await submit();
     if (ok) navigate(`/usuarios/${id}`);
-  }
+  };
 
   return (
     <div className="container-fluid">
       <form className="card p-3 shadow-sm" onSubmit={onSubmit}>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="mb-0">Editar usuario</h5>
-          <div className="d-flex gap-2">
-            <button
-              type="button"
-              className="btn btn-outline-secondary"
-              onClick={() => navigate(`/usuarios/${id}`)}
-              disabled={saving}
-            >
-              Volver
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? "Guardando..." : "Guardar cambios"}
-            </button>
-          </div>
+          <ButtonGroup id={id} saving={saving} navigate={navigate} />
         </div>
 
-        {/* Datos personales */}
         <div className="row">
-          <div className="col-md-6 col-lg-4">
-            <div className="mb-2">
-              <label className="form-label">Nombre</label>
-              <input
-                type="text"
-                className="form-control"
-                name="nombre"
-                value={form.nombre}
-                onChange={onChange}
-                maxLength={100}
-                disabled={saving}
-                required
-              />
-            </div>
-          </div>
-          <div className="col-md-6 col-lg-4">
-            <div className="mb-2">
-              <label className="form-label">Apellido</label>
-              <input
-                type="text"
-                className="form-control"
-                name="apellido"
-                value={form.apellido}
-                onChange={onChange}
-                maxLength={100}
-                disabled={saving}
-                required
-              />
-            </div>
-          </div>
-          <div className="col-md-6 col-lg-4">
-            <div className="mb-2">
-              <label className="form-label">DNI</label>
-              <input
-                type="text"
-                className="form-control"
-                name="dni"
-                value={form.dni}
-                onChange={onChange}
-                maxLength={25}
-                disabled={saving}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="col-md-6 col-lg-4">
-            <div className="mb-2">
-              <label className="form-label">Teléfono</label>
-              <input
-                type="text"
-                className="form-control"
-                name="telefono"
-                value={form.telefono}
-                onChange={onChange}
-                maxLength={25}
-                disabled={saving}
-              />
-            </div>
-          </div>
-          <div className="col-md-6 col-lg-4">
-            <div className="mb-2">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                name="email"
-                value={form.email}
-                onChange={onChange}
-                maxLength={100}
-                disabled={saving}
-              />
-            </div>
-          </div>
-          <div className="col-md-6 col-lg-4">
-            <div className="mb-2">
-              <label className="form-label">Domicilio</label>
-              <input
-                type="text"
-                className="form-control"
-                name="domicilio"
-                value={form.domicilio}
-                onChange={onChange}
-                maxLength={100}
-                disabled={saving}
-              />
-            </div>
-          </div>
+          {PERSONAL_FIELDS.map(field => (
+            <Field key={field.name} field={field} value={form[field.name]} onChange={onChange} disabled={saving} />
+          ))}
         </div>
 
         <hr className="my-3" />
 
-        {/* Credenciales / Rol / Estado */}
         <div className="row">
           <div className="col-md-6 col-lg-4">
             <div className="mb-2">
@@ -164,7 +110,6 @@ export default function UserEdit() {
               <div className="form-text">El nombre de usuario no se puede cambiar.</div>
             </div>
           </div>
-
           <div className="col-md-6 col-lg-4">
             <div className="mb-2">
               <label className="form-label">Rol</label>
@@ -181,7 +126,6 @@ export default function UserEdit() {
               </select>
             </div>
           </div>
-
           <div className="col-md-6 col-lg-4">
             <div className="mb-2">
               <label className="form-label">Estado</label>
@@ -202,19 +146,8 @@ export default function UserEdit() {
           </div>
         </div>
 
-        {/* Botonera inferior (duplicada por accesibilidad) */}
         <div className="d-flex justify-content-end gap-2 mt-3">
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={() => navigate(`/usuarios/${id}`)}
-            disabled={saving}
-          >
-            Volver
-          </button>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? "Guardando..." : "Guardar cambios"}
-          </button>
+          <ButtonGroup id={id} saving={saving} navigate={navigate} />
         </div>
       </form>
     </div>
