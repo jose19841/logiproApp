@@ -4,6 +4,53 @@ import { useNavigate } from "react-router-dom";
 import { alertConfirm } from "@shared/components/alerts/swal";
 import useRegister from "@/features/users/hooks/useRegister";
 
+const INITIAL_FORM = {
+  nombre: "",
+  apellido: "",
+  dni: "",
+  telefono: "",
+  email: "",
+  domicilio: "",
+  usuario: "",
+  clave: "",
+  rol: "USER"
+};
+
+const PERSONAL_FIELDS = [
+  { name: "nombre", label: "Nombre", type: "text", maxLength: 100, required: true },
+  { name: "apellido", label: "Apellido", type: "text", maxLength: 100, required: true },
+  { name: "dni", label: "DNI", type: "text", maxLength: 25, required: true },
+  { name: "telefono", label: "Teléfono", type: "text", maxLength: 25 },
+  { name: "email", label: "Email", type: "email", maxLength: 100 },
+  { name: "domicilio", label: "Domicilio", type: "text", maxLength: 100 }
+];
+
+const CREDENTIAL_FIELDS = [
+  { name: "usuario", label: "Usuario", placeholder: "ej: admin", minLength: 4, maxLength: 20, required: true, helpText: "Entre 4 y 20 caracteres." },
+  { name: "clave", label: "Clave", type: "password", placeholder: "********", minLength: 8, maxLength: 20, required: true, helpText: "Entre 8 y 20 caracteres." }
+];
+
+const Field = ({ field, value, onChange, disabled }) => (
+  <div className="col-md-6 col-lg-4">
+    <div className="mb-2">
+      <label className="form-label">{field.label}</label>
+      <input
+        type={field.type || "text"}
+        className="form-control"
+        name={field.name}
+        value={value}
+        onChange={onChange}
+        placeholder={field.placeholder}
+        minLength={field.minLength}
+        maxLength={field.maxLength}
+        required={field.required}
+        disabled={disabled}
+      />
+      {field.helpText && <div className="form-text">{field.helpText}</div>}
+    </div>
+  </div>
+);
+
 /**
  * Props:
  *  - variant: "card" | "plain"
@@ -20,25 +67,14 @@ export default function UserCreateForm({
   const { submit, loading } = useRegister();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    nombre: "",
-    apellido: "",
-    dni: "",
-    telefono: "",
-    email: "",
-    domicilio: "",
-    usuario: "",
-    clave: "",
-    rol: "USER",
-    ...(initialValues || {})
-  });
+  const [form, setForm] = useState({ ...INITIAL_FORM, ...(initialValues || {}) });
 
-  function onChange(e) {
+  const onChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
-  }
+  };
 
-  async function onSubmit(e) {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const resConfirm = await alertConfirm(
       "¿Crear usuario?",
@@ -48,157 +84,27 @@ export default function UserCreateForm({
 
     const res = await submit(form);
     if (res.ok) {
-      setForm({
-        nombre: "",
-        apellido: "",
-        dni: "",
-        telefono: "",
-        email: "",
-        domicilio: "",
-        usuario: "",
-        clave: "",
-        rol: "USER"
-      });
+      setForm(INITIAL_FORM);
       onSuccess?.(res.data);
     }
-  }
+  };
 
   const Inner = (
     <>
       {variant === "card" && <h5 className="mb-3">Registrar usuario</h5>}
 
-      {/* Datos personales */}
       <div className="row">
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">Nombre</label>
-            <input
-              type="text"
-              className="form-control"
-              name="nombre"
-              value={form.nombre}
-              onChange={onChange}
-              maxLength={100}
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">Apellido</label>
-            <input
-              type="text"
-              className="form-control"
-              name="apellido"
-              value={form.apellido}
-              onChange={onChange}
-              maxLength={100}
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">DNI</label>
-            <input
-              type="text"
-              className="form-control"
-              name="dni"
-              value={form.dni}
-              onChange={onChange}
-              maxLength={25}
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">Teléfono</label>
-            <input
-              type="text"
-              className="form-control"
-              name="telefono"
-              value={form.telefono}
-              onChange={onChange}
-              maxLength={25}
-              disabled={loading}
-            />
-          </div>
-        </div>
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-control"
-              name="email"
-              value={form.email}
-              onChange={onChange}
-              maxLength={100}
-              disabled={loading}
-            />
-          </div>
-        </div>
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">Domicilio</label>
-            <input
-              type="text"
-              className="form-control"
-              name="domicilio"
-              value={form.domicilio}
-              onChange={onChange}
-              maxLength={100}
-              disabled={loading}
-            />
-          </div>
-        </div>
+        {PERSONAL_FIELDS.map(field => (
+          <Field key={field.name} field={field} value={form[field.name]} onChange={onChange} disabled={loading} />
+        ))}
       </div>
 
       <hr className="my-3" />
 
-      {/* Credenciales */}
       <div className="row">
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">Usuario</label>
-            <input
-              type="text"
-              className="form-control"
-              name="usuario"
-              value={form.usuario}
-              onChange={onChange}
-              placeholder="ej: admin"
-              minLength={4}
-              maxLength={20}
-              required
-              disabled={loading}
-            />
-            <div className="form-text">Entre 4 y 20 caracteres.</div>
-          </div>
-        </div>
-        <div className="col-md-6 col-lg-4">
-          <div className="mb-2">
-            <label className="form-label">Clave</label>
-            <input
-              type="password"
-              className="form-control"
-              name="clave"
-              value={form.clave}
-              onChange={onChange}
-              placeholder="********"
-              minLength={8}
-              maxLength={20}
-              required
-              disabled={loading}
-            />
-            <div className="form-text">Entre 8 y 20 caracteres.</div>
-          </div>
-        </div>
+        {CREDENTIAL_FIELDS.map(field => (
+          <Field key={field.name} field={field} value={form[field.name]} onChange={onChange} disabled={loading} />
+        ))}
         <div className="col-md-6 col-lg-4">
           <div className="mb-2">
             <label className="form-label">Rol</label>
@@ -217,7 +123,6 @@ export default function UserCreateForm({
         </div>
       </div>
 
-      {/* Botones */}
       {variant === "card" && (
         <div className="d-flex justify-content-end gap-2 mt-3">
           <button
