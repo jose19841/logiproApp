@@ -1,6 +1,6 @@
 import { getAccessToken } from "@shared/utils/session";
 import apiClient from "@shared/services/apiClient";
-import { refresh } from "@/services/auth.api";
+import { refresh } from "@shared/services/auth.api";
 
 /** 
  * Wrapper simple sobre apiClient.

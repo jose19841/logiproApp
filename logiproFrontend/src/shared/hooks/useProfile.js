@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUser, subscribe } from "@shared/utils/session";
 import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
-import { logout } from "@/services/auth.api";
+import { logout } from "@shared/services/auth.api";
 
 export default function useProfile() {
   const navigate = useNavigate();
