@@ -1,4 +1,4 @@
-import { getAccessToken } from "@/auth/session";
+import { getAccessToken } from "@shared/utils/session";
 import apiClient from "@shared/services/apiClient";
 import { refresh } from "@/services/auth.api";
 

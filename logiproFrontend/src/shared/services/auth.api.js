@@ -1,5 +1,5 @@
 // src/shared/services/auth.api.js
-import { clearAccessToken, setAccessToken, setUser } from "@/auth/session";
+import { clearAccessToken, setAccessToken, setUser } from "@shared/utils/session";
 import apiClient from "@shared/services/apiClient";
 import { httpRequest } from "@shared/services/httpService"; // ← wrapper con Authorization
 

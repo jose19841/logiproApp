@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUser, subscribe } from "@/auth/session";
+import { getUser, subscribe } from "@shared/utils/session";
 import { alertConfirm, alertError, alertSuccess } from "@/components/alerts/swal";
 import { logout } from "@/services/auth.api";
 
