@@ -2,7 +2,7 @@
 import DataTable from "@shared/components/DataTable";
 import { alertInfo as swalInfo } from "@shared/components/alerts/swal";
 
-import CardStat from "@/modules/dashboard/components/CardStat";
+import CardStat from "@/features/dashboard/components/CardStat";
 
 const alertInfo = swalInfo ?? ((msg) => window.alert(msg));
 
