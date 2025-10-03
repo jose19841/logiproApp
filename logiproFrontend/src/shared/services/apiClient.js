@@ -1,17 +1,21 @@
 import axios from "axios";
 import { getAccessToken, setAccessToken, getRefreshToken, clearAccessToken } from "@shared/utils/session";
 
-const apiClient = axios.create({
-  baseURL: "http://localhost:8080",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const BASE_URL = import.meta.env?.VITE_API_BASE_URL ?? "http://localhost:8080";
+const DEFAULT_HEADERS = { "Content-Type": "application/json" };
 
-let interceptorsRegistered = false;
-let refreshPromise = null;
+// Singleton global para HMR estable
+const g = globalThis;
+if (!g.__LOGIPRO_API_CLIENT__) {
+  g.__LOGIPRO_API_CLIENT__ = axios.create({
+    baseURL: BASE_URL,
+    headers: DEFAULT_HEADERS,
+  });
+}
+const apiClient = g.__LOGIPRO_API_CLIENT__;
 
-if (!interceptorsRegistered) {
+// Registrar interceptores una sola vez por instancia
+if (!apiClient.__INTERCEPTORS_REGISTERED__) {
   // Request interceptor: adjuntar Authorization header automáticamente
   apiClient.interceptors.request.use(
     (config) => {
@@ -31,27 +35,24 @@ if (!interceptorsRegistered) {
     async (error) => {
       const originalRequest = error.config;
 
-      // Solo manejar 401 y evitar loops infinitos
       if (error?.response?.status !== 401 || originalRequest._retry) {
         return Promise.reject(error);
       }
 
-      // Marcar para evitar reintentos infinitos
       originalRequest._retry = true;
 
-      // Carrera de refresh: usar promesa única
-      if (!refreshPromise) {
-        refreshPromise = (async () => {
+      // Promesa global única para refresh
+      if (!g.__LOGIPRO_REFRESH_PROMISE__) {
+        g.__LOGIPRO_REFRESH_PROMISE__ = (async () => {
           try {
             const refreshToken = getRefreshToken();
             if (!refreshToken) {
               throw new Error("No refresh token available");
             }
 
-            // Cliente bare sin interceptores para evitar ciclos
             const bareClient = axios.create({
-              baseURL: "http://localhost:8080",
-              headers: { "Content-Type": "application/json" },
+              baseURL: BASE_URL,
+              headers: DEFAULT_HEADERS,
             });
 
             const { data } = await bareClient.post("/auth/refresh", { refreshToken });
@@ -65,19 +66,17 @@ if (!interceptorsRegistered) {
             }
             throw new Error("No access token in refresh response");
           } catch (err) {
-            // Refresh falló: limpiar sesión y redirigir
             clearAccessToken();
             window.location.assign("/login");
             throw err;
           } finally {
-            refreshPromise = null;
+            g.__LOGIPRO_REFRESH_PROMISE__ = null;
           }
         })();
       }
 
       try {
-        const newToken = await refreshPromise;
-        // Actualizar header del request original y reintentar
+        const newToken = await g.__LOGIPRO_REFRESH_PROMISE__;
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
@@ -87,7 +86,7 @@ if (!interceptorsRegistered) {
     }
   );
 
-  interceptorsRegistered = true;
+  apiClient.__INTERCEPTORS_REGISTERED__ = true;
 }
 
 export default apiClient;
