@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
 import { useLogin } from "@/features/auth/hooks/useLogin";
-import "@/modules/login/styles/login.css";
+import "@/features/auth/styles/login.css";
 
 const USER_RE = /^[A-Za-z0-9]{4,20}$/; // alfanumérico 4–20
 const PASS_RE = /^.{8,}$/;             // mínimo 8 caracteres

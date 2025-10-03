@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
 import { recoverPassword } from "@shared/services/auth.api";
-import "@/modules/login/styles/login.css";
+import "@/features/auth/styles/login.css";
 
 const ID_RE = /^.{3,100}$/; // mínimo 3 caracteres (usuario o email)
 

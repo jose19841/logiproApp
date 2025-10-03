@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
 import { changePassword } from "@shared/services/auth.api";
-import "@/modules/login/styles/login.css";
+import "@/features/auth/styles/login.css";
 
 const PASS_RE = /^.{8,}$/; // mínimo 8
 
