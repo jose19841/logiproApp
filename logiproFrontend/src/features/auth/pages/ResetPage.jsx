@@ -5,78 +5,78 @@ import { alertError, alertSuccess, alertWarning } from "@shared/components/alert
 import { resetPassword } from "@shared/services/auth.api";
 import "@/features/auth/styles/login.css";
 
-const PASS_RE = /^.{8,}$/; // mínimo 8 caracteres
+const PASS_RE = /^.{8,}$/;
+
+const PasswordField = ({ id, label, placeholder, value, onChange, onBlur, show, onToggle, error, touched }) => (
+  <div className="mb-3">
+    <label htmlFor={id} className="form-label">{label}</label>
+    <div className="position-relative">
+      <input
+        id={id}
+        type={show ? "text" : "password"}
+        className={`form-control pe-5 ${touched && error ? "is-invalid" : ""}`}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        autoComplete="new-password"
+        required
+      />
+      <button
+        type="button"
+        className="btn btn-sm btn-outline-secondary toggle-pass-btn"
+        aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
+        onClick={onToggle}
+        tabIndex={-1}
+      >
+        {show ? "🙈" : "👁️"}
+      </button>
+      {touched && error && <div className="invalid-feedback d-block">{error}</div>}
+    </div>
+  </div>
+);
 
 export default function ResetPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  // 1) Leemos el token del querystring una sola vez
   const tokenFromUrl = useMemo(() => searchParams.get("token") || "", [searchParams]);
   const [token, setToken] = useState(tokenFromUrl);
 
-  // 2) Limpiamos la URL para que el token no quede visible en la barra
   useEffect(() => {
     if (tokenFromUrl) {
       const url = new URL(window.location.href);
       url.searchParams.delete("token");
       window.history.replaceState({}, document.title, url.pathname + url.search);
     }
-    // Guardamos el token leído en memoria
     setToken(tokenFromUrl);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenFromUrl]);
 
-  const [nueva, setNueva] = useState("");
-  const [repetir, setRepetir] = useState("");
-
-  const [touchedN, setTouchedN] = useState(false);
-  const [touchedR, setTouchedR] = useState(false);
-
-  const [showN, setShowN] = useState(false);
-  const [showR, setShowR] = useState(false);
-
+  const [form, setForm] = useState({ nueva: "", repetir: "" });
+  const [touched, setTouched] = useState({ nueva: false, repetir: false });
+  const [show, setShow] = useState({ nueva: false, repetir: false });
   const [submitting, setSubmitting] = useState(false);
 
-  // Validaciones
   const errToken = !token ? "El enlace es inválido o está incompleto." : "";
-  const errNueva =
-    !nueva ? "Ingresá tu nueva contraseña."
-    : !PASS_RE.test(nueva) ? "La nueva contraseña debe tener al menos 8 caracteres."
-    : "";
-  const errRepetir =
-    !repetir ? "Repetí la nueva contraseña."
-    : (nueva && repetir && nueva !== repetir) ? "Las contraseñas no coinciden."
-    : "";
-
+  const errNueva = !form.nueva ? "Ingresá tu nueva contraseña." : !PASS_RE.test(form.nueva) ? "La nueva contraseña debe tener al menos 8 caracteres." : "";
+  const errRepetir = !form.repetir ? "Repetí la nueva contraseña." : (form.nueva && form.repetir && form.nueva !== form.repetir) ? "Las contraseñas no coinciden." : "";
   const isValid = !errToken && !errNueva && !errRepetir;
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setTouchedN(true);
-    setTouchedR(true);
-
+    setTouched({ nueva: true, repetir: true });
     if (!isValid) {
       await alertWarning("Datos inválidos", "Revisá los campos marcados en rojo.");
       return;
     }
-
     try {
       setSubmitting(true);
-      const ok = await resetPassword(token.trim(), nueva);
-      if (ok) {
-        await alertSuccess("Contraseña actualizada", "Ya podés iniciar sesión con tu nueva clave.");
-        navigate("/login");
-        return;
-      }
-      // fallback conservador
+      await resetPassword(token.trim(), form.nueva);
       await alertSuccess("Contraseña actualizada", "Ya podés iniciar sesión con tu nueva clave.");
       navigate("/login");
     } catch (err) {
       const status = err?.response?.status;
-      const raw = err?.response?.data;
-      const msg = (raw?.mensaje || raw?.message || "No se pudo restablecer la contraseña").toString();
-
+      const msg = (err?.response?.data?.mensaje || err?.response?.data?.message || "No se pudo restablecer la contraseña").toString();
       if (status === 400) {
         await alertWarning("No se pudo restablecer", msg || "Token inválido o expirado.");
         return;
@@ -85,7 +85,7 @@ export default function ResetPage() {
     } finally {
       setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="login-root">
@@ -99,8 +99,6 @@ export default function ResetPage() {
                 <p className="text-muted mb-3">
                   Ingresá tu <strong>nueva</strong> contraseña y confirmala.
                 </p>
-
-                {/* Estado del enlace/token sin exponerlo */}
                 {token ? (
                   <div className="alert alert-success py-2" role="status" aria-live="polite">
                     Enlace verificado. Podés continuar.
@@ -114,64 +112,31 @@ export default function ResetPage() {
                     .
                   </div>
                 )}
-
                 <form onSubmit={handleSubmit} noValidate>
-                  {/* Nueva contraseña */}
-                  <div className="mb-3">
-                    <label htmlFor="nueva" className="form-label">Nueva contraseña</label>
-                    <div className="position-relative">
-                      <input
-                        id="nueva"
-                        type={showN ? "text" : "password"}
-                        className={`form-control pe-5 ${touchedN && errNueva ? "is-invalid" : ""}`}
-                        placeholder="mínimo 8 caracteres"
-                        value={nueva}
-                        onChange={(e) => setNueva(e.target.value)}
-                        onBlur={() => setTouchedN(true)}
-                        autoComplete="new-password"
-                        required
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-secondary toggle-pass-btn"
-                        aria-label={showN ? "Ocultar contraseña" : "Mostrar contraseña"}
-                        onClick={() => setShowN((v) => !v)}
-                        tabIndex={-1}
-                      >
-                        {showN ? "🙈" : "👁️"}
-                      </button>
-                      {touchedN && errNueva && <div className="invalid-feedback d-block">{errNueva}</div>}
-                    </div>
-                  </div>
-
-                  {/* Repetir nueva */}
-                  <div className="mb-3">
-                    <label htmlFor="repetir" className="form-label">Repetir nueva contraseña</label>
-                    <div className="position-relative">
-                      <input
-                        id="repetir"
-                        type={showR ? "text" : "password"}
-                        className={`form-control pe-5 ${touchedR && errRepetir ? "is-invalid" : ""}`}
-                        placeholder="repetí la nueva contraseña"
-                        value={repetir}
-                        onChange={(e) => setRepetir(e.target.value)}
-                        onBlur={() => setTouchedR(true)}
-                        autoComplete="new-password"
-                        required
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-secondary toggle-pass-btn"
-                        aria-label={showR ? "Ocultar contraseña" : "Mostrar contraseña"}
-                        onClick={() => setShowR((v) => !v)}
-                        tabIndex={-1}
-                      >
-                        {showR ? "🙈" : "👁️"}
-                      </button>
-                      {touchedR && errRepetir && <div className="invalid-feedback d-block">{errRepetir}</div>}
-                    </div>
-                  </div>
-
+                  <PasswordField
+                    id="nueva"
+                    label="Nueva contraseña"
+                    placeholder="mínimo 8 caracteres"
+                    value={form.nueva}
+                    onChange={(e) => setForm({ ...form, nueva: e.target.value })}
+                    onBlur={() => setTouched({ ...touched, nueva: true })}
+                    show={show.nueva}
+                    onToggle={() => setShow({ ...show, nueva: !show.nueva })}
+                    error={errNueva}
+                    touched={touched.nueva}
+                  />
+                  <PasswordField
+                    id="repetir"
+                    label="Repetir nueva contraseña"
+                    placeholder="repetí la nueva contraseña"
+                    value={form.repetir}
+                    onChange={(e) => setForm({ ...form, repetir: e.target.value })}
+                    onBlur={() => setTouched({ ...touched, repetir: true })}
+                    show={show.repetir}
+                    onToggle={() => setShow({ ...show, repetir: !show.repetir })}
+                    error={errRepetir}
+                    touched={touched.repetir}
+                  />
                   <button
                     type="submit"
                     className="btn btn-primary w-100"
@@ -182,13 +147,11 @@ export default function ResetPage() {
                     {submitting ? "Guardando..." : "Restablecer contraseña"}
                   </button>
                 </form>
-
                 <div className="text-center mt-3">
                   <Link to="/login" className="forgot-link">Volver a Iniciar sesión</Link>
                 </div>
               </div>
             </div>
-
             <div className="text-center mt-3 text-white-50">
               <small>© {new Date().getFullYear()} LogiPro</small>
             </div>
