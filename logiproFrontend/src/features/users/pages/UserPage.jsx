@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "@shared/utils/session";
 import { alertWarning } from "@shared/components/alerts/swal";
-import UserList from "@/modules/users/pages/UserList";
+import UserList from "@/features/users/pages/UserList";
 
 export default function UserPage() {
   const navigate = useNavigate();
