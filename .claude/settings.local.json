@@ -12,7 +12,10 @@
       "Bash(cat:*)",
       "Bash(git grep:*)",
       "Bash(git rm:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(for file in \"footer/Footer\" \"header/Header\" \"header/UserProfileMenu\" \"modal/Modal\" \"sidebar/Sidebar\")",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
