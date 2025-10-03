@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import useProfile from "@shared/hooks/useProfile";
-import ChangePasswordModal from "@/modules/users/components/ChangePasswordModal";
+import ChangePasswordModal from "@/features/users/components/ChangePasswordModal";
 import { logout } from "@/services/auth.api"; 
 
 export default function UserProfileMenu() {

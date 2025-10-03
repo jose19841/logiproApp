@@ -15,10 +15,10 @@ import ResetPage from "@/features/auth/pages/ResetPage";
 import Dashboard from "@/features/dashboard/pages/DashboardPage";
 
 // Users
-import UserCreateForm from "@/modules/users/components/UserCreateForm"; // alta
-import UserDetail from "@/modules/users/pages/UserDetail.jsx"; // detalle
-import UserEdit from "@/modules/users/pages/UserEdit.jsx"; // edición
-import UserPage from "@/modules/users/pages/UserPage.jsx"; // ⬅️ página con check de ADMIN + SweetAlert2 + UserList
+import UserCreateForm from "@/features/users/components/UserCreateForm"; // alta
+import UserDetail from "@/features/users/pages/UserDetail"; // detalle
+import UserEdit from "@/features/users/pages/UserEdit"; // edición
+import UserPage from "@/features/users/pages/UserPage"; // ⬅️ página con check de ADMIN + SweetAlert2 + UserList
 
 export default function AppRouter() {
   return (
