@@ -4,12 +4,12 @@ import RequireAuth from "@shared/components/RequireAuth";
 import MainLayout from "@shared/layouts/MainLayout";
 
 // Página de login
-import LoginPage from "@/modules/login/pages/LoginPage";
+import LoginPage from "@/features/auth/pages/LoginPage";
 
 // Password flow (recuperación / cambio)
-import ChangePasswordPage from "@/modules/login/pages/ChangePasswordPage.jsx";
-import RecoverPage from "@/modules/login/pages/RecoverPage.jsx";
-import ResetPage from "@/modules/login/pages/ResetPage.jsx";
+import ChangePasswordPage from "@/features/auth/pages/ChangePasswordPage";
+import RecoverPage from "@/features/auth/pages/RecoverPage";
+import ResetPage from "@/features/auth/pages/ResetPage";
 
 // Dashboard
 import Dashboard from "@/features/dashboard/pages/DashboardPage";
