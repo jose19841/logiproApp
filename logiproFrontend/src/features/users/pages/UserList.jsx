@@ -5,6 +5,18 @@ import DataTable from "@shared/components/DataTable";
 import useList from "@/features/users/hooks/useList";
 
 export default function UserList() {
+  const getEstadoBadgeClass = (estado) => {
+    const map = {
+      ACTIVO: "bg-success",
+      INACTIVO: "bg-secondary",
+      SUSPENDIDO: "bg-danger"
+    };
+    return `badge ${map[estado] || "bg-info"}`;
+  };
+
+  const ESTADOS = ["ACTIVO", "INACTIVO", "SUSPENDIDO"];
+  const ESTADO_ICONS = { ACTIVO: "bg-success", INACTIVO: "bg-secondary", SUSPENDIDO: "bg-danger" };
+
   const navigate = useNavigate();
   const { rows, loading, err, reload, changeState, showStatesFor, toggleStatesMenu } = useList();
   const [selectedUser, setSelectedUser] = useState(null);
@@ -20,17 +32,7 @@ export default function UserList() {
         label: "Estado",
         sortable: true,
         align: "center",
-        render: (value) => {
-          const cls =
-            value === "ACTIVO"
-              ? "badge bg-success"
-              : value === "INACTIVO"
-              ? "badge bg-secondary"
-              : value === "SUSPENDIDO"
-              ? "badge bg-danger"
-              : "badge bg-info";
-          return <span className={cls}>{value ?? "-"}</span>;
-        },
+        render: (value) => <span className={getEstadoBadgeClass(value)}>{value ?? "-"}</span>,
       },
       {
         key: "acciones",
@@ -50,7 +52,6 @@ export default function UserList() {
               ⋮
             </button>
             <ul className="dropdown-menu dropdown-menu-end shadow-sm" style={{minWidth: '200px'}}>
-              {/* Ver detalles */}
               <li>
                 <button
                   className="dropdown-item d-flex align-items-center gap-2 py-2"
@@ -63,7 +64,6 @@ export default function UserList() {
 
               <li><hr className="dropdown-divider" /></li>
 
-              {/* Cambiar estado - Expandible */}
               <li>
                 <button
                   className="dropdown-item d-flex align-items-center gap-2 py-2"
@@ -79,50 +79,26 @@ export default function UserList() {
                 </button>
               </li>
 
-              {/* Estados - Se muestran solo si está expandido */}
               {showStatesFor === row.id && (
                 <>
-                  <li>
-                    <button
-                      className={`dropdown-item ps-5 d-flex align-items-center gap-2 py-1 ${row.estado === "ACTIVO" ? "active" : ""}`}
-                      onClick={() => changeState(row, "ACTIVO")}
-                      disabled={row.estado === "ACTIVO"}
-                    >
-                      <span className="badge bg-success" style={{width: '8px', height: '8px', borderRadius: '50%'}}></span>
-                      Activo
-                      {row.estado === "ACTIVO" && <i className="bi bi-check-lg ms-auto text-success"></i>}
-                    </button>
-                  </li>
-                  
-                  <li>
-                    <button
-                      className={`dropdown-item ps-5 d-flex align-items-center gap-2 py-1 ${row.estado === "INACTIVO" ? "active" : ""}`}
-                      onClick={() => changeState(row, "INACTIVO")}
-                      disabled={row.estado === "INACTIVO"}
-                    >
-                      <span className="badge bg-secondary" style={{width: '8px', height: '8px', borderRadius: '50%'}}></span>
-                      Inactivo
-                      {row.estado === "INACTIVO" && <i className="bi bi-check-lg ms-auto text-success"></i>}
-                    </button>
-                  </li>
-                  
-                  <li>
-                    <button
-                      className={`dropdown-item ps-5 d-flex align-items-center gap-2 py-1 ${row.estado === "SUSPENDIDO" ? "active" : ""}`}
-                      onClick={() => changeState(row, "SUSPENDIDO")}
-                      disabled={row.estado === "SUSPENDIDO"}
-                    >
-                      <span className="badge bg-danger" style={{width: '8px', height: '8px', borderRadius: '50%'}}></span>
-                      Suspendido
-                      {row.estado === "SUSPENDIDO" && <i className="bi bi-check-lg ms-auto text-success"></i>}
-                    </button>
-                  </li>
+                  {ESTADOS.map(estado => (
+                    <li key={estado}>
+                      <button
+                        className={`dropdown-item ps-5 d-flex align-items-center gap-2 py-1 ${row.estado === estado ? "active" : ""}`}
+                        onClick={() => changeState(row, estado)}
+                        disabled={row.estado === estado}
+                      >
+                        <span className={`badge ${ESTADO_ICONS[estado]}`} style={{width: '8px', height: '8px', borderRadius: '50%'}}></span>
+                        {estado.charAt(0) + estado.slice(1).toLowerCase()}
+                        {row.estado === estado && <i className="bi bi-check-lg ms-auto text-success"></i>}
+                      </button>
+                    </li>
+                  ))}
                 </>
               )}
 
               <li><hr className="dropdown-divider" /></li>
 
-              {/* Editar */}
               <li>
                 <button
                   className="dropdown-item d-flex align-items-center gap-2 py-2"
@@ -144,9 +120,8 @@ export default function UserList() {
 
   return (
     <div className="container-fluid">
-      {/* Toolbar (sin título) */}
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <div /> {/* spacer para empujar los botones a la derecha */}
+        <div />
         <div className="d-flex gap-2">
           <button
             className="btn btn-primary"
@@ -173,7 +148,6 @@ export default function UserList() {
         rowKey="id"
       />
 
-      {/* Modal de detalles del usuario */}
       {selectedUser && (
         <div 
           className="modal fade show" 
@@ -197,7 +171,6 @@ export default function UserList() {
               
               <div className="modal-body">
                 <div className="row g-3">
-                  {/* Información básica */}
                   <div className="col-12">
                     <div className="card border-0 bg-light">
                       <div className="card-body">
@@ -231,7 +204,6 @@ export default function UserList() {
                     </div>
                   </div>
 
-                  {/* Información del sistema */}
                   <div className="col-12">
                     <div className="card border-0 bg-light">
                       <div className="card-body">
@@ -257,11 +229,7 @@ export default function UserList() {
                           <div className="col-md-4">
                             <label className="form-label text-muted small">Estado</label>
                             <p className="fw-semibold mb-2">
-                              <span className={`badge ${
-                                selectedUser.estado === 'ACTIVO' ? 'bg-success' :
-                                selectedUser.estado === 'INACTIVO' ? 'bg-secondary' :
-                                selectedUser.estado === 'SUSPENDIDO' ? 'bg-danger' : 'bg-info'
-                              }`}>
+                              <span className={getEstadoBadgeClass(selectedUser.estado)}>
                                 {selectedUser.estado}
                               </span>
                             </p>
