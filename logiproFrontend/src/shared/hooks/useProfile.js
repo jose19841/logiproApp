@@ -1,17 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUser, subscribe } from "@shared/utils/session";
+import { useAuth } from "@/features/auth/context/AuthContext";
 import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
-import { logout } from "@shared/services/auth.api";
 
 export default function useProfile() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(getUser());
-
-  useEffect(() => {
-    const unsub = subscribe(() => setUser(getUser()));
-    return () => unsub();
-  }, []);
+  const { user, logout } = useAuth();
 
   // ✅ Inicial robusta: siempre string, 1er char en mayúscula, fallback "?"
   const initial = useMemo(() => {
@@ -24,7 +18,7 @@ export default function useProfile() {
     if (!res.isConfirmed) return { ok: false, cancelled: true };
 
     try {
-      await logout(); // POST /auth/logout-all + limpiar sesión cliente
+      await logout(); // logout del contexto (POST /auth/logout-all + limpiar sesión)
       await alertSuccess("Sesión cerrada", "Volvé a iniciar sesión cuando quieras.");
       navigate("/login", { replace: true });
       return { ok: true };

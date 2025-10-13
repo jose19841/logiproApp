@@ -6,7 +6,7 @@ import {
   alertSuccess,
   alertWarning,
 } from "@shared/components/alerts/swal";
-import { fetchUserById, updateUser } from "@/features/users/services/userList";
+import { fetchUserById, updateUser, changeUserState } from "@/features/users/services/userList";
 
 /**
  * Hook de edición de usuario.
@@ -29,6 +29,7 @@ export default function useEdit(userId) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [initialState, setInitialState] = useState("ACTIVO"); // Estado inicial para detectar cambios
 
   const mapFromApi = useCallback((u) => {
     // 🔍 DEBUG: Ver qué datos trae el backend
@@ -58,7 +59,9 @@ export default function useEdit(userId) {
         alertWarning("Usuario no encontrado");
         return;
       }
-      setForm(mapFromApi(data));
+      const mappedData = mapFromApi(data);
+      setForm(mappedData);
+      setInitialState(mappedData.estado); // Guardar estado inicial
     } catch (e) {
       console.error("❌ Error al cargar usuario:", e);
       alertError("No se pudo cargar el usuario");
@@ -92,25 +95,32 @@ export default function useEdit(userId) {
 
     try {
       setSaving(true);
-      
-      // 🔥 NUEVO: Solo envía campos que acepta RegistrarUsuarioRequestDTO
+
+      // Solo envía campos que acepta RegistrarUsuarioRequestDTO
       const payload = {
         nombre: form.nombre,
         apellido: form.apellido,
         dni: form.dni,
-        telefono: form.telefono || "", // Convertir null/undefined a string vacío
+        telefono: form.telefono || "",
         email: form.email || "",
         domicilio: form.domicilio || "",
         usuario: form.usuario,
         clave: "TempPassword123!", // Campo requerido - considera mejorarlo
         rol: form.rol
-        // ❌ NO envíes 'estado' - se maneja con PATCH /estado separado
       };
-      
+
       console.log("🔍 Payload enviado:", payload);
       console.log("🔍 ID del usuario:", userId);
-      
+
+      // 1. Actualizar datos del usuario (PUT)
       await updateUser(userId, payload);
+
+      // 2. Si el estado cambió, actualizar con PATCH
+      if (form.estado !== initialState) {
+        console.log(`🔄 Cambiando estado de ${initialState} a ${form.estado}`);
+        await changeUserState(userId, form.estado);
+      }
+
       await alertSuccess("Actualizado", "Los datos del usuario fueron guardados.");
       return true;
     } catch (e) {
@@ -122,7 +132,7 @@ export default function useEdit(userId) {
     } finally {
       setSaving(false);
     }
-  }, [userId, form]);
+  }, [userId, form, initialState]);
 
   return {
     form,

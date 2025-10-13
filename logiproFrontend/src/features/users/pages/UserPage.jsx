@@ -1,14 +1,14 @@
 // src/features/users/pages/UserPage.jsx
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUser } from "@shared/utils/session";
+import { useAuth } from "@/features/auth/context/AuthContext";
 import { alertWarning } from "@shared/components/alerts/swal";
 import UserList from "@/features/users/pages/UserList";
 
 export default function UserPage() {
   const navigate = useNavigate();
-  const me = getUser();
-  const isAdmin = me?.rol === "ADMIN";
+  const { user } = useAuth();
+  const isAdmin = user?.rol === "ADMIN";
 
   useEffect(() => {
     if (!isAdmin) {

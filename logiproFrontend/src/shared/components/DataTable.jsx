@@ -51,8 +51,8 @@ export default function DataTable({
   };
 
   return (
-    <div className="card shadow-sm">
-      <div className="card-body">
+    <div className="card shadow-sm" style={{overflow: 'visible'}}>
+      <div className="card-body" style={{overflow: 'visible'}}>
         {loading && (
           <div className="d-flex align-items-center gap-2 text-muted">
             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -67,7 +67,7 @@ export default function DataTable({
         )}
 
         {!loading && !error && (
-          <div className="table-responsive">
+          <div className="table-responsive" style={{overflow: 'visible'}}>
             <table className="table align-middle">
               <thead>
                 <tr>

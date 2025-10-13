@@ -1,15 +1,14 @@
 
 import { useNavigate } from "react-router-dom";
-import useProfile from "@shared/hooks/useProfile";
+import { useAuth } from "@/features/auth/context/AuthContext";
 import ChangePasswordModal from "@/features/users/components/ChangePasswordModal";
-import { logout } from "@shared/services/auth.api"; 
 
 export default function UserProfileMenu() {
-  const { user } = useProfile(); 
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   if (!user) return null;
 
-  
+
   const initial =
     (user?.usuario?.toString().trim().charAt(0).toUpperCase()) || "?";
 

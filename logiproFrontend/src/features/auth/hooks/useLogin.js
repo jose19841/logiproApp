@@ -1,60 +1,23 @@
 // src/features/auth/hooks/useLogin.js
-import { useCallback, useState } from "react";
-import { setUser } from "@shared/utils/session";
-import { login as loginApi } from "@shared/services/auth.api";
+// ⚠️ DEPRECATED: Use useAuth from AuthContext instead
+// This is a compatibility shim for legacy code
+
+import { useState } from "react";
+import { useAuth } from "@/features/auth/context/AuthContext";
 
 export function useLogin() {
+  const { login: contextLogin } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const login = useCallback(async (creds) => {
-    // soporta {usuario, clave} o {username, password}
-    const usuario = creds?.usuario ?? creds?.username ?? "";
-    const clave   = creds?.clave   ?? creds?.password ?? "";
-
+  const login = async (creds) => {
     setLoading(true);
     try {
-      const res = await loginApi(usuario, clave);
-      if (res?.user) setUser(res.user);
+      const res = await contextLogin(creds);
       return res;
-    } catch (err) {
-      // Normalizamos errores para la UI
-      const status = err?.response?.status;
-      const raw = err?.response?.data;
-      const msg = (raw?.mensaje || raw?.message || "").toString();
-
-      // 🚫 Usuario inactivo/suspendido: SOLO 403 o mensaje explícito
-      const esNoActivoPorStatus = status === 403; // <- clave: solo 403 = inactivo
-      const esNoActivoPorMensaje = /inactiv|suspendid/i.test(msg);
-
-      if (esNoActivoPorStatus || esNoActivoPorMensaje) {
-        const e = new Error("Usuario inactivo");
-        e.code = "USER_INACTIVE";
-        e.usuario = usuario;
-        throw e;
-      }
-
-      // 🔐 Credenciales inválidas (clave o usuario)
-      if (status === 401) {
-        const e = new Error("Usuario o contraseña incorrectos");
-        e.code = "BAD_CREDENTIALS";
-        e.usuario = usuario;
-        throw e;
-      }
-
-      // Otros 4xx: mantener error original para que la página decida
-      if (status >= 400 && status < 500) {
-        const e = new Error(msg || "Error en la solicitud");
-        e.code = "CLIENT_ERROR";
-        e.status = status;
-        throw e;
-      }
-
-      // Resto (5xx, red, etc.)
-      throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   return { login, loading };
 }

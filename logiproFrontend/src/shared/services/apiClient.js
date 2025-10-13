@@ -1,11 +1,96 @@
+// src/shared/services/apiClient.js
+// Unified HTTP client with token management, auth interceptors, and auto-refresh
 import axios from "axios";
-import { getAccessToken, setAccessToken, getRefreshToken, clearAccessToken } from "@shared/utils/session";
 
 const BASE_URL = import.meta.env?.VITE_API_BASE_URL ?? "http://localhost:8080";
 const DEFAULT_HEADERS = { "Content-Type": "application/json" };
 
-// Singleton global para HMR estable
+// ============================================================================
+// TOKEN & USER STORAGE (unified from session.js)
+// ============================================================================
+
+let accessToken = null;
+const listeners = new Set();
+
+/** Set access token in memory and sessionStorage, notify subscribers */
+export function setAccessToken(token) {
+  accessToken = token || null;
+
+  if (token) {
+    sessionStorage.setItem("accessToken", token);
+  } else {
+    sessionStorage.removeItem("accessToken");
+  }
+
+  for (const fn of listeners) {
+    try { fn(accessToken); } catch { /* noop */ }
+  }
+}
+
+/** Get access token (memory -> sessionStorage -> localStorage) */
+export function getAccessToken() {
+  return (
+    accessToken ||
+    sessionStorage.getItem("accessToken") ||
+    localStorage.getItem("accessToken") ||
+    null
+  );
+}
+
+/** Clear all tokens and user data (logout / refresh failed) */
+export function clearAccessToken() {
+  accessToken = null;
+  sessionStorage.removeItem("accessToken");
+  sessionStorage.removeItem("refreshToken");
+  sessionStorage.removeItem("user");
+  for (const fn of listeners) {
+    try { fn(null); } catch { /* noop */ }
+  }
+}
+
+/** Subscribe to token changes. Returns unsubscribe function. */
+export function subscribe(fn) {
+  if (typeof fn === "function") {
+    listeners.add(fn);
+    return () => listeners.delete(fn);
+  }
+  return () => {};
+}
+
+/** Save/read refresh token in sessionStorage */
+export function setRefreshToken(token) {
+  if (token) sessionStorage.setItem("refreshToken", token);
+  else sessionStorage.removeItem("refreshToken");
+}
+
+export function getRefreshToken() {
+  return sessionStorage.getItem("refreshToken") || null;
+}
+
+/** Save user in sessionStorage */
+export function setUser(user) {
+  if (user) sessionStorage.setItem("user", JSON.stringify(user));
+  else sessionStorage.removeItem("user");
+}
+
+/** Read user from sessionStorage (with fallback to localStorage) */
+export function getUser() {
+  const raw =
+    sessionStorage.getItem("user") || localStorage.getItem("user") || null;
+  try {
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+// ============================================================================
+// HTTP CLIENT (singleton with interceptors)
+// ============================================================================
+
 const g = globalThis;
+
+// Singleton for HMR stability
 if (!g.__LOGIPRO_API_CLIENT__) {
   g.__LOGIPRO_API_CLIENT__ = axios.create({
     baseURL: BASE_URL,
@@ -14,9 +99,9 @@ if (!g.__LOGIPRO_API_CLIENT__) {
 }
 const apiClient = g.__LOGIPRO_API_CLIENT__;
 
-// Registrar interceptores una sola vez por instancia
+// Register interceptors once per instance
 if (!apiClient.__INTERCEPTORS_REGISTERED__) {
-  // Request interceptor: adjuntar Authorization header automáticamente
+  // Request interceptor: auto-attach Authorization header
   apiClient.interceptors.request.use(
     (config) => {
       const token = getAccessToken();
@@ -29,7 +114,7 @@ if (!apiClient.__INTERCEPTORS_REGISTERED__) {
     (error) => Promise.reject(error)
   );
 
-  // Response interceptor: manejar 401 con refresh automático
+  // Response interceptor: handle 401 with auto-refresh
   apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -41,7 +126,7 @@ if (!apiClient.__INTERCEPTORS_REGISTERED__) {
 
       originalRequest._retry = true;
 
-      // Promesa global única para refresh
+      // Global unique refresh promise (prevents concurrent refresh calls)
       if (!g.__LOGIPRO_REFRESH_PROMISE__) {
         g.__LOGIPRO_REFRESH_PROMISE__ = (async () => {
           try {
@@ -50,6 +135,7 @@ if (!apiClient.__INTERCEPTORS_REGISTERED__) {
               throw new Error("No refresh token available");
             }
 
+            // Bare axios client (no interceptors)
             const bareClient = axios.create({
               baseURL: BASE_URL,
               headers: DEFAULT_HEADERS,
@@ -60,7 +146,7 @@ if (!apiClient.__INTERCEPTORS_REGISTERED__) {
             if (data?.accessToken) {
               setAccessToken(data.accessToken);
               if (data?.refreshToken) {
-                sessionStorage.setItem("refreshToken", data.refreshToken);
+                setRefreshToken(data.refreshToken);
               }
               return data.accessToken;
             }

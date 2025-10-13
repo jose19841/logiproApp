@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -85,12 +86,22 @@ public class AuthController {
 
             return ResponseEntity.ok(new LoginResponseDTO(accessToken, refreshToken, userDto));
 
+        } catch (DisabledException e) {
+            // Usuario inactivo/suspendido - buscar el estado real
+            Usuario usuario = usuarioRepository.findByUsuario(req.getUsuario()).orElse(null);
+            String estadoStr = (usuario != null && usuario.getEstado() != null)
+                ? usuario.getEstado().name()
+                : "INACTIVO";
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                String.format("El usuario '%s' está %s y no puede iniciar sesión", req.getUsuario(), estadoStr)
+            );
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
         } catch (UsernameNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
         } catch (AuthenticationException e) {
-            // Disabled, Locked, etc.
+            // Locked, etc.
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
         } catch (IllegalArgumentException e) {
             // Mensaje típico del DelegatingPasswordEncoder cuando falta prefijo

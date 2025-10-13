@@ -1,9 +1,11 @@
 // src/shared/services/auth.api.js
-import { clearAccessToken, setAccessToken, setUser } from "@shared/utils/session";
-import apiClient from "@shared/services/apiClient";
-import { httpRequest } from "@shared/services/httpService"; // ← wrapper con Authorization
-
-// 👉 URL base ya la maneja apiClient con VITE_API_URL
+import apiClient, {
+  clearAccessToken,
+  setAccessToken,
+  setRefreshToken,
+  setUser,
+  getRefreshToken,
+} from "@shared/services/apiClient";
 
 // Login: recibe credenciales, guarda tokens y devuelve user
 export async function login(usuario, clave) {
@@ -11,7 +13,7 @@ export async function login(usuario, clave) {
   const { data } = await apiClient.post("/auth/login", { usuario, clave });
 
   if (data?.accessToken) setAccessToken(data.accessToken);
-  if (data?.refreshToken) sessionStorage.setItem("refreshToken", data.refreshToken);
+  if (data?.refreshToken) setRefreshToken(data.refreshToken);
   if (data?.user) setUser(data.user);
 
   return data; // { accessToken, refreshToken, user }
@@ -19,24 +21,23 @@ export async function login(usuario, clave) {
 
 // Refresh: rota access y refresh
 export async function refresh() {
-  const refreshToken = sessionStorage.getItem("refreshToken");
+  const refreshToken = getRefreshToken();
   if (!refreshToken) return null;
 
   try {
     const { data } = await apiClient.post("/auth/refresh", { refreshToken });
     if (data?.accessToken) setAccessToken(data.accessToken);
-    if (data?.refreshToken) sessionStorage.setItem("refreshToken", data.refreshToken);
+    if (data?.refreshToken) setRefreshToken(data.refreshToken);
     return data.accessToken;
   } catch {
     clearAccessToken();
-    sessionStorage.removeItem("refreshToken");
     return null;
   }
 }
 
 // Logout: invalida refresh en backend y limpia cliente
 export async function logout() {
-  const refreshToken = sessionStorage.getItem("refreshToken");
+  const refreshToken = getRefreshToken();
   try {
     if (refreshToken) {
       await apiClient.post("/auth/logout-all", { refreshToken });
@@ -45,7 +46,6 @@ export async function logout() {
     // no pasa nada si falla logout
   }
   clearAccessToken();
-  sessionStorage.removeItem("refreshToken");
 }
 
 /**
@@ -55,10 +55,10 @@ export async function logout() {
  * Respuesta OK: 204 (o 200) sin body
  */
 export async function changePassword({ actualClave, nuevaClave, repetirClave }) {
-  const res = await httpRequest({
-    method: "POST",
-    url: "/auth/change-password", // ajustá si tu endpoint tiene otro path real
-    data: { actualClave, nuevaClave, repetirClave },
+  const res = await apiClient.post("/auth/change-password", {
+    actualClave,
+    nuevaClave,
+    repetirClave,
   });
   return res?.status === 204 || res?.status === 200;
 }

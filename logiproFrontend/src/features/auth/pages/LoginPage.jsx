@@ -2,7 +2,7 @@
 import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
-import { useLogin } from "@/features/auth/hooks/useLogin";
+import { useAuth } from "@/features/auth/context/AuthContext";
 import "@/features/auth/styles/login.css";
 
 const USER_RE = /^[A-Za-z0-9]{4,20}$/;
@@ -16,7 +16,8 @@ const clearSession = () => {
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, loading } = useLogin();
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [form, setForm] = useState({ usuario: "", clave: "" });
   const [showPass, setShowPass] = useState(false);
@@ -32,12 +33,18 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation(); // Evitar propagación del evento
+
+    // Prevenir doble submit
+    if (loading) return;
+
     setTouched({ usuario: true, clave: true });
     setFormError("");
     if (!isFormValid) {
-      alertError("Datos inválidos", "Corregí los campos marcados en rojo.");
+      await alertError("Datos inválidos", "Corregí los campos marcados en rojo.");
       return;
     }
+    setLoading(true);
     try {
       const data = await login({ username: form.usuario, password: form.clave });
       const estado = data?.user?.estado || data?.user?.status;
@@ -50,7 +57,14 @@ export default function LoginPage() {
       navigate("/");
     } catch (err) {
       if (err?.code === "USER_INACTIVE") {
-        await alertWarning("Usuario inactivo", `El usuario "${err.usuario || form.usuario}" se encuentra inactivo.`);
+        // Extraer el estado específico del mensaje del backend
+        const mensaje = err?.message || "";
+        const match = mensaje.match(/(INACTIVO|SUSPENDIDO|REGISTRADO)/i);
+        const estado = match ? match[1].toLowerCase() : "inactivo";
+        await alertWarning(
+          `Usuario ${estado}`,
+          `El usuario "${err.usuario || form.usuario}" se encuentra ${estado} y no puede iniciar sesión.`
+        );
         clearSession();
         return;
       }
@@ -66,6 +80,8 @@ export default function LoginPage() {
       const msg = (err?.response?.data?.mensaje || err?.response?.data?.message || "Error de conexión").toString();
       setFormError(msg);
       alertError("Error", msg);
+    } finally {
+      setLoading(false);
     }
   };
 
