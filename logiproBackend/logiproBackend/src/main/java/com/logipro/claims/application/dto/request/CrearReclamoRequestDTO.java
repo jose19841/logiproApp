@@ -15,8 +15,8 @@ public class CrearReclamoRequestDTO {
     @Size(max=50,message = "El numero de reclamo no puede superarlos 50 caracteres")
     private String numReclamo;
 
-    @NotBlank(message = "Ladescripcion es obligatoria")
-    @Size(max = 1000, message = "La descripcion no puedesuperar los 1000 caracteres")
+    @NotBlank(message = "La descripcion es obligatoria")
+    @Size(max = 500, message = "La descripcion no puede superar los 500 caracteres")
     private String descripcion;
 
     @NotNull(message = "El proveedor es obligatorio")

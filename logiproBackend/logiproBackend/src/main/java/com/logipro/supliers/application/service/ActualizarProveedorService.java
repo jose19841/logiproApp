@@ -25,17 +25,15 @@ public class ActualizarProveedorService implements ActualizarProveedorUseCase {
         return proveedorRepository.findById(id).map(proveedor -> {
             // Aplicar cambios solo si vienen en el request
 
-            if(request.getNombre() !=null && request.getNombre().trim().isEmpty()){
-                proveedor.actualizarNombre(request.getNombre().trim());
+            if (request.getNombre() != null && !request.getNombre().trim().isEmpty()) {
+                proveedor.actualizarNombre(request.getNombre());
             }
-            if(request.getDescripcion() !=null){
-                String desc = request.getDescripcion().trim();
+            if (request.getDescripcion() != null) {
+                proveedor.actualizarDescripcion(request.getDescripcion());
+            }
 
-                // método de dominio que agregaremos en Proveedor
-                proveedor.actualizarDescripcion(desc.isEmpty()? null:desc);
-        }
             Proveedor guardado = proveedorRepository.save(proveedor);
             return proveedorMapper.toResponseDTO(guardado);
-});
+        });
     }
 }

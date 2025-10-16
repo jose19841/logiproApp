@@ -30,7 +30,6 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class ReclamoController {
 
-    // ✅ Solo el servicio general
     private final ReclamoService reclamoService;
 
     @PostMapping

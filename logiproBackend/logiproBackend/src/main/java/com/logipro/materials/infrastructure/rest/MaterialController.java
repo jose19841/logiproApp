@@ -49,7 +49,7 @@ public class MaterialController {
 
     @Operation(
             summary = "Listar materiales (filtros + paginado + orden)",
-            description = "Filtros: proveedorId, reclamoId, tipoMaterialId, minCantidad, maxCantidad. " +
+            description = "Filtros: proveedorId, reclamoId, tipoMaterialId, cantidadMin, cantidadMax. " +
                     "Paginado: page (0..N), size (>=1). Orden: sortBy (propiedad), sortDir (asc|desc).",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Listado de materiales",
@@ -61,15 +61,15 @@ public class MaterialController {
             @RequestParam(required = false) Long proveedorId,
             @RequestParam(required = false) Long reclamoId,
             @RequestParam(required = false) Long tipoMaterialId,
-            @RequestParam(required = false) Integer minCantidad,
-            @RequestParam(required = false) Integer maxCantidad,
+            @RequestParam(required = false) Integer cantidadMin,
+            @RequestParam(required = false) Integer cantidadMax,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
         FiltroMaterialesDTO filtro = new FiltroMaterialesDTO(
-                proveedorId, reclamoId, tipoMaterialId, minCantidad, maxCantidad
+                proveedorId, reclamoId, tipoMaterialId, cantidadMin, cantidadMax
         );
         List<MaterialResponseDTO> lista = materialService.listar(filtro, page, size, sortBy, sortDir);
         return ResponseEntity.ok(lista);

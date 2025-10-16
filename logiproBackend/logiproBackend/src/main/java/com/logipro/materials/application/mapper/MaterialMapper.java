@@ -24,7 +24,7 @@ public class MaterialMapper {
                 .id(material.getId())
                 .cantidad(material.getCantidad())
 
-                .recladoId(material.getReclamo() != null ? material.getReclamo().getId() : null)
+                .reclamoId(material.getReclamo() != null ? material.getReclamo().getId() : null)
                 .reclamoDescripcion(material.getReclamo() != null ? material.getReclamo().getDescripcion():null)
 
                 .proveedorId(material.getProveedor() != null ? material.getProveedor().getId(): null)

@@ -26,10 +26,11 @@ public class CrearProveedorService implements CrearProveedorUseCase {
 
     @Override
     public ProveedorResponseDTO ejecutar(CrearProveedorRequestDTO request) {
-        String nombre = request.getNombre().trim();
-        String descripcion = (request.getDescripcion()!=null)?request.getDescripcion().trim() : null;
-
-        Proveedor proveedor = new Proveedor(nombre, descripcion);
+        // El constructor ya hace trim y validaciones
+        Proveedor proveedor = new Proveedor(
+            request.getNombre(),
+            request.getDescripcion()
+        );
         Proveedor guardado = proveedorRepository.save(proveedor);
 
         return proveedorMapper.toResponseDTO(guardado);

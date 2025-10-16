@@ -4,12 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "detalle_reclamo")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetalleReclamo {
@@ -23,9 +21,18 @@ public class DetalleReclamo {
     private String descripcion;
 
     // ===== Factory Method =====
+    /**
+     * Crea un nuevo detalle de reclamo con validación
+     * @param descripcion Descripción del detalle
+     * @return DetalleReclamo nuevo
+     * @throws IllegalArgumentException si la descripción es inválida
+     */
     public static DetalleReclamo crear(String descripcion){
         if(descripcion == null || descripcion.isBlank()){
-            throw new IllegalArgumentException("la descripcion es obligatoria");
+            throw new IllegalArgumentException("La descripción es obligatoria");
+        }
+        if(descripcion.trim().length() > 255){
+            throw new IllegalArgumentException("La descripción no puede exceder 255 caracteres");
         }
         DetalleReclamo detalle = new DetalleReclamo();
         detalle.descripcion = descripcion.trim();

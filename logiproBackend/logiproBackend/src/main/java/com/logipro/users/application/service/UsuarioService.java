@@ -51,6 +51,7 @@ public class UsuarioService {
 
     public List<UsuarioResponseDTO> listar() {
         return listarUsuarioUseCase.listar()
+
                 .stream()
                 .map(usuarioMapper::toResponse)
                 .collect(Collectors.toList());

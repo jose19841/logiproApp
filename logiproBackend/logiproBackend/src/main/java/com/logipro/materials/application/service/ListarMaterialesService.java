@@ -55,11 +55,11 @@ public class ListarMaterialesService implements ListarMaterialesUseCase {
                 if(filtro.getTipoMaterialId() != null) {
                     predicates.add(cb.equal(root.get("tipoMaterial").get("id"), filtro.getTipoMaterialId()));
                 }
-                if(filtro.getMinCantidad() !=null) {
-                    predicates.add(cb.greaterThanOrEqualTo(root.get("cantidad"), filtro.getMinCantidad()));
+                if(filtro.getCantidadMin() !=null) {
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("cantidad"), filtro.getCantidadMin()));
                 }
-                if(filtro.getMaxCantidad() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(root.get("cantidad"), filtro.getMaxCantidad()));
+                if(filtro.getCantidadMax() != null) {
+                    predicates.add(cb.lessThanOrEqualTo(root.get("cantidad"), filtro.getCantidadMax()));
                 }
             }
             return predicates.isEmpty() ? null : cb.and(predicates.toArray(new Predicate[0]));

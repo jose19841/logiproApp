@@ -15,11 +15,9 @@ import java.time.Instant;
 @Table(name = "material")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Material {
 
     @Id
@@ -43,7 +41,7 @@ public class Material {
     @JoinColumn(name = "id_calidad")
     private Calidad calidad;
 
-     @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_material")
     private TipoMaterial tipoMaterial;
 
@@ -55,4 +53,32 @@ public class Material {
     @LastModifiedDate
     @Column(name = "fecha_actualizacion")
     private Instant fechaActualizacion;
+
+    // ===== Lógica de Negocio (DDD) =====
+
+
+    public void cambiarCantidad(Integer nuevaCantidad) {
+        if (nuevaCantidad == null || nuevaCantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa o nula");
+        }
+        this.cantidad = nuevaCantidad;
+    }
+
+
+    public void actualizarRelaciones(Reclamo reclamo, Proveedor proveedor, Calidad calidad, TipoMaterial tipoMaterial) {
+        this.reclamo = reclamo;
+        this.proveedor = proveedor;
+        this.calidad = calidad;
+        this.tipoMaterial = tipoMaterial;
+    }
+
+
+    public boolean requiereInspeccionAdicional() {
+        return this.cantidad != null && this.cantidad > 1000;
+    }
+
+
+    public boolean tieneStockBajo() {
+        return this.cantidad != null && this.cantidad < 10;
+    }
 }

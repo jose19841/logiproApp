@@ -29,6 +29,17 @@ import SuppliersListPage from "@/features/suppliers/pages/SuppliersListPage";
 import ClaimCreatePage from "@/features/claims/pages/ClaimCreatePage";
 import ClaimsListPage from "@/features/claims/pages/ClaimsListPage";
 
+// Materials
+import MaterialCreatePage from "@/features/materials/pages/MaterialCreatePage";
+import MaterialDetailPage from "@/features/materials/pages/MaterialDetailPage";
+import MaterialEditPage from "@/features/materials/pages/MaterialEditPage";
+import MaterialsListPage from "@/features/materials/pages/MaterialsListPage";
+
+// Inventory
+import InventoryCreatePage from "@/features/inventory/pages/InventoryCreatePage";
+import InventoryEditPage from "@/features/inventory/pages/InventoryEditPage";
+import InventoryListPage from "@/features/inventory/pages/InventoryListPage";
+
 // Inline Protected Route Guard
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -98,6 +109,17 @@ export default function AppRouter() {
         {/* Claims */}
         <Route path="claims" element={<ClaimsListPage />} />
         <Route path="claims/new" element={<ClaimCreatePage />} />
+
+        {/* Materials */}
+        <Route path="materials" element={<MaterialsListPage />} />
+        <Route path="materials/new" element={<MaterialCreatePage />} />
+        <Route path="materials/:id" element={<MaterialDetailPage />} />
+        <Route path="materials/:id/edit" element={<MaterialEditPage />} />
+
+        {/* Inventory */}
+        <Route path="inventory" element={<InventoryListPage />} />
+        <Route path="inventory/new" element={<InventoryCreatePage />} />
+        <Route path="inventory/:id/edit" element={<InventoryEditPage />} />
 
         {/* Cuenta / Seguridad */}
         <Route path="cambiar-clave" element={<ChangePasswordPage />} />

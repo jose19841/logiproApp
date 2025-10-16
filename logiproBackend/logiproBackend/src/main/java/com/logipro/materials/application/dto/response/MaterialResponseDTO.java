@@ -13,7 +13,7 @@ public class MaterialResponseDTO {
     private Integer cantidad;
 
     // Datos de relaciones (simplificados)
-    private Long recladoId;
+    private Long reclamoId;
     private String reclamoDescripcion;
 
     private Long proveedorId;

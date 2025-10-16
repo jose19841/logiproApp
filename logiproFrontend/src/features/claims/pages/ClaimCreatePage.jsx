@@ -46,8 +46,8 @@ export default function ClaimCreatePage() {
   // Validation
   const descripcionError = !form.descripcion.trim()
     ? "La descripción es requerida"
-    : form.descripcion.length > 1000
-    ? "La descripción no puede exceder 1000 caracteres"
+    : form.descripcion.length > 500
+    ? "La descripción no puede exceder 500 caracteres"
     : "";
 
   const proveedorIdError = !form.proveedorId ? "El proveedor es requerido" : "";
@@ -129,14 +129,14 @@ export default function ClaimCreatePage() {
                   value={form.descripcion}
                   onChange={handleChange}
                   rows={4}
-                  maxLength={1000}
+                  maxLength={500}
                   disabled={loading}
                 />
                 {descripcionError && (
                   <div className="invalid-feedback">{descripcionError}</div>
                 )}
                 <small className="text-muted">
-                  {form.descripcion.length}/1000 caracteres
+                  {form.descripcion.length}/500 caracteres
                 </small>
               </div>
 
