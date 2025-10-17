@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
 import { useAuth } from "@/features/auth/context/AuthContext";
+import "@shared/styles/theme-controlroom.css";
 import "@/features/auth/styles/login.css";
 
 const USER_RE = /^[A-Za-z0-9]{4,20}$/;
@@ -86,7 +87,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-root">
+    <div className="theme-controlroom login-root">
       <div className="login-overlay" />
       <div className="container py-5">
         <div className="row justify-content-center">

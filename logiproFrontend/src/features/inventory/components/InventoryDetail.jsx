@@ -42,14 +42,12 @@ export default function InventoryDetail({ inventario, onClose, onEdit }) {
 
                 <div className="col-md-6">
                   <label className="form-label text-muted small">Sector</label>
-                  <p className="fw-bold">{inventario.sectorNombre}</p>
-                  <small className="text-muted">ID: {inventario.sectorId}</small>
+                  <p className="fw-bold">{inventario.sectorNombre || 'No especificado'}</p>
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label text-muted small">Material</label>
-                  <p className="fw-bold">{inventario.materialNombre}</p>
-                  <small className="text-muted">ID: {inventario.materialId}</small>
+                  <label className="form-label text-muted small">Material (Tipo)</label>
+                  <p className="fw-bold">{inventario.materialNombre || 'No especificado'}</p>
                 </div>
 
                 <div className="col-md-6">

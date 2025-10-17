@@ -3,11 +3,34 @@ import useListSuppliers from "@/features/suppliers/hooks/useListSuppliers";
 import DataTable from "@shared/components/DataTable";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import { changeSupplierStatus } from "@/features/suppliers/services/suppliersApi";
 
 export default function SuppliersListPage() {
   const navigate = useNavigate();
   const { rows, loading, err, reload } = useListSuppliers();
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+
+  const handleChangeStatus = async (supplier) => {
+    const action = supplier.habilitado ? "inhabilitar" : "habilitar";
+    const ok = await alertConfirm(
+      `¿${action.charAt(0).toUpperCase() + action.slice(1)} proveedor?`,
+      `¿Está seguro de que desea ${action} al proveedor "${supplier.nombre}"?`
+    );
+    if (!ok.isConfirmed) return;
+
+    try {
+      await changeSupplierStatus(supplier.id, !supplier.habilitado);
+      await alertSuccess(
+        "Estado actualizado",
+        `El proveedor "${supplier.nombre}" ha sido ${action === "habilitar" ? "habilitado" : "inhabilitado"}.`
+      );
+      reload();
+    } catch (error) {
+      console.error("Error changing supplier status:", error);
+      alertError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo cambiar el estado");
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -24,50 +47,48 @@ export default function SuppliersListPage() {
         )
       },
       {
+        key: "habilitado",
+        label: "Estado",
+        sortable: true,
+        align: "center",
+        render: (value) => (
+          <span className={`badge bg-${value ? 'success' : 'danger'}`}>
+            {value ? 'Habilitado' : 'Inhabilitado'}
+          </span>
+        )
+      },
+      {
         key: "acciones",
-        label: "",
-        align: "end",
+        label: "Acciones",
+        align: "center",
         render: (_, row) => (
-          <div className="dropdown">
+          <div className="btn-group btn-group-sm" role="group">
             <button
-              className="btn btn-sm btn-outline-secondary border-0"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              aria-label="Actions"
-              title="Actions"
-              style={{ fontSize: '18px', lineHeight: 1 }}
+              className="btn btn-outline-primary"
+              onClick={() => setSelectedSupplier(row)}
+              title="Ver detalle"
             >
-              ⋮
+              <i className="bi bi-eye"></i>
             </button>
-            <ul className="dropdown-menu dropdown-menu-end shadow-sm" style={{minWidth: '200px'}}>
-              <li>
-                <button
-                  className="dropdown-item d-flex align-items-center gap-2 py-2"
-                  onClick={() => setSelectedSupplier(row)}
-                >
-                  <i className="bi bi-eye text-primary"></i>
-                  Ver Detalles
-                </button>
-              </li>
-
-              <li><hr className="dropdown-divider" /></li>
-
-              <li>
-                <button
-                  className="dropdown-item d-flex align-items-center gap-2 py-2"
-                  onClick={() => navigate(`/suppliers/${row.id}/edit`)}
-                >
-                  <i className="bi bi-pencil text-warning"></i>
-                  Editar
-                </button>
-              </li>
-            </ul>
+            <button
+              className="btn btn-outline-warning"
+              onClick={() => navigate(`/suppliers/${row.id}/edit`)}
+              title="Editar"
+            >
+              <i className="bi bi-pencil"></i>
+            </button>
+            <button
+              className={`btn btn-outline-${row.habilitado ? 'danger' : 'success'}`}
+              onClick={() => handleChangeStatus(row)}
+              title={row.habilitado ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <i className={`bi bi-${row.habilitado ? 'x-circle' : 'check-circle'}`}></i>
+            </button>
           </div>
         ),
       },
     ],
-    [navigate]
+    [navigate, handleChangeStatus]
   );
 
   const closeModal = () => setSelectedSupplier(null);

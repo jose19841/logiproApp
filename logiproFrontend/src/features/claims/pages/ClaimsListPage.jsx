@@ -41,87 +41,6 @@ export default function ClaimsListPage() {
     return filtered;
   }, [rows, estadoFilter, searchTerm]);
 
-  const columns = useMemo(
-    () => [
-      { key: "id", label: "ID", sortable: true, align: "center" },
-      { key: "numReclamo", label: "N° Reclamo", sortable: true },
-      {
-        key: "descripcion",
-        label: "Descripción",
-        sortable: true,
-        render: (value) => (
-          <span className="text-muted" style={{ maxWidth: "300px", display: "inline-block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {value || "-"}
-          </span>
-        )
-      },
-      {
-        key: "estado",
-        label: "Estado",
-        sortable: true,
-        align: "center",
-        render: (value) => {
-          const estado = ESTADOS[value] || { label: value, variant: "secondary" };
-          return (
-            <span className={`badge bg-${estado.variant}`}>
-              {estado.label}
-            </span>
-          );
-        }
-      },
-      {
-        key: "proveedorNombre",
-        label: "Proveedor",
-        sortable: true,
-        render: (value) => value || "-"
-      },
-      {
-        key: "acciones",
-        label: "",
-        align: "end",
-        render: (_, row) => (
-          <div className="dropdown">
-            <button
-              className="btn btn-sm btn-outline-secondary border-0"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              aria-label="Acciones"
-              title="Acciones"
-              style={{ fontSize: '18px', lineHeight: 1 }}
-            >
-              ⋮
-            </button>
-            <ul className="dropdown-menu dropdown-menu-end shadow-sm" style={{minWidth: '200px'}}>
-              <li>
-                <button
-                  className="dropdown-item d-flex align-items-center gap-2 py-2"
-                  onClick={() => setSelectedClaim(row)}
-                >
-                  <i className="bi bi-eye text-primary"></i>
-                  Ver detalles
-                </button>
-              </li>
-
-              <li><hr className="dropdown-divider" /></li>
-
-              <li>
-                <button
-                  className="dropdown-item d-flex align-items-center gap-2 py-2"
-                  onClick={() => handleChangeState(row)}
-                >
-                  <i className="bi bi-arrow-repeat text-info"></i>
-                  Cambiar estado
-                </button>
-              </li>
-            </ul>
-          </div>
-        ),
-      },
-    ],
-    []
-  );
-
   const handleChangeState = async (claim) => {
     const ok = await alertConfirm(
       "¿Cambiar estado?",
@@ -167,6 +86,67 @@ export default function ClaimsListPage() {
       }
     }
   };
+
+  const columns = useMemo(
+    () => [
+      { key: "id", label: "ID", sortable: true, align: "center" },
+      { key: "numReclamo", label: "N° Reclamo", sortable: true },
+      {
+        key: "descripcion",
+        label: "Descripción",
+        sortable: true,
+        render: (value) => (
+          <span className="text-muted" style={{ maxWidth: "300px", display: "inline-block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {value || "-"}
+          </span>
+        )
+      },
+      {
+        key: "estado",
+        label: "Estado",
+        sortable: true,
+        align: "center",
+        render: (value) => {
+          const estado = ESTADOS[value] || { label: value, variant: "secondary" };
+          return (
+            <span className={`badge bg-${estado.variant}`}>
+              {estado.label}
+            </span>
+          );
+        }
+      },
+      {
+        key: "proveedorNombre",
+        label: "Proveedor",
+        sortable: true,
+        render: (value) => value || "-"
+      },
+      {
+        key: "acciones",
+        label: "Acciones",
+        align: "center",
+        render: (_, row) => (
+          <div className="btn-group btn-group-sm" role="group">
+            <button
+              className="btn btn-outline-primary"
+              onClick={() => setSelectedClaim(row)}
+              title="Ver detalle"
+            >
+              <i className="bi bi-eye"></i>
+            </button>
+            <button
+              className="btn btn-outline-info"
+              onClick={() => handleChangeState(row)}
+              title="Cambiar estado"
+            >
+              <i className="bi bi-arrow-repeat"></i>
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [handleChangeState]
+  );
 
   const closeModal = () => setSelectedClaim(null);
 

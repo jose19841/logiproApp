@@ -13,15 +13,20 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ActualizarInventarioRequestDTO {
 
-    @NotNull
+    // El inventarioId se obtiene del path parameter, no es obligatorio en el body
     private Long inventarioId;
 
-    @Min(0)
+    @NotNull(message = "La cantidad mínima es obligatoria")
+    @Min(value = 0, message = "La cantidad mínima debe ser mayor o igual a 0")
     private Integer cantidadMinima;
 
-    @Min(0)
-    private  Integer cantidadMaxima;
+    @NotNull(message = "La cantidad máxima es obligatoria")
+    @Min(value = 0, message = "La cantidad máxima debe ser mayor o igual a 0")
+    private Integer cantidadMaxima;
 
+    @NotNull(message = "El sector es obligatorio")
     private Long sectorId;
+
+    @NotNull(message = "El material es obligatorio")
     private Long materialId;
 }

@@ -1,0 +1,107 @@
+/* ==========================================================================
+   AUTH CSS - Estilos para páginas de autenticación con tema 3D
+   ========================================================================== */
+
+/* Layout principal de autenticación - centrado vertical y horizontal */
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  background: var(--bg-page, #0a0e1a);
+}
+
+/* Card de autenticación con ancho máximo controlado */
+.auth-card {
+  width: min(100%, 420px);
+  margin: 0 auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Logo responsive dentro del auth-card */
+.auth-card img,
+.auth-card svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Inputs a ancho completo en auth */
+.auth-card input,
+.auth-card select,
+.auth-card textarea,
+.auth-card button {
+  width: 100%;
+  min-width: 220px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Botón de submit a ancho completo */
+.auth-card .btn {
+  width: 100%;
+}
+
+/* Links centrados */
+.auth-card .text-center {
+  text-align: center;
+}
+
+/* Evitar desborde horizontal */
+.auth-card * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Responsive para móviles */
+@media (max-width: 576px) {
+  .auth-layout {
+    padding: 16px;
+  }
+
+  .auth-card {
+    width: 100%;
+    padding: 0;
+  }
+
+  .auth-card input,
+  .auth-card select,
+  .auth-card textarea {
+    min-width: 180px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Integración con login-root existente */
+.login-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Container del login responsivo */
+.login-root .container {
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Card del login sin desborde */
+.login-root .login-card {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Inputs del login a ancho completo */
+.login-root input,
+.login-root button {
+  width: 100%;
+  box-sizing: border-box;
+}

@@ -9,6 +9,8 @@ export default function Sidebar() {
   const [openUsuarios, setOpenUsuarios] = useState(false);
   const [openSuppliers, setOpenSuppliers] = useState(false);
   const [openClaims, setOpenClaims] = useState(false);
+  const [openMaterials, setOpenMaterials] = useState(false);
+  const [openInventory, setOpenInventory] = useState(false);
 
   // Verificar si el usuario es ADMIN
   const isAdmin = user?.rol === "ADMIN" || user?.rol?.nombre === "ADMIN";
@@ -150,6 +152,84 @@ export default function Sidebar() {
               }
             >
               ➕ Nuevo Reclamo
+            </NavLink>
+          </div>
+        )}
+
+        {/* Materials - Toggle */}
+        <button
+          type="button"
+          onClick={() => setOpenMaterials(!openMaterials)}
+          className={
+            "list-group-item list-group-item-action d-flex justify-content-between align-items-center" +
+            (openMaterials ? " active" : "")
+          }
+        >
+          <span>
+            <span className="me-2">📦</span> Materiales
+          </span>
+          <span>{openMaterials ? "▾" : "▸"}</span>
+        </button>
+
+        {/* Submenú Materials */}
+        {openMaterials && (
+          <div className="submenu">
+            <NavLink
+              to="/materials"
+              className={({ isActive }) =>
+                "list-group-item list-group-item-action" +
+                (isActive ? " active" : "")
+              }
+            >
+              📋 Listado de Materiales
+            </NavLink>
+            <NavLink
+              to="/materials/new"
+              className={({ isActive }) =>
+                "list-group-item list-group-item-action" +
+                (isActive ? " active" : "")
+              }
+            >
+              ➕ Nuevo Material
+            </NavLink>
+          </div>
+        )}
+
+        {/* Inventory - Toggle */}
+        <button
+          type="button"
+          onClick={() => setOpenInventory(!openInventory)}
+          className={
+            "list-group-item list-group-item-action d-flex justify-content-between align-items-center" +
+            (openInventory ? " active" : "")
+          }
+        >
+          <span>
+            <span className="me-2">📊</span> Inventario
+          </span>
+          <span>{openInventory ? "▾" : "▸"}</span>
+        </button>
+
+        {/* Submenú Inventory */}
+        {openInventory && (
+          <div className="submenu">
+            <NavLink
+              to="/inventory"
+              className={({ isActive }) =>
+                "list-group-item list-group-item-action" +
+                (isActive ? " active" : "")
+              }
+            >
+              📋 Listado de Inventario
+            </NavLink>
+            <NavLink
+              to="/inventory/new"
+              className={({ isActive }) =>
+                "list-group-item list-group-item-action" +
+                (isActive ? " active" : "")
+              }
+            >
+              ➕ Nuevo Inventario
             </NavLink>
           </div>
         )}

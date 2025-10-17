@@ -5,7 +5,7 @@ const BASE_PATH = "/api/materiales";
 
 /**
  * GET /api/materiales
- * @param {Object} params - { page, size, cantidad, reclamoId, proveedorId, calidadId, tipoMaterialId }
+ * @param {Object} params - { page, size, cantidad, proveedorId, calidadId, tipoMaterialId }
  */
 export async function listMaterials(params = {}) {
   const { data } = await apiClient.get(BASE_PATH, { params });
@@ -23,7 +23,7 @@ export async function getMaterialById(id) {
 
 /**
  * POST /api/materiales
- * @param {Object} dto - { cantidad, reclamoId, proveedorId, calidadId, tipoMaterialId }
+ * @param {Object} dto - { cantidad, proveedorId, calidadId, tipoMaterialId }
  */
 export async function createMaterial(dto) {
   const { data } = await apiClient.post(BASE_PATH, dto);
@@ -33,7 +33,7 @@ export async function createMaterial(dto) {
 /**
  * PUT /api/materiales/{id}
  * @param {number} id - Material ID
- * @param {Object} dto - { cantidad, reclamoId, proveedorId, calidadId, tipoMaterialId }
+ * @param {Object} dto - { cantidad, proveedorId, calidadId, tipoMaterialId }
  */
 export async function updateMaterial(id, dto) {
   const { data } = await apiClient.put(`${BASE_PATH}/${id}`, dto);

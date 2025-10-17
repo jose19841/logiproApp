@@ -23,16 +23,21 @@ public class MaterialMapper {
         return MaterialResponseDTO.builder()
                 .id(material.getId())
                 .cantidad(material.getCantidad())
+                .fechaCreacion(material.getFechaCreacion())
 
                 .reclamoId(material.getReclamo() != null ? material.getReclamo().getId() : null)
                 .reclamoDescripcion(material.getReclamo() != null ? material.getReclamo().getDescripcion():null)
 
                 .proveedorId(material.getProveedor() != null ? material.getProveedor().getId(): null)
-                .proveedorDescripcion(material.getProveedor() != null ? material.getProveedor().getDescripcion(): null)
+                .proveedorDescripcion(material.getProveedor() != null ? material.getProveedor().getNombre(): null)
 
                 .calidadId(material.getCalidad() != null ? material.getCalidad().getId() : null)
                 .resultadoCalidad(material.getCalidad() != null && material.getCalidad().getDetalleCalidad() != null
                     ? material.getCalidad().getDetalleCalidad().getResultado() : null)
+                .resultadoInspeccion(material.getCalidad() != null && material.getCalidad().getDetalleCalidad() != null
+                    ? material.getCalidad().getDetalleCalidad().getResultado() : null)
+                .observacionesInspeccion(material.getCalidad() != null && material.getCalidad().getDetalleCalidad() != null
+                    ? material.getCalidad().getDetalleCalidad().getObservaciones() : null)
 
                 .tipoMaterialId(material.getTipoMaterial() != null ?material.getTipoMaterial().getId() : null)
                 .nombreTipoMaterial(material.getTipoMaterial() != null ? material.getTipoMaterial().getNombre() : null)
@@ -43,26 +48,6 @@ public class MaterialMapper {
         return materiales.stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
-    }
-
-    // ===== REQUEST DTO → ENTITY parcial =====
-    // (solo para componer dentro del caso de uso)
-
-    public Material toEntity(
-            CrearMaterialRequestDTO dto,
-            Reclamo reclamo,
-            Proveedor proveedor,
-            Calidad calidad,
-            TipoMaterial tipoMaterial
-
-    ) {
-         return Material.builder()
-                 .cantidad(dto.getCantidad())
-                 .reclamo(reclamo)
-                 .proveedor(proveedor)
-                 .calidad(calidad)
-                 .tipoMaterial(tipoMaterial)
-                 .build();
     }
 
 }

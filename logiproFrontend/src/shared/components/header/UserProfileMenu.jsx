@@ -1,13 +1,11 @@
-
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import ChangePasswordModal from "@/features/users/components/ChangePasswordModal";
+import { useNavigate } from "react-router-dom";
 
 export default function UserProfileMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   if (!user) return null;
-
 
   const initial =
     (user?.usuario?.toString().trim().charAt(0).toUpperCase()) || "?";
@@ -16,56 +14,48 @@ export default function UserProfileMenu() {
 
   const handleAfterPasswordChange = async () => {
     try {
-      await logout(); // revoca refresh en backend y limpia cliente
+      await logout();
     } finally {
-      navigate("/login", { replace: true }); // directo al login
+      navigate("/login", { replace: true });
     }
   };
 
   return (
-    <div className="dropdown" style={{ width: WIDTH }}>
+    <div className="dropdown user-menu" style={{ width: WIDTH }}>
       {/* Botón principal */}
       <button
-        className="btn d-flex align-items-center gap-2 w-100 px-3 py-2"
+        className="btn user-toggle d-flex align-items-center gap-2 w-100 px-3 py-2"
         type="button"
         id="userMenuButton"
         data-bs-toggle="dropdown"
         aria-expanded="false"
-        style={{ backgroundColor: "var(--bs-primary)", color: "#fff" }}
       >
-        <div
-          className="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center"
-          style={{ width: 36, height: 36, fontSize: 18, fontWeight: 800 }}
-        >
+        <div className="user-avatar rounded-circle d-flex align-items-center justify-content-center">
           {initial}
         </div>
-        <span className="fw-semibold text-truncate">{user.usuario}</span>
+        <span className="fw-semibold text-truncate user-name">{user.usuario}</span>
       </button>
 
       {/* Dropdown */}
       <ul
-        className="dropdown-menu p-0 overflow-hidden show-on-click"
+        className="dropdown-menu p-0 overflow-hidden user-dropdown"
         aria-labelledby="userMenuButton"
         style={{ width: WIDTH }}
       >
-        <li
-          className="text-center py-3"
-          style={{ backgroundColor: "var(--bs-primary)", color: "#fff" }}
-        >
+        <li className="text-center py-3 user-dropdown-header">
           <div className="fw-semibold">{user.usuario}</div>
-          <div className="small" style={{ opacity: 0.9 }}>
+          <div className="small role-line">
             {user.rol || "Usuario"}
           </div>
         </li>
 
-        <li style={{ borderTop: "1px solid rgba(255,255,255,.25)" }} />
+        <li className="divider-line" />
 
-        {/* Botón cambiar contraseña */}
+        {/* Cambiar contraseña */}
         <li>
           <button
             type="button"
-            className="btn w-100 rounded-0 fw-bold border-0 py-3"
-            style={{ backgroundColor: "var(--bs-primary)", color: "#fff" }}
+            className="btn w-100 rounded-0 fw-bold border-0 py-3 user-dropdown-action"
             data-bs-toggle="modal"
             data-bs-target="#changePasswordModal"
           >
@@ -73,12 +63,11 @@ export default function UserProfileMenu() {
           </button>
         </li>
 
-        {/* Cerrar sesión manual */}
+        {/* Cerrar sesión */}
         <li>
           <button
             type="button"
-            className="btn w-100 rounded-0 fw-bold border-0 py-3"
-            style={{ backgroundColor: "var(--bs-primary)", color: "var(--bs-danger)" }}
+            className="btn w-100 rounded-0 fw-bold border-0 py-3 user-dropdown-action logout"
             onClick={async () => {
               await logout();
               navigate("/login", { replace: true });
@@ -89,7 +78,7 @@ export default function UserProfileMenu() {
         </li>
       </ul>
 
-      {/* Modal de cambio de clave */}
+      {/* Modal */}
       <ChangePasswordModal id="changePasswordModal" onDone={handleAfterPasswordChange} />
     </div>
   );

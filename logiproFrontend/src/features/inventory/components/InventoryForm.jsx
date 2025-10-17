@@ -82,24 +82,28 @@ export default function InventoryForm({
     errors.materialId = "Campo obligatorio";
   }
 
-  if (!form.cantidadMinima || form.cantidadMinima.trim() === "") {
+  const cantidadMinimaStr = String(form.cantidadMinima || "").trim();
+  if (!cantidadMinimaStr) {
     errors.cantidadMinima = "Campo obligatorio";
-  } else if (isNaN(form.cantidadMinima)) {
+  } else if (isNaN(cantidadMinimaStr)) {
     errors.cantidadMinima = "Debe ser un número";
-  } else if (parseInt(form.cantidadMinima) < 0) {
+  } else if (parseInt(cantidadMinimaStr) < 0) {
     errors.cantidadMinima = "Debe ser mayor o igual a 0";
   }
 
-  if (!form.cantidadMaxima || form.cantidadMaxima.trim() === "") {
+  const cantidadMaximaStr = String(form.cantidadMaxima || "").trim();
+  if (!cantidadMaximaStr) {
     errors.cantidadMaxima = "Campo obligatorio";
-  } else if (isNaN(form.cantidadMaxima)) {
+  } else if (isNaN(cantidadMaximaStr)) {
     errors.cantidadMaxima = "Debe ser un número";
-  } else if (parseInt(form.cantidadMaxima) < 0) {
+  } else if (parseInt(cantidadMaximaStr) < 0) {
     errors.cantidadMaxima = "Debe ser mayor o igual a 0";
   } else if (
-    !isNaN(form.cantidadMinima) &&
-    !isNaN(form.cantidadMaxima) &&
-    parseInt(form.cantidadMaxima) < parseInt(form.cantidadMinima)
+    cantidadMinimaStr &&
+    cantidadMaximaStr &&
+    !isNaN(cantidadMinimaStr) &&
+    !isNaN(cantidadMaximaStr) &&
+    parseInt(cantidadMaximaStr) < parseInt(cantidadMinimaStr)
   ) {
     errors.cantidadMaxima = "Debe ser mayor o igual a la cantidad mínima";
   }
@@ -188,7 +192,7 @@ export default function InventoryForm({
             <option value="">-- Seleccione un material --</option>
             {materiales.map((material) => (
               <option key={material.id} value={material.id}>
-                Material #{material.id} - Cantidad: {material.cantidad}
+                {material.nombreTipoMaterial || `Material #${material.id}`} - Cantidad disponible: {material.cantidad} - Proveedor: {material.proveedorDescripcion || 'N/A'}
               </option>
             ))}
           </select>

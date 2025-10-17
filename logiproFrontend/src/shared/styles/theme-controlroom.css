@@ -1,0 +1,309 @@
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║        THEME GLOBAL – 3D SOFISTICADO (Metal / Control Room)      ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* ====== NORMALIZACIÓN PARA CONTROL DE SCROLL ====== */
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  overflow-x: hidden; /* solo prevenir scroll horizontal */
+  overflow-y: auto; /* permitir scroll vertical */
+  background: #0b0e11;
+}
+
+/* ====== ROOT del tema (aplica a TODO lo envuelto en .theme-controlroom) ====== */
+.theme-controlroom {
+  /* Base + profundidad */
+  background: #0b0e11;
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgba(36, 54, 85, 0.35), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(0, 162, 211, 0.18), transparent 60%),
+    radial-gradient(800px 600px at 30% 120%, rgba(27, 40, 56, 0.45), transparent 60%),
+    /* grilla técnica sutil */
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: auto, auto, auto, 48px 48px, 48px 48px;
+
+  color: #e8edf2;
+  min-height: 100%;
+  font-family: "Inter", system-ui, sans-serif;
+
+  /* Layout y contención del brillo/sombras para evitar overflows */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: clip; /* recorta pseudo-elementos sin generar scroll */
+}
+
+/* EXCEPCIÓN: Login tiene su propio background con imagen */
+.theme-controlroom.login-root {
+  background: none !important;
+  background-image: none !important;
+}
+.theme-controlroom.login-root::before {
+  display: none !important;
+}
+@supports not (overflow: clip) {
+  .theme-controlroom { overflow: hidden; }
+}
+
+/* Brillo diagonal leve sobre todo el shell (ajustado para no desbordar) */
+.theme-controlroom::before {
+  content: "";
+  position: absolute;
+  inset: -8% -12%;  /* menos "salida" que antes para no empujar layout */
+  background: conic-gradient(
+    from 210deg,
+    rgba(255,255,255,0.0),
+    rgba(255,255,255,0.06),
+    rgba(255,255,255,0.0) 30%
+  );
+  filter: blur(50px);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: sheen 12s linear infinite;
+}
+@keyframes sheen {
+  0% { transform: translateX(-10%) translateY(-5%) rotate(0deg); opacity: .35; }
+  50% { transform: translateX(5%) translateY(2%) rotate(8deg); opacity: .2; }
+  100% { transform: translateX(-10%) translateY(-5%) rotate(0deg); opacity: .35; }
+}
+
+/* ====== LAYOUT genérico ====== */
+
+/* Contenedor central (sidebar + content) puede encoger; así el scroll vive adentro */
+.theme-controlroom .d-flex.flex-grow-1 { min-height: 0 !important; }
+
+/* Área de contenido con scroll interno y sin overflow horizontal de hijos anchos */
+.theme-controlroom main.content {
+  padding: 1.5rem;            /* (equivale al viejo .content { padding }) */
+  min-height: 0;
+  min-width: 0;               /* CLAVE para evitar barra horizontal en flex */
+  overflow: auto;             /* scroll vertical (y horizontal si hay tablas anchas) */
+}
+
+/* Sidebar con scroll independiente si crece */
+.theme-controlroom .sidebar {
+  width: 280px;
+  background: linear-gradient(180deg, #12161c, #0f1318);
+  border-right: 1px solid rgba(124,146,168,.18);
+  box-shadow: 12px 0 40px rgba(0,0,0,.45);
+  position: sticky; top: 0;
+  align-self: stretch;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* HOTFIX DESBORDES SIDEBAR */
+  box-sizing: border-box;
+  padding: 8px 6px;
+}
+.theme-controlroom .sidebar-header {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(180deg, #1b2027, #151a20);
+  border-bottom: 1px solid rgba(124,146,168,.18);
+  color: #e7ecf2; font-weight: 600; letter-spacing: .3px;
+  position: relative;
+}
+.theme-controlroom .sidebar-header::after {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, #1e88e5, #26c6da);
+  box-shadow: 0 0 12px rgba(30,136,229,.5);
+  border-radius: 2px;
+}
+.theme-controlroom .nav,
+.theme-controlroom .list-unstyled { margin: 0; padding: 0; list-style: none; }
+.theme-controlroom .nav-link,
+.theme-controlroom .sidebar a,
+.theme-controlroom .sidebar .list-group-item {
+  display: flex; gap: .75rem; align-items: center;
+  padding: .625rem 1rem;
+  color: #c9d3de; text-decoration: none;
+  border: 1px solid transparent; border-radius: 10px;
+  margin: .25rem .5rem;
+  background: linear-gradient(180deg, #161b22, #13171d);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+  transition: background .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.theme-controlroom .nav-link:hover,
+.theme-controlroom .sidebar a:hover {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(30,136,229,.18), rgba(38,198,218,.12));
+  transform: translateX(2px);
+  box-shadow: 0 6px 18px rgba(33,150,243,.22);
+}
+.theme-controlroom .nav-link.active,
+.theme-controlroom .sidebar a.active,
+.theme-controlroom .sidebar .list-group-item.active {
+  color: #fff;
+  background: linear-gradient(180deg, #2196f3, #1976d2);
+  border-color: #1a78d6;
+  box-shadow: 0 10px 24px rgba(33,150,243,.28), inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* Sidebar: ajustes de texto/jerarquía + desborde controlado */
+.theme-controlroom .sidebar .list-group { padding: 0 2px; }
+.theme-controlroom .sidebar .list-group-item {
+  margin: 6px 6px;
+  border-radius: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.theme-controlroom .sidebar .submenu {
+  margin: 4px 2px 8px 8px;
+  padding-left: 8px;
+  max-width: calc(100% - 10px);
+}
+.theme-controlroom .sidebar .submenu .list-group-item.active,
+.theme-controlroom .sidebar .list-group > .list-group-item.active:not(.submenu .list-group-item) {
+  box-shadow:
+    0 8px 18px rgba(33,150,243,.22),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+.theme-controlroom .sidebar .submenu .list-group-item.active::before {
+  content: "";
+  position: absolute;
+  left: -6px; top: 10px; bottom: 10px;
+  width: 3px;
+  background: linear-gradient(180deg, #1e88e5, #26c6da);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(30,136,229,.55);
+}
+.theme-controlroom .sidebar .list-group-item > span.me-2 {
+  flex: 0 0 20px;
+}
+
+/* ====== TITULARES (línea LED) ====== */
+.theme-controlroom h1.h3 {
+  color: #dfe7ef;
+  text-shadow: 0 1px 0 #0a0c10, 0 8px 24px rgba(0, 153, 255, 0.18);
+  position: relative;
+  letter-spacing: .3px;
+}
+.theme-controlroom h1.h3::after {
+  content: "";
+  display: block;
+  margin-top: .5rem;
+  width: 140px; height: 3px;
+  background: linear-gradient(90deg, #1e88e5, #26c6da 60%, transparent);
+  box-shadow: 0 0 12px rgba(30,136,229,.6), 0 0 22px rgba(38,198,218,.45);
+  border-radius: 2px;
+}
+
+/* ====== CARDS (global) ====== */
+.theme-controlroom .card {
+  background: linear-gradient(145deg, #121519, #1a1f26);
+  border: 1px solid rgba(124, 146, 168, 0.18);
+  border-radius: 14px;
+  color: #e7ecf2;
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 0 0 1px rgba(255,255,255,.02);
+  backdrop-filter: saturate(120%) blur(2px);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  position: relative;
+}
+.theme-controlroom .card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+.theme-controlroom .card::after {
+  content: ""; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+  background: linear-gradient(145deg, rgba(38,198,218,.08), rgba(30,136,229,.08));
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.theme-controlroom .card-header {
+  position: relative;
+  background: linear-gradient(180deg, #1b2027, #151a20);
+  border-bottom: 1px solid rgba(124, 146, 168, 0.18);
+  color: #e7ecf2;
+}
+.theme-controlroom .card-header h2 { letter-spacing: .2px; text-shadow: 0 1px 0 #0a0c10; }
+.theme-controlroom .card-header::after {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, #1e88e5, #26c6da);
+  box-shadow: 0 0 12px rgba(30,136,229,.5), inset 0 0 3px rgba(0,0,0,.6);
+  border-radius: 2px 0 0 2px;
+}
+
+/* ====== BOTONES (global) ====== */
+.theme-controlroom .btn-primary {
+  background: linear-gradient(180deg, #2196f3, #1976d2);
+  border: 1px solid #1a78d6; color: #fff; border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(33,150,243,.28), inset 0 1px 0 rgba(255,255,255,.18);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.theme-controlroom .btn-primary:hover {
+  filter: brightness(1.06); transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(33,150,243,.35), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.theme-controlroom .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(33,150,243,.25), inset 0 2px 0 rgba(0,0,0,.25);
+}
+.theme-controlroom .btn-outline-primary {
+  color: #90caf9;
+  background: linear-gradient(180deg, rgba(22,28,34,1), rgba(17,22,28,1));
+  border: 1px solid #90caf9; border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+  transition: transform .15s ease, box-shadow .15s ease, color .15s ease, background .15s ease;
+}
+.theme-controlroom .btn-outline-primary:hover {
+  color: #fff; background: linear-gradient(180deg, #2196f3, #1976d2);
+  border-color: #1a78d6; transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(33,150,243,.28);
+}
+
+/* ====== TABLAS (global) ====== */
+.theme-controlroom table { color: #e7ecf2; background: transparent; max-width: 100%; }
+.theme-controlroom .table thead th {
+  color: #b9d7ff;
+  background: linear-gradient(180deg, #171c23, #14181e);
+  border-bottom: 2px solid rgba(124,146,168,.2);
+  text-transform: uppercase; letter-spacing: .4px; font-weight: 600;
+}
+.theme-controlroom .table tbody tr {
+  background: linear-gradient(180deg, #161b22, #13171d);
+  border-color: rgba(124,146,168,.12);
+}
+.theme-controlroom .table tbody tr:hover {
+  background: linear-gradient(180deg, rgba(30,136,229,.16), rgba(38,198,218,.12));
+  box-shadow: inset 0 0 0 1px rgba(30,136,229,.28);
+}
+
+/* ====== Badges ====== */
+.theme-controlroom .badge.text-bg-warning {
+  background: linear-gradient(180deg, #ffd54f, #fbc02d);
+  color: #1a1a1a;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 4px 10px rgba(251,192,45,.25);
+}
+.theme-controlroom .badge.text-bg-success {
+  background: linear-gradient(180deg, #43a047, #2e7d32);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 4px 10px rgba(46,125,50,.28);
+}
+
+/* ====== Scrollbar global ====== */
+.theme-controlroom::-webkit-scrollbar { width: 10px; height: 10px; }
+.theme-controlroom::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #2b3a49, #1e2935);
+  border-radius: 6px; border: 1px solid rgba(255,255,255,.06);
+}
+.theme-controlroom::-webkit-scrollbar-track { background: #0b0e11; }
+
+/* Footer (oscuro integrado) */
+.theme-controlroom .theme-footer {
+  background: linear-gradient(180deg, #0f1318, #0b0e11);
+  color: #93a4b2;
+}
+
+/* Accesibilidad: reducir animaciones si el usuario lo pide */
+@media (prefers-reduced-motion: reduce) {
+  .theme-controlroom * { transition: none !important; animation: none !important; }
+}

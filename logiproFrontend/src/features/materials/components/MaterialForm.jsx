@@ -1,11 +1,11 @@
 // src/features/materials/components/MaterialForm.jsx
 import { useState, useEffect } from "react";
 import { listSuppliers } from "@/features/suppliers/services/suppliersApi";
-import { listClaims } from "@/features/claims/services/claimsApi";
 import apiClient from "@shared/services/apiClient";
 
 /**
  * Componente de formulario reutilizable para crear/editar materiales
+ * Campos: cantidad, proveedorId, calidadId, tipoMaterialId
  * @param {Object} initialValues - Valores iniciales del formulario
  * @param {Function} onSubmit - Callback al enviar el formulario
  * @param {Function} onCancel - Callback al cancelar
@@ -20,17 +20,15 @@ export default function MaterialForm({
   submitLabel = "Guardar"
 }) {
   const [suppliers, setSuppliers] = useState([]);
-  const [claims, setClaims] = useState([]);
-  const [calidades, setCalidades] = useState([]);
   const [tiposMaterial, setTiposMaterial] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
 
   const [form, setForm] = useState({
     cantidad: "",
-    reclamoId: "",
     proveedorId: "",
-    calidadId: "",
     tipoMaterialId: "",
+    resultadoInspeccion: "",
+    observacionesInspeccion: "",
     ...initialValues
   });
 
@@ -39,16 +37,12 @@ export default function MaterialForm({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [suppliersData, claimsData, calidadesData, tiposMaterialData] = await Promise.all([
+        const [suppliersData, tiposMaterialData] = await Promise.all([
           listSuppliers().catch(() => []),
-          listClaims().catch(() => []),
-          apiClient.get("/api/calidades").then(res => res.data).catch(() => []),
-          apiClient.get("/api/tipos-material").then(res => res.data).catch(() => [])
+          apiClient.get("/api/materiales/tipos-material").then(res => res.data).catch(() => [])
         ]);
 
         setSuppliers(suppliersData || []);
-        setClaims(claimsData || []);
-        setCalidades(calidadesData || []);
         setTiposMaterial(tiposMaterialData || []);
       } catch (error) {
         console.error("Error loading form data:", error);
@@ -63,10 +57,10 @@ export default function MaterialForm({
     if (initialValues && Object.keys(initialValues).length > 0) {
       setForm({
         cantidad: initialValues.cantidad?.toString() || "",
-        reclamoId: initialValues.reclamoId?.toString() || "",
         proveedorId: initialValues.proveedorId?.toString() || "",
-        calidadId: initialValues.calidadId?.toString() || "",
-        tipoMaterialId: initialValues.tipoMaterialId?.toString() || ""
+        tipoMaterialId: initialValues.tipoMaterialId?.toString() || "",
+        resultadoInspeccion: initialValues.resultadoInspeccion || "",
+        observacionesInspeccion: initialValues.observacionesInspeccion || ""
       });
     }
   }, [initialValues]);
@@ -83,28 +77,26 @@ export default function MaterialForm({
   // Validaciones
   const errors = {};
 
-  if (!form.cantidad || form.cantidad.trim() === "") {
-    errors.cantidad = "Campo obligatorio";
-  } else if (isNaN(form.cantidad)) {
+  const cantidadStr = String(form.cantidad || "").trim();
+  if (!cantidadStr) {
+    errors.cantidad = "La cantidad es obligatoria";
+  } else if (isNaN(cantidadStr)) {
     errors.cantidad = "Debe ser un número";
-  } else if (parseInt(form.cantidad) < 0) {
-    errors.cantidad = "Debe ser un número entero mayor o igual a 0";
-  }
-
-  if (!form.reclamoId) {
-    errors.reclamoId = "Campo obligatorio";
+  } else if (parseInt(cantidadStr) <= 0) {
+    errors.cantidad = "La cantidad debe ser mayor que 0";
   }
 
   if (!form.proveedorId) {
-    errors.proveedorId = "Campo obligatorio";
+    errors.proveedorId = "El proveedor es obligatorio";
   }
 
-  if (!form.calidadId) {
-    errors.calidadId = "Campo obligatorio";
+  const resultadoStr = String(form.resultadoInspeccion || "").trim();
+  if (!resultadoStr) {
+    errors.resultadoInspeccion = "El resultado de la inspección es obligatorio";
   }
 
   if (!form.tipoMaterialId) {
-    errors.tipoMaterialId = "Campo obligatorio";
+    errors.tipoMaterialId = "El tipo de material es obligatorio";
   }
 
   const isFormValid = Object.keys(errors).length === 0;
@@ -115,9 +107,8 @@ export default function MaterialForm({
     // Marcar todos los campos como touched
     setTouched({
       cantidad: true,
-      reclamoId: true,
       proveedorId: true,
-      calidadId: true,
+      resultadoInspeccion: true,
       tipoMaterialId: true
     });
 
@@ -127,10 +118,10 @@ export default function MaterialForm({
 
     const dto = {
       cantidad: parseInt(form.cantidad, 10),
-      reclamoId: parseInt(form.reclamoId, 10),
       proveedorId: parseInt(form.proveedorId, 10),
-      calidadId: parseInt(form.calidadId, 10),
-      tipoMaterialId: parseInt(form.tipoMaterialId, 10)
+      tipoMaterialId: parseInt(form.tipoMaterialId, 10),
+      resultadoInspeccion: form.resultadoInspeccion,
+      observacionesInspeccion: form.observacionesInspeccion || null
     };
 
     onSubmit?.(dto);
@@ -165,36 +156,10 @@ export default function MaterialForm({
             onChange={handleChange}
             onBlur={() => handleBlur("cantidad")}
             disabled={loading}
-            min="0"
+            min="1"
           />
           {touched.cantidad && errors.cantidad && (
             <div className="invalid-feedback">{errors.cantidad}</div>
-          )}
-        </div>
-
-        {/* Reclamo */}
-        <div className="col-md-6">
-          <label htmlFor="reclamoId" className="form-label">
-            Reclamo <span className="text-danger">*</span>
-          </label>
-          <select
-            id="reclamoId"
-            name="reclamoId"
-            className={`form-select ${touched.reclamoId && errors.reclamoId ? 'is-invalid' : ''}`}
-            value={form.reclamoId}
-            onChange={handleChange}
-            onBlur={() => handleBlur("reclamoId")}
-            disabled={loading}
-          >
-            <option value="">-- Seleccione un reclamo --</option>
-            {claims.map((claim) => (
-              <option key={claim.id} value={claim.id}>
-                {claim.numReclamo || `Reclamo #${claim.id}`}
-              </option>
-            ))}
-          </select>
-          {touched.reclamoId && errors.reclamoId && (
-            <div className="invalid-feedback">{errors.reclamoId}</div>
           )}
         </div>
 
@@ -224,30 +189,46 @@ export default function MaterialForm({
           )}
         </div>
 
-        {/* Calidad */}
+        {/* Resultado de Inspección */}
         <div className="col-md-6">
-          <label htmlFor="calidadId" className="form-label">
-            Calidad <span className="text-danger">*</span>
+          <label htmlFor="resultadoInspeccion" className="form-label">
+            Resultado de Inspección <span className="text-danger">*</span>
           </label>
           <select
-            id="calidadId"
-            name="calidadId"
-            className={`form-select ${touched.calidadId && errors.calidadId ? 'is-invalid' : ''}`}
-            value={form.calidadId}
+            id="resultadoInspeccion"
+            name="resultadoInspeccion"
+            className={`form-select ${touched.resultadoInspeccion && errors.resultadoInspeccion ? 'is-invalid' : ''}`}
+            value={form.resultadoInspeccion}
             onChange={handleChange}
-            onBlur={() => handleBlur("calidadId")}
+            onBlur={() => handleBlur("resultadoInspeccion")}
             disabled={loading}
           >
-            <option value="">-- Seleccione una calidad --</option>
-            {calidades.map((calidad) => (
-              <option key={calidad.id} value={calidad.id}>
-                {calidad.nombre || `Calidad #${calidad.id}`}
-              </option>
-            ))}
+            <option value="">-- Seleccione resultado --</option>
+            <option value="Bueno">Bueno</option>
+            <option value="Regular">Regular</option>
+            <option value="Malo">Malo</option>
           </select>
-          {touched.calidadId && errors.calidadId && (
-            <div className="invalid-feedback">{errors.calidadId}</div>
+          {touched.resultadoInspeccion && errors.resultadoInspeccion && (
+            <div className="invalid-feedback">{errors.resultadoInspeccion}</div>
           )}
+        </div>
+
+        {/* Observaciones de Inspección */}
+        <div className="col-md-12">
+          <label htmlFor="observacionesInspeccion" className="form-label">
+            Observaciones de Inspección (Opcional)
+          </label>
+          <textarea
+            id="observacionesInspeccion"
+            name="observacionesInspeccion"
+            className="form-control"
+            placeholder="Ingrese observaciones sobre la inspección"
+            value={form.observacionesInspeccion}
+            onChange={handleChange}
+            onBlur={() => handleBlur("observacionesInspeccion")}
+            disabled={loading}
+            rows={3}
+          />
         </div>
 
         {/* Tipo Material */}

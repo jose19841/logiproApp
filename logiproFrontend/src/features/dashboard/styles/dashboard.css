@@ -1,0 +1,55 @@
+/* ===================== Dashboard – ajustes sobre el tema global ===================== */
+
+/* Lienzo del dashboard */
+.dashboard-page {
+  padding: 1.5rem;                /* el tema global ya maneja fondo/typo */
+  min-height: 100%;
+}
+
+/* Título con barra LED (más corto que el global) */
+.dashboard-page h1.h3 {
+  margin-bottom: .5rem;
+}
+.dashboard-page h1.h3::after {
+  content: "";
+  display: block;
+  width: 140px;
+  height: 3px;
+  background: linear-gradient(90deg, #1e88e5, #26c6da 60%, transparent);
+  box-shadow: 0 0 12px rgba(30,136,229,.6), 0 0 22px rgba(38,198,218,.45);
+  border-radius: 2px;
+  margin-top: .5rem;
+}
+
+/* Cards – un toque extra de “flotado” en esta vista */
+.dashboard-page .card {
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.dashboard-page .card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Tabla – realce leve al hover de filas */
+.dashboard-page .table tbody tr:hover {
+  box-shadow: inset 0 0 0 1px rgba(30,136,229,.28);
+}
+
+/* Actividad reciente – items con separación suave */
+.dashboard-page .list-group-item {
+  border-radius: 10px;
+  margin: .125rem 0;
+}
+
+/* Botones de accesos rápidos – consistencia y respuesta */
+.dashboard-page .card-body .btn {
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.dashboard-page .card-body .btn:hover {
+  transform: translateY(-1px);
+}

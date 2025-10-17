@@ -23,9 +23,13 @@ public class Proveedor {
     @Column(name = "descripcion", length = 255)
     private String descripcion;
 
+    @Column(name = "habilitado", nullable = false)
+    private Boolean habilitado = true;
+
     public Proveedor(String nombre, String descripcion){
         establecerNombre(nombre);
         actualizarDescripcion(descripcion);
+        this.habilitado = true;
     }
 
     // ===== Lógica de Negocio (DDD) =====
@@ -64,6 +68,30 @@ public class Proveedor {
         this.descripcion = (descripcion != null && !descripcion.trim().isEmpty())
                 ? descripcion.trim()
                 : null;
+    }
+
+    /**
+     * Habilita el proveedor en el sistema
+     * Permite que el proveedor pueda ser utilizado en operaciones
+     */
+    public void habilitar() {
+        this.habilitado = true;
+    }
+
+    /**
+     * Inhabilita el proveedor en el sistema
+     * El proveedor no podrá ser utilizado en nuevas operaciones
+     */
+    public void inhabilitar() {
+        this.habilitado = false;
+    }
+
+    /**
+     * Verifica si el proveedor está habilitado
+     * @return true si el proveedor está habilitado, false en caso contrario
+     */
+    public boolean estaHabilitado() {
+        return this.habilitado != null && this.habilitado;
     }
 
 }

@@ -60,50 +60,58 @@ export default function MaterialDetail({ material, onClose, onEdit }) {
                 </div>
               </div>
 
-              {/* Relaciones */}
+              {/* Información del Material */}
               <div className="col-12">
                 <div className="card border-0 bg-light">
                   <div className="card-body">
                     <h6 className="card-title text-muted mb-3">
                       <i className="bi bi-diagram-3 me-2"></i>
-                      Relaciones
+                      Información del Material
                     </h6>
                     <div className="row g-3">
                       <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Reclamo ID</label>
+                        <label className="form-label text-muted small mb-1">Proveedor</label>
                         <p className="fw-semibold mb-0">
-                          {material.reclamoId ? (
-                            <code className="bg-white px-2 py-1 rounded">#{material.reclamoId}</code>
+                          {material.proveedorDescripcion || (
+                            <span className="text-muted">No especificado</span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label text-muted small mb-1">Tipo de Material</label>
+                        <p className="fw-semibold mb-0">
+                          {material.nombreTipoMaterial || (
+                            <span className="text-muted">No especificado</span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label text-muted small mb-1">Calidad (Resultado de Inspección)</label>
+                        <p className="fw-semibold mb-0">
+                          {material.resultadoCalidad ? (
+                            <span className={`badge bg-${
+                              material.resultadoCalidad === 'Bueno' ? 'success' :
+                              material.resultadoCalidad === 'Regular' ? 'warning' :
+                              'danger'
+                            }`}>
+                              {material.resultadoCalidad}
+                            </span>
                           ) : (
                             <span className="text-muted">No especificado</span>
                           )}
                         </p>
                       </div>
                       <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Proveedor ID</label>
+                        <label className="form-label text-muted small mb-1">Fecha de Registro</label>
                         <p className="fw-semibold mb-0">
-                          {material.proveedorId ? (
-                            <code className="bg-white px-2 py-1 rounded">#{material.proveedorId}</code>
-                          ) : (
-                            <span className="text-muted">No especificado</span>
-                          )}
-                        </p>
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Calidad ID</label>
-                        <p className="fw-semibold mb-0">
-                          {material.calidadId ? (
-                            <code className="bg-white px-2 py-1 rounded">#{material.calidadId}</code>
-                          ) : (
-                            <span className="text-muted">No especificado</span>
-                          )}
-                        </p>
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Tipo Material ID</label>
-                        <p className="fw-semibold mb-0">
-                          {material.tipoMaterialId ? (
-                            <code className="bg-white px-2 py-1 rounded">#{material.tipoMaterialId}</code>
+                          {material.fechaCreacion ? (
+                            new Date(material.fechaCreacion).toLocaleDateString('es-AR', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
                           ) : (
                             <span className="text-muted">No especificado</span>
                           )}

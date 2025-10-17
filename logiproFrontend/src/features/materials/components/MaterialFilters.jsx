@@ -1,7 +1,6 @@
 // src/features/materials/components/MaterialFilters.jsx
 import { useState, useEffect } from "react";
 import { listSuppliers } from "@/features/suppliers/services/suppliersApi";
-import { listClaims } from "@/features/claims/services/claimsApi";
 import apiClient from "@shared/services/apiClient";
 
 /**
@@ -12,21 +11,18 @@ import apiClient from "@shared/services/apiClient";
  */
 export default function MaterialFilters({ filters = {}, onFilterChange, onClearFilters }) {
   const [suppliers, setSuppliers] = useState([]);
-  const [claims, setClaims] = useState([]);
   const [tiposMaterial, setTiposMaterial] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [suppliersData, claimsData, tiposData] = await Promise.all([
+        const [suppliersData, tiposData] = await Promise.all([
           listSuppliers().catch(() => []),
-          listClaims().catch(() => []),
-          apiClient.get("/api/tipos-material").then(res => res.data).catch(() => [])
+          apiClient.get("/api/materiales/tipos-material").then(res => res.data).catch(() => [])
         ]);
 
         setSuppliers(suppliersData || []);
-        setClaims(claimsData || []);
         setTiposMaterial(tiposData || []);
       } catch (error) {
         console.error("Error loading filter data:", error);
@@ -43,7 +39,6 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
 
   const hasActiveFilters =
     filters.proveedorId ||
-    filters.reclamoId ||
     filters.tipoMaterialId ||
     filters.cantidadMin ||
     filters.cantidadMax;
@@ -53,7 +48,7 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
       <div className="card-body">
         <div className="row g-3">
           {/* Proveedor */}
-          <div className="col-md-3">
+          <div className="col-md-4">
             <label htmlFor="filter-proveedorId" className="form-label small text-muted">
               Proveedor
             </label>
@@ -73,29 +68,8 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
             </select>
           </div>
 
-          {/* Reclamo */}
-          <div className="col-md-3">
-            <label htmlFor="filter-reclamoId" className="form-label small text-muted">
-              Reclamo
-            </label>
-            <select
-              id="filter-reclamoId"
-              className="form-select"
-              value={filters.reclamoId || ""}
-              onChange={(e) => handleChange("reclamoId", e.target.value)}
-              disabled={loading}
-            >
-              <option value="">Todos</option>
-              {claims.map((claim) => (
-                <option key={claim.id} value={claim.id}>
-                  {claim.numReclamo || `#${claim.id}`}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Tipo de Material */}
-          <div className="col-md-3">
+          <div className="col-md-4">
             <label htmlFor="filter-tipoMaterialId" className="form-label small text-muted">
               Tipo de Material
             </label>
@@ -116,7 +90,7 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
           </div>
 
           {/* Rango de Cantidad - Mínimo */}
-          <div className="col-md-1-5">
+          <div className="col-md-2">
             <label htmlFor="filter-cantidadMin" className="form-label small text-muted">
               Cantidad Mín.
             </label>
@@ -132,7 +106,7 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
           </div>
 
           {/* Rango de Cantidad - Máximo */}
-          <div className="col-md-1-5">
+          <div className="col-md-2">
             <label htmlFor="filter-cantidadMax" className="form-label small text-muted">
               Cantidad Máx.
             </label>

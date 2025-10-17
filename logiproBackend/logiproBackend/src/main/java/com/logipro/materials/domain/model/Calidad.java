@@ -19,10 +19,10 @@ public class Calidad {
     @Column(name = "id_calidad")
     private Long id;
 
-    @Column(name = "fehca_inspeccion", nullable = false)
+    @Column(name = "fecha_inspeccion", nullable = false)
     private Instant fechaInspeccion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_detalle_calidad")
     private DetalleCalidad detalleCalidad;
 }

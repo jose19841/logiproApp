@@ -5,6 +5,8 @@ import com.logipro.materials.application.dto.request.CrearMaterialRequestDTO;
 import com.logipro.materials.application.dto.request.FiltroMaterialesDTO;
 import com.logipro.materials.application.dto.response.MaterialResponseDTO;
 import com.logipro.materials.application.service.MaterialService;
+import com.logipro.materials.domain.model.TipoMaterial;
+import com.logipro.materials.domain.repository.TipoMaterialRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -31,6 +33,7 @@ import java.util.List;
 public class MaterialController {
 
     private final MaterialService materialService;
+    private final TipoMaterialRepository tipoMaterialRepository;
 
     @Operation(
             summary = "Crear material",
@@ -119,5 +122,18 @@ public class MaterialController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         materialService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Listar todos los tipos de material",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Listado de tipos de material",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TipoMaterial.class))))
+            }
+    )
+    @GetMapping("/tipos-material")
+    public ResponseEntity<List<TipoMaterial>> listarTiposMaterial() {
+        List<TipoMaterial> tipos = tipoMaterialRepository.findAll();
+        return ResponseEntity.ok(tipos);
     }
 }

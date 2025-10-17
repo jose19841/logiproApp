@@ -24,11 +24,11 @@ public class Inventario {
     private Integer cantidadMaxima;
 
     // relacion con sector
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "id_sector", nullable = false)
     private Sector sector;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "id_material", nullable = false)
     private Material material;
 

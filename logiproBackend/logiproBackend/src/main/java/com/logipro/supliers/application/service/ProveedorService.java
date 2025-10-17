@@ -5,6 +5,7 @@ import com.logipro.supliers.application.dto.request.CrearProveedorRequestDTO;
 import com.logipro.supliers.application.dto.response.ProveedorResponseDTO;
 import com.logipro.supliers.application.usecase.ActualizarProveedorUseCase;
 import com.logipro.supliers.application.usecase.BuscarProveedorPorIdUseCase;
+import com.logipro.supliers.application.usecase.CambiarEstadoProveedorUseCase;
 import com.logipro.supliers.application.usecase.CrearProveedorUseCase;
 import com.logipro.supliers.application.usecase.ListarProveedoresUseCase;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class ProveedorService {
     private final ListarProveedoresUseCase listarProveedoresUseCase;
     private final ActualizarProveedorUseCase actualizarProveedorUseCase;
     private final BuscarProveedorPorIdUseCase buscarProveedorPorIdUseCase;
+    private final CambiarEstadoProveedorUseCase cambiarEstadoProveedorUseCase;
 
     @Transactional
     public ProveedorResponseDTO crear(CrearProveedorRequestDTO dto){
@@ -40,6 +42,11 @@ public class ProveedorService {
     @Transactional
     public Optional<ProveedorResponseDTO> actualizar(Long id, ActualizarProveedorRequestDTO dto) {
         return actualizarProveedorUseCase.ejecutar(id, dto);
+    }
+
+    @Transactional
+    public Optional<ProveedorResponseDTO> cambiarEstado(Long id, Boolean habilitar) {
+        return cambiarEstadoProveedorUseCase.ejecutar(id, habilitar);
     }
 
 }

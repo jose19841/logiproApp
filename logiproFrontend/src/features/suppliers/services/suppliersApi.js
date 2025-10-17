@@ -27,3 +27,9 @@ export async function updateSupplier(id, dto) {
   const { data } = await apiClient.patch(`${BASE_PATH}/${id}`, dto);
   return data;
 }
+
+
+export async function changeSupplierStatus(id, habilitar) {
+  const { data } = await apiClient.patch(`${BASE_PATH}/${id}/estado?habilitar=${habilitar}`);
+  return data;
+}

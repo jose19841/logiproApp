@@ -42,7 +42,7 @@ export default function MaterialEditPage() {
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
-          <p className="mt-2 text-muted">Cargando material...</p>
+          <p className="mt-2 text-muted">Cargando material #{id}...</p>
         </div>
       </div>
     );
@@ -54,6 +54,24 @@ export default function MaterialEditPage() {
         <div className="alert alert-danger" role="alert">
           <i className="bi bi-exclamation-triangle me-2"></i>
           {errorMaterial}
+        </div>
+        <button
+          className="btn btn-outline-secondary"
+          onClick={handleCancel}
+        >
+          <i className="bi bi-arrow-left me-2"></i>
+          Volver a Materiales
+        </button>
+      </div>
+    );
+  }
+
+  if (!material) {
+    return (
+      <div className="container-fluid">
+        <div className="alert alert-warning" role="alert">
+          <i className="bi bi-exclamation-triangle me-2"></i>
+          No se encontró el material #{id}
         </div>
         <button
           className="btn btn-outline-secondary"

@@ -1,37 +1,66 @@
-/* src/modules/login/styles/login.css */
+/* src/features/auth/styles/login.css - Integrado con theme-controlroom */
 
-/* ===== Fondo con imagen (metalúrgica) ===== */
-.login-root {
+/* ===== Fondo con imagen (metalúrgica) - FORZAR VISIBILIDAD ===== */
+.theme-controlroom.login-root {
   min-height: 100vh;
   display: grid;
   place-items: center;
   position: relative;
-  background: url("/img/metalurgica.png") center / cover no-repeat fixed;
-  background-color: var(--color-bg);
+  /* BACKGROUND CON IMAGEN - debe ser visible */
+  background-color: #0b0e11 !important;
+  background-image: url("/img/metalurgica.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
   overflow: hidden;
+  /* Overlay oscuro sobre la imagen para mejorar contraste */
+  isolation: isolate;
 }
 
-.login-overlay {
+.theme-controlroom.login-root::after {
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(0,0,0,.55) 0%,
-    rgba(0,0,0,.45) 40%,
-    rgba(0,0,0,.55) 100%
+    rgba(11,14,17,.4) 0%,
+    rgba(11,14,17,.25) 40%,
+    rgba(11,14,17,.4) 100%
   );
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* ===== Card colapsable ===== */
-.login-card {
+.theme-controlroom .login-overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Container y Card deben estar por encima del overlay */
+.theme-controlroom.login-root .container {
   position: relative;
   z-index: 1;
-  background: var(--card-bg-translucent, rgba(255,255,255,.88));
-  backdrop-filter: blur(var(--card-blur, 8px));
-  -webkit-backdrop-filter: blur(var(--card-blur, 8px));
-  box-shadow: var(--shadow-lg);
-  border: 0;
-  border-radius: var(--radius-lg);
+}
+
+/* ===== Card colapsable con tema 3D ===== */
+.theme-controlroom .login-card {
+  position: relative;
+  z-index: 1;
+  /* Usar el mismo estilo de card que el tema */
+  background: linear-gradient(145deg, #121519, #1a1f26);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(124, 146, 168, 0.18);
+  border-radius: 14px;
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 0 0 1px rgba(255,255,255,.02);
+  color: #e7ecf2;
   overflow: hidden;
   transition:
     box-shadow 220ms ease,
@@ -40,24 +69,27 @@
 }
 
 /* estado compacto (cerrado) */
-.login-card.collapsible.compact {
+.theme-controlroom .login-card.collapsible.compact {
   max-height: 72px; /* altura del header */
   transform: translateY(6px);
 }
 
 /* estado abierto */
-.login-card.collapsible.open {
+.theme-controlroom .login-card.collapsible.open {
   max-height: 680px; /* suficiente para el formulario */
   transform: translateY(0);
 }
 
 /* hover lift */
-.login-card.collapsible:hover {
-  box-shadow: var(--shadow);
+.theme-controlroom .login-card.collapsible:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 /* ===== Header clickable ===== */
-.login-header-btn {
+.theme-controlroom .login-header-btn {
   width: 100%;
   background: transparent;
   border: 0;
@@ -67,27 +99,30 @@
   gap: .5rem;
   padding: 1rem 1.25rem;
   cursor: pointer;
+  color: #e7ecf2;
 }
 
-.login-header-btn:focus-visible {
+.theme-controlroom .login-header-btn:focus-visible {
   outline: none;
-  box-shadow: var(--focus-ring, 0 0 0 .25rem rgba(13,110,253,.25));
-  border-radius: var(--radius);
+  box-shadow: 0 0 0 .25rem rgba(33,150,243,.25);
+  border-radius: 10px;
 }
 
 /* chevron */
-.chevron {
+.theme-controlroom .chevron {
   width: 0.75rem;
   height: 0.75rem;
-  border-right: 2px solid rgba(0,0,0,.6);
-  border-bottom: 2px solid rgba(0,0,0,.6);
+  border-right: 2px solid #90caf9;
+  border-bottom: 2px solid #90caf9;
   transform: rotate(45deg);
   transition: transform 220ms ease, border-color 200ms ease;
 }
-.chevron.up { transform: rotate(-135deg); }
+.theme-controlroom .chevron.up {
+  transform: rotate(-135deg);
+}
 
 /* ===== Contenido que se revela ===== */
-.login-fields {
+.theme-controlroom .login-fields {
   padding: 0 1.25rem 1.25rem;
   opacity: 0;
   transform: translateY(8px);
@@ -96,73 +131,154 @@
     transform 260ms ease 90ms;
   pointer-events: none;
 }
-.login-card.open .login-fields {
+.theme-controlroom .login-card.open .login-fields {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
 
-/* Inputs / tipografía */
-.login-card .form-control { border-radius: var(--radius); }
-.login-card .form-label { color: var(--color-text); }
+/* ===== Labels y Form Controls ===== */
+.theme-controlroom .login-card .form-label {
+  color: #c9d3de;
+  font-weight: 500;
+  margin-bottom: .5rem;
+}
 
-/* ===== Botón “ojito” para ver/ocultar contraseña ===== */
-.position-relative .toggle-pass-btn {
+.theme-controlroom .login-card .form-control {
+  background: linear-gradient(180deg, #161b22, #13171d);
+  border: 1px solid rgba(124, 146, 168, 0.18);
+  color: #e7ecf2;
+  border-radius: 10px;
+  padding: .625rem 1rem;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.theme-controlroom .login-card .form-control:focus {
+  background: linear-gradient(180deg, #1a1f26, #161b22);
+  border-color: #90caf9;
+  color: #fff;
+  box-shadow: 0 0 0 .2rem rgba(33,150,243,.15), inset 0 1px 0 rgba(255,255,255,.03);
+  outline: none;
+}
+
+.theme-controlroom .login-card .form-control::placeholder {
+  color: #93a4b2;
+  opacity: 0.7;
+}
+
+.theme-controlroom .login-card .form-control.is-invalid {
+  border-color: #ef5350;
+  background: linear-gradient(180deg, rgba(239,83,80,.08), rgba(211,47,47,.05));
+}
+
+.theme-controlroom .login-card .form-control.is-invalid:focus {
+  box-shadow: 0 0 0 .2rem rgba(239,83,80,.25);
+}
+
+/* ===== Botón "ojito" para ver/ocultar contraseña ===== */
+.theme-controlroom .position-relative .toggle-pass-btn {
   position: absolute;
   top: 50%;
   right: .5rem;
   transform: translateY(-50%);
   padding: .25rem .5rem;
   line-height: 1;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  border: 1px solid rgba(0,0,0,.08);
-  box-shadow: var(--shadow-sm);
-  color: var(--color-text);
-  transition: var(--transition);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #1a1f26, #161b22);
+  border: 1px solid rgba(124, 146, 168, 0.18);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  color: #c9d3de;
+  transition: transform .15s ease, box-shadow .15s ease, color .15s ease;
 }
-.position-relative .toggle-pass-btn:hover {
-  box-shadow: var(--shadow);
+.theme-controlroom .position-relative .toggle-pass-btn:hover {
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(33,150,243,.2);
+  transform: translateY(-50%) scale(1.05);
 }
-.position-relative .toggle-pass-btn:focus-visible {
+.theme-controlroom .position-relative .toggle-pass-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+  box-shadow: 0 0 0 .25rem rgba(33,150,243,.25);
 }
 
 /* Asegura espacio dentro del input para que no tape el texto */
-.form-control.pe-5 {
+.theme-controlroom .form-control.pe-5 {
   padding-right: 2.75rem !important;
 }
 
-/* Errores inline: asegurar separación y visibilidad */
-.invalid-feedback {
+/* ===== Mensajes de Error ===== */
+.theme-controlroom .login-card .invalid-feedback {
   font-size: .875rem;
+  color: #ef5350;
+  font-weight: 500;
 }
-.invalid-feedback.d-block {
+.theme-controlroom .login-card .invalid-feedback.d-block {
   margin-top: .375rem;
 }
 
-/* Link “¿Olvidaste tu contraseña?” */
-.forgot-link {
-  color: var(--color-primary);
+.theme-controlroom .login-card .alert-danger {
+  background: linear-gradient(145deg, rgba(239,83,80,.12), rgba(211,47,47,.08));
+  border: 1px solid rgba(239,83,80,.3);
+  color: #ffcdd2;
+  border-radius: 10px;
+}
+
+/* ===== Link "¿Olvidaste tu contraseña?" ===== */
+.theme-controlroom .forgot-link {
+  color: #90caf9;
   font-weight: 500;
   text-decoration: none;
-  transition: var(--transition);
+  transition: color .15s ease, text-shadow .15s ease;
 }
-.forgot-link:hover {
-  color: var(--color-accent);
+.theme-controlroom .forgot-link:hover {
+  color: #64b5f6;
   text-decoration: underline;
+  text-shadow: 0 0 8px rgba(33,150,243,.3);
 }
 
-/* Botón con micro-interacción */
-.btn-primary {
-  box-shadow: var(--shadow-sm);
-  transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease;
+/* ===== Botón Primary (usar el del tema) ===== */
+.theme-controlroom .login-card .btn-primary {
+  background: linear-gradient(180deg, #2196f3, #1976d2);
+  border: 1px solid #1a78d6;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(33,150,243,.28), inset 0 1px 0 rgba(255,255,255,.18);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  font-weight: 600;
 }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.theme-controlroom .login-card .btn-primary:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(33,150,243,.35), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.theme-controlroom .login-card .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(33,150,243,.25), inset 0 2px 0 rgba(0,0,0,.25);
+}
+.theme-controlroom .login-card .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
 
-/* Responsive */
+/* ===== Footer text ===== */
+.theme-controlroom .text-white-50 {
+  color: #93a4b2 !important;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 576px) {
-  .login-card.collapsible.compact { max-height: 64px; }
-  .login-card { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .theme-controlroom .login-card.collapsible.compact {
+    max-height: 64px;
+  }
+  .theme-controlroom .login-card {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .theme-controlroom .login-header-btn {
+    padding: .875rem 1rem;
+  }
+  .theme-controlroom .login-fields {
+    padding: 0 1rem 1rem;
+  }
 }

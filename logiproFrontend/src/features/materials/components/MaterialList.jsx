@@ -33,82 +33,70 @@ export default function MaterialList({ data = [], loading = false, error = "", o
         )
       },
       {
-        key: "reclamoId",
-        label: "Reclamo",
+        key: "fechaCreacion",
+        label: "Fecha de Registro",
         sortable: true,
         align: "center",
-        render: (value) => value ? `#${value}` : "-"
+        render: (value) => value ? new Date(value).toLocaleDateString('es-AR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }) : "-"
       },
       {
-        key: "proveedorId",
+        key: "proveedorDescripcion",
         label: "Proveedor",
         sortable: true,
-        align: "center",
-        render: (value) => value ? `#${value}` : "-"
+        align: "left",
+        render: (value) => value || "-"
       },
       {
-        key: "calidadId",
+        key: "resultadoCalidad",
         label: "Calidad",
         sortable: true,
         align: "center",
-        render: (value) => value ? `#${value}` : "-"
+        render: (value) => {
+          if (!value) return "-";
+          const badgeClass = value === "Bueno" ? "success" : value === "Regular" ? "warning" : "danger";
+          return <span className={`badge bg-${badgeClass}`}>{value}</span>;
+        }
       },
       {
-        key: "tipoMaterialId",
+        key: "nombreTipoMaterial",
         label: "Tipo Material",
         sortable: true,
-        align: "center",
-        render: (value) => value ? `#${value}` : "-"
+        align: "left",
+        render: (value) => value || "-"
       },
       {
         key: "acciones",
         label: "Acciones",
-        align: "end",
+        align: "center",
         render: (_, row) => (
-          <div className="dropdown">
+          <div className="btn-group btn-group-sm" role="group">
             <button
-              className="btn btn-sm btn-outline-secondary border-0"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              aria-label="Acciones"
-              title="Acciones"
-              style={{ fontSize: '18px', lineHeight: 1 }}
+              className="btn btn-outline-primary"
+              onClick={() => onView?.(row)}
+              title="Ver detalle"
             >
-              ⋮
+              <i className="bi bi-eye"></i>
             </button>
-            <ul className="dropdown-menu dropdown-menu-end shadow-sm" style={{minWidth: '200px'}}>
-              <li>
-                <button
-                  className="dropdown-item d-flex align-items-center gap-2 py-2"
-                  onClick={() => onView?.(row)}
-                >
-                  <i className="bi bi-eye text-primary"></i>
-                  Ver detalles
-                </button>
-              </li>
-              <li>
-                <button
-                  className="dropdown-item d-flex align-items-center gap-2 py-2"
-                  onClick={() => onEdit?.(row)}
-                >
-                  <i className="bi bi-pencil text-warning"></i>
-                  Editar
-                </button>
-              </li>
-
-              <li><hr className="dropdown-divider" /></li>
-
-              <li>
-                <button
-                  className="dropdown-item d-flex align-items-center gap-2 py-2 text-danger"
-                  onClick={() => onDelete?.(row)}
-                >
-                  <i className="bi bi-trash"></i>
-                  Eliminar
-                </button>
-              </li>
-            </ul>
+            <button
+              className="btn btn-outline-warning"
+              onClick={() => onEdit?.(row)}
+              title="Editar"
+            >
+              <i className="bi bi-pencil"></i>
+            </button>
+            <button
+              className="btn btn-outline-danger"
+              onClick={() => onDelete?.(row)}
+              title="Eliminar"
+            >
+              <i className="bi bi-trash"></i>
+            </button>
           </div>
         ),
       },

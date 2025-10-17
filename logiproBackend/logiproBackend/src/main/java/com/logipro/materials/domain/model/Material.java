@@ -33,15 +33,15 @@ public class Material {
     @JoinColumn(name = "id_reclamo")
     private Reclamo reclamo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_provedor")
     private Proveedor proveedor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_calidad")
     private Calidad calidad;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_tipo_material")
     private TipoMaterial tipoMaterial;
 

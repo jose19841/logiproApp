@@ -118,4 +118,24 @@ public class ProveedorController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+    @PatchMapping("/{id}/estado")
+    @Operation(
+            summary = "Cambiar estado del proveedor",
+            description = "Habilita o inhabilita un proveedor en el sistema. Requiere JWT.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Estado del proveedor actualizado",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ProveedorResponseDTO.class))),
+                    @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Proveedor no encontrado", content = @Content)
+            }
+    )
+    public ResponseEntity<ProveedorResponseDTO> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam Boolean habilitar) {
+        return proveedorService.cambiarEstado(id, habilitar)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
 }

@@ -19,6 +19,7 @@ public class ProveedorMapper {
                 .id(proveedor.getId())
                 .nombre(proveedor.getNombre())
                 .descripcion(proveedor.getDescripcion())
+                .habilitado(proveedor.getHabilitado())
                 .build();
     }
     public List<ProveedorResponseDTO> toResponseDTOList(List<Proveedor> proveedores){
