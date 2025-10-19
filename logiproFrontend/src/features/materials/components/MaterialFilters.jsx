@@ -48,8 +48,8 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
       <div className="card-body">
         <div className="row g-3">
           {/* Proveedor */}
-          <div className="col-md-4">
-            <label htmlFor="filter-proveedorId" className="form-label small text-muted">
+          <div className="col-md-3">
+            <label htmlFor="filter-proveedorId" className="form-label small">
               Proveedor
             </label>
             <select
@@ -69,8 +69,8 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
           </div>
 
           {/* Tipo de Material */}
-          <div className="col-md-4">
-            <label htmlFor="filter-tipoMaterialId" className="form-label small text-muted">
+          <div className="col-md-3">
+            <label htmlFor="filter-tipoMaterialId" className="form-label small">
               Tipo de Material
             </label>
             <select
@@ -90,8 +90,8 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
           </div>
 
           {/* Rango de Cantidad - Mínimo */}
-          <div className="col-md-2">
-            <label htmlFor="filter-cantidadMin" className="form-label small text-muted">
+          <div className="col-md-3">
+            <label htmlFor="filter-cantidadMin" className="form-label small">
               Cantidad Mín.
             </label>
             <input
@@ -106,8 +106,8 @@ export default function MaterialFilters({ filters = {}, onFilterChange, onClearF
           </div>
 
           {/* Rango de Cantidad - Máximo */}
-          <div className="col-md-2">
-            <label htmlFor="filter-cantidadMax" className="form-label small text-muted">
+          <div className="col-md-3">
+            <label htmlFor="filter-cantidadMax" className="form-label small">
               Cantidad Máx.
             </label>
             <input

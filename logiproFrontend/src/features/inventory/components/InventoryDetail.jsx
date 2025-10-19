@@ -36,29 +36,29 @@ export default function InventoryDetail({ inventario, onClose, onEdit }) {
             <div className="modal-body">
               <div className="row g-3">
                 <div className="col-md-6">
-                  <label className="form-label text-muted small">ID</label>
+                  <label className="form-label small">ID</label>
                   <p className="fw-bold">#{inventario.id}</p>
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label text-muted small">Sector</label>
+                  <label className="form-label small">Sector</label>
                   <p className="fw-bold">{inventario.sectorNombre || 'No especificado'}</p>
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label text-muted small">Material (Tipo)</label>
+                  <label className="form-label small">Material (Tipo)</label>
                   <p className="fw-bold">{inventario.materialNombre || 'No especificado'}</p>
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label text-muted small">Cantidad Mínima</label>
+                  <label className="form-label small">Cantidad Mínima</label>
                   <p>
                     <span className="badge bg-info fs-6">{inventario.cantidadMinima}</span>
                   </p>
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label text-muted small">Cantidad Máxima</label>
+                  <label className="form-label small">Cantidad Máxima</label>
                   <p>
                     <span className="badge bg-success fs-6">{inventario.cantidadMaxima}</span>
                   </p>

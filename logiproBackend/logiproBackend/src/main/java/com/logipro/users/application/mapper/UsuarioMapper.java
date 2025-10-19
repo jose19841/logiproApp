@@ -1,5 +1,6 @@
 package com.logipro.users.application.mapper;
 
+import com.logipro.users.application.dto.request.ActualizarUsuarioRequestDTO;
 import com.logipro.users.application.dto.request.RegistrarUsuarioRequestDTO;
 import com.logipro.users.application.dto.response.UsuarioResponseDTO;
 import com.logipro.users.domain.model.Usuario;
@@ -13,12 +14,12 @@ public class UsuarioMapper {
         return UsuarioResponseDTO.builder()
                 .id(u.getId())
                 .usuario(u.getUsuario())
-                .nombre(u.getNombre())           // ← AGREGADO
-                .apellido(u.getApellido())       // ← AGREGADO
-                .email(u.getEmail())             // ← AGREGADO
-                .telefono(u.getTelefono())       // ← AGREGADO
-                .domicilio(u.getDomicilio())     // ← AGREGADO
-                .dni(u.getDni())                 // ← AGREGADO
+                .nombre(u.getNombre())
+                .apellido(u.getApellido())
+                .email(u.getEmail())
+                .telefono(u.getTelefono())
+                .domicilio(u.getDomicilio())
+                .dni(u.getDni())
                 .rol(u.getRol() != null ? u.getRol().getNombre() : null)
                 .estado(u.getEstado())
                 .build();
@@ -37,5 +38,26 @@ public class UsuarioMapper {
                 .usuario(dto.getUsuario())
                 .clave(dto.getClave()) // se encripta en el service
                 .build();
+    }
+
+    /**
+     * Actualiza una entidad existente con los datos del DTO de actualización
+     * Usa métodos de dominio para mantener la lógica de negocio
+     */
+    public void updateEntityFromDTO(Usuario usuario, ActualizarUsuarioRequestDTO dto) {
+        if (usuario == null || dto == null) return;
+
+        // Usar métodos de dominio en vez de setters directos
+        usuario.actualizarDatosPersonales(
+                dto.getNombre(),
+                dto.getApellido(),
+                dto.getDni(),
+                dto.getTelefono(),
+                dto.getEmail(),
+                dto.getDomicilio()
+        );
+
+        usuario.actualizarUsuario(dto.getUsuario());
+        // Rol se asigna en el service con asignarRol()
     }
 }

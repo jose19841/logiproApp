@@ -39,7 +39,7 @@ public class CrearInventarioService implements CrearInventarioUseCase {
         // Crear inventario y validar con métodos de negocio
         Inventario inv = inventarioMapper.fromCrearRequest(dto, sector, material);
 
-        // La validación cantidadMinima <= cantidadMaxima ya está en Inventario.establecerCantidades()
+
         return inventarioRepository.save(inv);
     }
 }

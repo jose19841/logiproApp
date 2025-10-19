@@ -120,7 +120,11 @@ if (!apiClient.__INTERCEPTORS_REGISTERED__) {
     async (error) => {
       const originalRequest = error.config;
 
-      if (error?.response?.status !== 401 || originalRequest._retry) {
+      // ✅ DON'T auto-refresh for auth endpoints (login, refresh, forgot, reset)
+      // These endpoints return 401 for bad credentials, not expired tokens
+      const isAuthEndpoint = originalRequest?.url?.includes("/auth/");
+
+      if (error?.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {
         return Promise.reject(error);
       }
 

@@ -47,11 +47,7 @@ public class Reclamo {
 
     // ===== Lógica de Negocio (DDD) =====
 
-    /**
-     * Establece el número de reclamo con validación
-     * @param numReclamo Número único del reclamo
-     * @throws IllegalArgumentException si el número es inválido
-     */
+
     public void establecerNumReclamo(String numReclamo) {
         if (numReclamo == null || numReclamo.trim().isEmpty()) {
             throw new IllegalArgumentException("El número de reclamo no puede ser vacío");
@@ -59,11 +55,7 @@ public class Reclamo {
         this.numReclamo = numReclamo.trim();
     }
 
-    /**
-     * Establece la descripción con validación
-     * @param descripcion Descripción del reclamo
-     * @throws IllegalArgumentException si la descripción es inválida
-     */
+
     public void establecerDescripcion(String descripcion) {
         if (descripcion == null || descripcion.trim().isEmpty()) {
             throw new IllegalArgumentException("La descripción no puede ser vacía");
@@ -74,19 +66,12 @@ public class Reclamo {
         this.descripcion = descripcion.trim();
     }
 
-    /**
-     * Actualiza la descripción del reclamo
-     * @param nuevaDescripcion Nueva descripción
-     */
+
     public void actualizarDescripcion(String nuevaDescripcion) {
         establecerDescripcion(nuevaDescripcion);
     }
 
-    /**
-     * Asigna un proveedor al reclamo
-     * @param proveedor Proveedor asociado
-     * @throws IllegalArgumentException si el proveedor es nulo
-     */
+
     public void asignarProveedor(Proveedor proveedor) {
         if (proveedor == null) {
             throw new IllegalArgumentException("El proveedor no puede ser nulo");
@@ -94,19 +79,12 @@ public class Reclamo {
         this.proveedor = proveedor;
     }
 
-    /**
-     * Asigna detalle al reclamo
-     * @param detalle Detalle del reclamo (puede ser null)
-     */
+
     public void asignarDetalle(DetalleReclamo detalle) {
         this.detalleReclamo = detalle;
     }
 
-    /**
-     * Cambia el estado del reclamo validando transiciones válidas
-     * @param nuevoEstado Nuevo estado
-     * @throws IllegalArgumentException si la transición no es válida
-     */
+
     public void cambiarEstado(EstadoReclamo nuevoEstado) {
         if (nuevoEstado == null) {
             throw new IllegalArgumentException("El estado no puede ser nulo");
@@ -128,18 +106,12 @@ public class Reclamo {
         this.estado = nuevoEstado;
     }
 
-    /**
-     * Verifica si el reclamo está en estado final
-     * @return true si está cerrado o resuelto
-     */
+
     public boolean estaFinalizado() {
         return this.estado == EstadoReclamo.CERRADO || this.estado == EstadoReclamo.RESUELTO;
     }
 
-    /**
-     * Verifica si el reclamo requiere atención urgente
-     * @return true si está pendiente
-     */
+
     public boolean requiereAtencion() {
         return this.estado == EstadoReclamo.PENDIENTE;
     }

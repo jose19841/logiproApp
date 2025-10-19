@@ -1,9 +1,11 @@
 package com.logipro.users.infrastructure.rest;
 
+import com.logipro.users.application.dto.request.ActualizarUsuarioRequestDTO;
 import com.logipro.users.application.dto.request.RegistrarUsuarioRequestDTO;
 import com.logipro.users.application.dto.response.UsuarioResponseDTO;
 import com.logipro.users.domain.model.UserStatus;
 import com.logipro.users.application.service.UsuarioService;
+import com.logipro.users.application.usecase.ObtenerUsuarioAutenticadoUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.logipro.users.application.dto.request.CambiarClaveRequestDTO;
-import com.logipro.users.domain.repository.UsuarioRepository;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
@@ -30,7 +31,8 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final UsuarioRepository usuarioRepository;
+    // ✅ ELIMINAR acceso directo al repository, usar UseCase
+    private final ObtenerUsuarioAutenticadoUseCase obtenerUsuarioAutenticadoUseCase;
 
 
     @Operation(
@@ -79,7 +81,7 @@ public class UsuarioController {
 
     @Operation(
             summary = "Actualizar usuario",
-            description = "Actualiza los datos del usuario usando el DTO de registro.",
+            description = "Actualiza los datos del usuario (sin cambiar la clave).",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Usuario actualizado",
                             content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))),
@@ -90,7 +92,7 @@ public class UsuarioController {
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody RegistrarUsuarioRequestDTO request
+            @Valid @RequestBody ActualizarUsuarioRequestDTO request // ✅ USAR DTO ESPECÍFICO
     ) {
         return usuarioService.actualizar(id, request)
                 .map(ResponseEntity::ok)
@@ -133,7 +135,8 @@ public class UsuarioController {
         // auth.getName() → devuelve el login (en tu caso el campo "usuario")
         String login = auth.getName();
 
-        var usuarioOpt = usuarioRepository.findByUsuario(login);
+        // ✅ USAR USE CASE en lugar de repository directo
+        var usuarioOpt = obtenerUsuarioAutenticadoUseCase.obtenerPorUsername(login);
         if (usuarioOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

@@ -34,11 +34,7 @@ public class Proveedor {
 
     // ===== Lógica de Negocio (DDD) =====
 
-    /**
-     * Establece el nombre del proveedor con validación de reglas de negocio
-     * @param nombre Nombre del proveedor
-     * @throws IllegalArgumentException si el nombre es inválido
-     */
+
     public void establecerNombre(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del proveedor no puede ser vacío");
@@ -49,18 +45,12 @@ public class Proveedor {
         this.nombre = nombre.trim();
     }
 
-    /**
-     * Actualiza el nombre del proveedor
-     * @param nombre Nuevo nombre
-     */
+
     public void actualizarNombre(String nombre) {
         establecerNombre(nombre);
     }
 
-    /**
-     * Actualiza la descripción del proveedor
-     * @param descripcion Nueva descripción (puede ser null)
-     */
+
     public void actualizarDescripcion(String descripcion) {
         if (descripcion != null && descripcion.trim().length() > 255) {
             throw new IllegalArgumentException("La descripción no puede exceder 255 caracteres");
@@ -70,26 +60,17 @@ public class Proveedor {
                 : null;
     }
 
-    /**
-     * Habilita el proveedor en el sistema
-     * Permite que el proveedor pueda ser utilizado en operaciones
-     */
+
     public void habilitar() {
         this.habilitado = true;
     }
 
-    /**
-     * Inhabilita el proveedor en el sistema
-     * El proveedor no podrá ser utilizado en nuevas operaciones
-     */
+
     public void inhabilitar() {
         this.habilitado = false;
     }
 
-    /**
-     * Verifica si el proveedor está habilitado
-     * @return true si el proveedor está habilitado, false en caso contrario
-     */
+
     public boolean estaHabilitado() {
         return this.habilitado != null && this.habilitado;
     }

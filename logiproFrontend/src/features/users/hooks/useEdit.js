@@ -96,7 +96,7 @@ export default function useEdit(userId) {
     try {
       setSaving(true);
 
-      // Solo envía campos que acepta RegistrarUsuarioRequestDTO
+      // ✅ Solo envía campos que acepta ActualizarUsuarioRequestDTO (sin clave)
       const payload = {
         nombre: form.nombre,
         apellido: form.apellido,
@@ -105,7 +105,7 @@ export default function useEdit(userId) {
         email: form.email || "",
         domicilio: form.domicilio || "",
         usuario: form.usuario,
-        clave: "TempPassword123!", // Campo requerido - considera mejorarlo
+        // ❌ NO enviar clave - se cambia por endpoint separado /mi-clave
         rol: form.rol
       };
 

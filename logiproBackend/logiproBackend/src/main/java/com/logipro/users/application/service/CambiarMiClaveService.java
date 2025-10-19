@@ -39,7 +39,9 @@ public class CambiarMiClaveService implements CambiarMiClaveUsecase {
             throw new IllegalArgumentException("La nueva clave no cumple la política");
         }
 
-        usuario.setClave(passwordEncoder.encode(nuevaClave));
+        // ✅ USAR MÉTODO DE DOMINIO en vez de setter
+        String claveEncriptada = passwordEncoder.encode(nuevaClave);
+        usuario.cambiarClave(claveEncriptada);
         usuarioRepository.save(usuario);
 
         // Si quisieras, revocás refresh tokens acá

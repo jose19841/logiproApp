@@ -35,16 +35,12 @@ export default function SuppliersListPage() {
   const columns = useMemo(
     () => [
       { key: "id", label: "ID", sortable: true, align: "center" },
-      { key: "nombre", label: "Name", sortable: true },
+      { key: "nombre", label: "Nombre", sortable: true },
       {
         key: "descripcion",
-        label: "Description",
+        label: "Descripción",
         sortable: true,
-        render: (value) => (
-          <span className="text-muted">
-            {value || "-"}
-          </span>
-        )
+        render: (value) => value || "-"
       },
       {
         key: "habilitado",
@@ -109,7 +105,7 @@ export default function SuppliersListPage() {
             onClick={reload}
             disabled={loading}
           >
-            {loading ? "Refreshing..." : "Refresh"}
+            {loading ? "Actualizando..." : "Actualizar"}
           </button>
         </div>
       </div>
@@ -119,7 +115,7 @@ export default function SuppliersListPage() {
         data={rows}
         loading={loading}
         error={err}
-        emptyMessage="No suppliers yet."
+        emptyMessage="No hay proveedores registrados."
         rowKey="id"
       />
 
@@ -150,24 +146,24 @@ export default function SuppliersListPage() {
                   <div className="col-12">
                     <div className="card border-0 bg-light">
                       <div className="card-body">
-                        <h6 className="card-title text-muted mb-3">
+                        <h6 className="card-title mb-3">
                           <i className="bi bi-info-circle me-2"></i>
-                          Informacion Proveedor
+                          Información del Proveedor
                         </h6>
                         <div className="row">
                           <div className="col-md-4">
-                            <label className="form-label text-muted small">ID</label>
+                            <label className="form-label small">ID</label>
                             <p className="fw-semibold mb-2">
                               <code className="bg-white px-2 py-1 rounded">{selectedSupplier.id}</code>
                             </p>
                           </div>
                           <div className="col-md-8">
-                            <label className="form-label text-muted small">Nombre</label>
-                            <p className="fw-semibold mb-2">{selectedSupplier.nombre || 'Not specified'}</p>
+                            <label className="form-label small">Nombre</label>
+                            <p className="fw-semibold mb-2">{selectedSupplier.nombre || 'No especificado'}</p>
                           </div>
                           <div className="col-12">
-                            <label className="form-label text-muted small">Descripcion</label>
-                            <p className="fw-semibold mb-0">{selectedSupplier.descripcion || 'Not specified'}</p>
+                            <label className="form-label small">Descripción</label>
+                            <p className="fw-semibold mb-0">{selectedSupplier.descripcion || 'No especificado'}</p>
                           </div>
                         </div>
                       </div>
@@ -186,14 +182,14 @@ export default function SuppliersListPage() {
                   }}
                 >
                   <i className="bi bi-pencil me-2"></i>
-                  Edit Proveedor
+                  Editar Proveedor
                 </button>
                 <button
                   type="button"
                   className="btn btn-secondary"
                   onClick={closeModal}
                 >
-                  Close
+                  Cerrar
                 </button>
               </div>
             </div>

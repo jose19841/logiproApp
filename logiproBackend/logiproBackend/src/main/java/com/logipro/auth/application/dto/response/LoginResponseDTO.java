@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Respuesta de /auth/login
- * Incluye access token y refresh token.
- */
+
 
 @Getter
 @Setter

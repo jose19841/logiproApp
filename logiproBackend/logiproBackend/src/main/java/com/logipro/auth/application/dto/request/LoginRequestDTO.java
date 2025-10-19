@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Credenciales que envía el usuario para autenticarse.
- */
+
 @Getter
 @Setter
 @NoArgsConstructor

@@ -1,8 +1,4 @@
-/* ╔══════════════════════════════════════════════════════════════════╗
-   ║        THEME GLOBAL – 3D SOFISTICADO (Metal / Control Room)      ║
-   ╚══════════════════════════════════════════════════════════════════╝ */
 
-/* ====== NORMALIZACIÓN PARA CONTROL DE SCROLL ====== */
 html, body, #root { height: 100%; }
 body {
   margin: 0;

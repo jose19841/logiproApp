@@ -96,7 +96,7 @@ export default function ClaimsListPage() {
         label: "Descripción",
         sortable: true,
         render: (value) => (
-          <span className="text-muted" style={{ maxWidth: "300px", display: "inline-block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span style={{ maxWidth: "300px", display: "inline-block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {value || "-"}
           </span>
         )
@@ -176,7 +176,7 @@ export default function ClaimsListPage() {
         <div className="card-body">
           <div className="row g-3">
             <div className="col-md-4">
-              <label htmlFor="estadoFilter" className="form-label small text-muted">
+              <label htmlFor="estadoFilter" className="form-label small">
                 Filtrar por Estado
               </label>
               <select
@@ -194,7 +194,7 @@ export default function ClaimsListPage() {
               </select>
             </div>
             <div className="col-md-8">
-              <label htmlFor="searchTerm" className="form-label small text-muted">
+              <label htmlFor="searchTerm" className="form-label small">
                 Buscar por N° Reclamo o Descripción
               </label>
               <input
@@ -264,23 +264,23 @@ export default function ClaimsListPage() {
                   <div className="col-12">
                     <div className="card border-0 bg-light">
                       <div className="card-body">
-                        <h6 className="card-title text-muted mb-3">
+                        <h6 className="card-title mb-3">
                           <i className="bi bi-info-circle me-2"></i>
                           Información del Reclamo
                         </h6>
                         <div className="row">
                           <div className="col-md-3">
-                            <label className="form-label text-muted small">ID</label>
+                            <label className="form-label small">ID</label>
                             <p className="fw-semibold mb-2">
                               <code className="bg-white px-2 py-1 rounded">{selectedClaim.id}</code>
                             </p>
                           </div>
                           <div className="col-md-5">
-                            <label className="form-label text-muted small">Número de Reclamo</label>
+                            <label className="form-label small">Número de Reclamo</label>
                             <p className="fw-semibold mb-2">{selectedClaim.numReclamo || 'No especificado'}</p>
                           </div>
                           <div className="col-md-4">
-                            <label className="form-label text-muted small">Estado</label>
+                            <label className="form-label small">Estado</label>
                             <p className="mb-2">
                               <span className={`badge bg-${ESTADOS[selectedClaim.estado]?.variant || 'secondary'}`}>
                                 {ESTADOS[selectedClaim.estado]?.label || selectedClaim.estado}
@@ -288,7 +288,7 @@ export default function ClaimsListPage() {
                             </p>
                           </div>
                           <div className="col-12">
-                            <label className="form-label text-muted small">Descripción</label>
+                            <label className="form-label small">Descripción</label>
                             <p className="fw-semibold mb-2">{selectedClaim.descripcion || 'No especificado'}</p>
                           </div>
                         </div>
@@ -300,24 +300,24 @@ export default function ClaimsListPage() {
                     <div className="col-12">
                       <div className="card border-0 bg-light">
                         <div className="card-body">
-                          <h6 className="card-title text-muted mb-3">
+                          <h6 className="card-title mb-3">
                             <i className="bi bi-truck me-2"></i>
                             Información del Proveedor
                           </h6>
                           <div className="row">
                             <div className="col-md-3">
-                              <label className="form-label text-muted small">ID Proveedor</label>
+                              <label className="form-label small">ID Proveedor</label>
                               <p className="fw-semibold mb-2">
                                 <code className="bg-white px-2 py-1 rounded">{selectedClaim.proveedorId}</code>
                               </p>
                             </div>
                             <div className="col-md-9">
-                              <label className="form-label text-muted small">Nombre</label>
+                              <label className="form-label small">Nombre</label>
                               <p className="fw-semibold mb-2">{selectedClaim.proveedorNombre}</p>
                             </div>
                             {selectedClaim.proveedorDescripcion && (
                               <div className="col-12">
-                                <label className="form-label text-muted small">Descripción</label>
+                                <label className="form-label small">Descripción</label>
                                 <p className="fw-semibold mb-0">{selectedClaim.proveedorDescripcion}</p>
                               </div>
                             )}
@@ -331,13 +331,13 @@ export default function ClaimsListPage() {
                     <div className="col-12">
                       <div className="card border-0 bg-light">
                         <div className="card-body">
-                          <h6 className="card-title text-muted mb-3">
+                          <h6 className="card-title mb-3">
                             <i className="bi bi-list-ul me-2"></i>
                             Detalles Adicionales
                           </h6>
                           <div className="row">
                             <div className="col-md-12">
-                              <label className="form-label text-muted small">ID Detalle</label>
+                              <label className="form-label small">ID Detalle</label>
                               <p className="fw-semibold mb-0">
                                 <code className="bg-white px-2 py-1 rounded">{selectedClaim.detalleReclamoId}</code>
                               </p>

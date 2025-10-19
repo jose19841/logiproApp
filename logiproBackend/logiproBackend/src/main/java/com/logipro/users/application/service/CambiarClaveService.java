@@ -24,8 +24,9 @@ public class CambiarClaveService implements CambiarClaveUsecase {
         Usuario usuario = usuarioRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID " + userId));
 
-        // hasheamos antes de guardar
-        usuario.setClave(passwordEncoder.encode(nuevaClave));
+        // ✅ USAR MÉTODO DE DOMINIO en vez de setter
+        String claveEncriptada = passwordEncoder.encode(nuevaClave);
+        usuario.cambiarClave(claveEncriptada);
 
         usuarioRepository.save(usuario);
     }

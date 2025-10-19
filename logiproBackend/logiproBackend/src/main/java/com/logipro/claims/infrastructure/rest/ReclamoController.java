@@ -46,8 +46,8 @@ public class ReclamoController {
             }
     )
     public ResponseEntity<ReclamoResponseDTO> crear(@Valid @RequestBody CrearReclamoRequestDTO request) {
-        ReclamoResponseDTO response = reclamoService.crear(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            ReclamoResponseDTO response = reclamoService.crear(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping

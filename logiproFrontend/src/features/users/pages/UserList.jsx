@@ -174,29 +174,29 @@ export default function UserList() {
                   <div className="col-12">
                     <div className="card border-0 bg-light">
                       <div className="card-body">
-                        <h6 className="card-title text-muted mb-3">
+                        <h6 className="card-title mb-3">
                           <i className="bi bi-person me-2"></i>
                           Información Personal
                         </h6>
                         <div className="row">
                           <div className="col-md-6">
-                            <label className="form-label text-muted small">Nombre Completo</label>
+                            <label className="form-label small">Nombre Completo</label>
                             <p className="fw-semibold mb-2">{selectedUser.nombreCompleto || 'No especificado'}</p>
                           </div>
                           <div className="col-md-6">
-                            <label className="form-label text-muted small">DNI</label>
+                            <label className="form-label small">DNI</label>
                             <p className="fw-semibold mb-2">{selectedUser.dni || 'No especificado'}</p>
                           </div>
                           <div className="col-md-6">
-                            <label className="form-label text-muted small">Email</label>
+                            <label className="form-label small">Email</label>
                             <p className="fw-semibold mb-2">{selectedUser.email || 'No especificado'}</p>
                           </div>
                           <div className="col-md-6">
-                            <label className="form-label text-muted small">Teléfono</label>
+                            <label className="form-label small">Teléfono</label>
                             <p className="fw-semibold mb-2">{selectedUser.telefono || 'No especificado'}</p>
                           </div>
                           <div className="col-12">
-                            <label className="form-label text-muted small">Domicilio</label>
+                            <label className="form-label small">Domicilio</label>
                             <p className="fw-semibold mb-0">{selectedUser.domicilio || 'No especificado'}</p>
                           </div>
                         </div>
@@ -207,19 +207,19 @@ export default function UserList() {
                   <div className="col-12">
                     <div className="card border-0 bg-light">
                       <div className="card-body">
-                        <h6 className="card-title text-muted mb-3">
+                        <h6 className="card-title mb-3">
                           <i className="bi bi-gear me-2"></i>
                           Información del Sistema
                         </h6>
                         <div className="row">
                           <div className="col-md-4">
-                            <label className="form-label text-muted small">Usuario</label>
+                            <label className="form-label small">Usuario</label>
                             <p className="fw-semibold mb-2">
                               <code className="bg-white px-2 py-1 rounded">{selectedUser.usuario}</code>
                             </p>
                           </div>
                           <div className="col-md-4">
-                            <label className="form-label text-muted small">Rol</label>
+                            <label className="form-label small">Rol</label>
                             <p className="fw-semibold mb-2">
                               <span className={`badge ${selectedUser.rol === 'ADMIN' ? 'bg-primary' : 'bg-secondary'}`}>
                                 {selectedUser.rol}
@@ -227,7 +227,7 @@ export default function UserList() {
                             </p>
                           </div>
                           <div className="col-md-4">
-                            <label className="form-label text-muted small">Estado</label>
+                            <label className="form-label small">Estado</label>
                             <p className="fw-semibold mb-2">
                               <span className={getEstadoBadgeClass(selectedUser.estado)}>
                                 {selectedUser.estado}

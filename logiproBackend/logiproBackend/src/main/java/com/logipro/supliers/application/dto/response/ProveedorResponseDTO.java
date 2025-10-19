@@ -4,10 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * ========== RESPONSE DTO: Proveedor ==========
- * Representa los datos expuestos al cliente tras crear o consultar un proveedor.
- */
+
 @Getter
 @Setter
 @Builder

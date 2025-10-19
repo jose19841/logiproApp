@@ -29,17 +29,7 @@ public class ProveedorController {
 
     private final ProveedorService proveedorService;
 
-    /**
-     * ================================================================
-     * ENDPOINT: Crear nuevo proveedor
-     * ---------------------------------------------------------------
-     * Método POST que permite registrar un proveedor en el sistema.
-     * Requiere autenticación por token Bearer (JWT).
-     * ================================================================
-     *
-     * @param request DTO con los datos del proveedor a crear.
-     * @return ProveedorResponseDTO con el proveedor creado.
-     */
+
     @PostMapping
     @Operation(
             summary = "Crear nuevo proveedor",

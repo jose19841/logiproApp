@@ -36,19 +36,19 @@ export default function MaterialDetail({ material, onClose, onEdit }) {
               <div className="col-12">
                 <div className="card border-0 bg-light">
                   <div className="card-body">
-                    <h6 className="card-title text-muted mb-3">
+                    <h6 className="card-title mb-3">
                       <i className="bi bi-info-circle me-2"></i>
                       Información General
                     </h6>
                     <div className="row g-3">
                       <div className="col-md-3">
-                        <label className="form-label text-muted small mb-1">ID</label>
+                        <label className="form-label small mb-1">ID</label>
                         <p className="fw-semibold mb-0">
                           <code className="bg-white px-2 py-1 rounded">{material.id}</code>
                         </p>
                       </div>
                       <div className="col-md-3">
-                        <label className="form-label text-muted small mb-1">Cantidad</label>
+                        <label className="form-label small mb-1">Cantidad</label>
                         <p className="fw-semibold mb-0">
                           <span className="badge bg-primary fs-6">
                             {material.cantidad ?? 'No especificado'}
@@ -64,29 +64,25 @@ export default function MaterialDetail({ material, onClose, onEdit }) {
               <div className="col-12">
                 <div className="card border-0 bg-light">
                   <div className="card-body">
-                    <h6 className="card-title text-muted mb-3">
+                    <h6 className="card-title mb-3">
                       <i className="bi bi-diagram-3 me-2"></i>
                       Información del Material
                     </h6>
                     <div className="row g-3">
                       <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Proveedor</label>
+                        <label className="form-label small mb-1">Proveedor</label>
                         <p className="fw-semibold mb-0">
-                          {material.proveedorDescripcion || (
-                            <span className="text-muted">No especificado</span>
-                          )}
+                          {material.proveedorDescripcion || 'No especificado'}
                         </p>
                       </div>
                       <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Tipo de Material</label>
+                        <label className="form-label small mb-1">Tipo de Material</label>
                         <p className="fw-semibold mb-0">
-                          {material.nombreTipoMaterial || (
-                            <span className="text-muted">No especificado</span>
-                          )}
+                          {material.nombreTipoMaterial || 'No especificado'}
                         </p>
                       </div>
                       <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Calidad (Resultado de Inspección)</label>
+                        <label className="form-label small mb-1">Calidad (Resultado de Inspección)</label>
                         <p className="fw-semibold mb-0">
                           {material.resultadoCalidad ? (
                             <span className={`badge bg-${
@@ -96,13 +92,11 @@ export default function MaterialDetail({ material, onClose, onEdit }) {
                             }`}>
                               {material.resultadoCalidad}
                             </span>
-                          ) : (
-                            <span className="text-muted">No especificado</span>
-                          )}
+                          ) : 'No especificado'}
                         </p>
                       </div>
                       <div className="col-md-6">
-                        <label className="form-label text-muted small mb-1">Fecha de Registro</label>
+                        <label className="form-label small mb-1">Fecha de Registro</label>
                         <p className="fw-semibold mb-0">
                           {material.fechaCreacion ? (
                             new Date(material.fechaCreacion).toLocaleDateString('es-AR', {
@@ -112,9 +106,7 @@ export default function MaterialDetail({ material, onClose, onEdit }) {
                               hour: '2-digit',
                               minute: '2-digit'
                             })
-                          ) : (
-                            <span className="text-muted">No especificado</span>
-                          )}
+                          ) : 'No especificado'}
                         </p>
                       </div>
                     </div>

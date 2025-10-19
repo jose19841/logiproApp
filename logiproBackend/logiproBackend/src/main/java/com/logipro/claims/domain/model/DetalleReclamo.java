@@ -21,12 +21,7 @@ public class DetalleReclamo {
     private String descripcion;
 
     // ===== Factory Method =====
-    /**
-     * Crea un nuevo detalle de reclamo con validación
-     * @param descripcion Descripción del detalle
-     * @return DetalleReclamo nuevo
-     * @throws IllegalArgumentException si la descripción es inválida
-     */
+
     public static DetalleReclamo crear(String descripcion){
         if(descripcion == null || descripcion.isBlank()){
             throw new IllegalArgumentException("La descripción es obligatoria");

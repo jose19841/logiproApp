@@ -65,4 +65,139 @@ public class Usuario {
     void prePersist() {
         if (estado == null) estado = UserStatus.REGISTRADO;
     }
+
+    // ===== Lógica de Negocio (DDD) =====
+
+    /**
+     * Activa un usuario registrado o suspendido
+     */
+    public void activar() {
+        if (this.estado == UserStatus.ACTIVO) {
+            throw new IllegalStateException("El usuario ya está activo");
+        }
+        this.estado = UserStatus.ACTIVO;
+    }
+
+    /**
+     * Suspende un usuario activo
+     */
+    public void suspender() {
+        if (this.estado == UserStatus.SUSPENDIDO) {
+            throw new IllegalStateException("El usuario ya está suspendido");
+        }
+        this.estado = UserStatus.SUSPENDIDO;
+    }
+
+    /**
+     * Marca el usuario como inactivo
+     */
+    public void inactivar() {
+        if (this.estado == UserStatus.INACTIVO) {
+            throw new IllegalStateException("El usuario ya está inactivo");
+        }
+        this.estado = UserStatus.INACTIVO;
+    }
+
+    /**
+     * Cambia el estado del usuario a uno específico con validaciones
+     */
+    public void cambiarEstado(UserStatus nuevoEstado) {
+        if (nuevoEstado == null) {
+            throw new IllegalArgumentException("El estado no puede ser nulo");
+        }
+        if (this.estado == nuevoEstado) {
+            throw new IllegalStateException("El usuario ya tiene el estado: " + nuevoEstado);
+        }
+        this.estado = nuevoEstado;
+    }
+
+    /**
+     * Actualiza la contraseña del usuario (ya encriptada)
+     */
+    public void cambiarClave(String claveEncriptada) {
+        if (claveEncriptada == null || claveEncriptada.trim().isEmpty()) {
+            throw new IllegalArgumentException("La clave encriptada no puede estar vacía");
+        }
+        this.clave = claveEncriptada;
+    }
+
+    /**
+     * Actualiza los datos personales del usuario
+     */
+    public void actualizarDatosPersonales(String nombre, String apellido, String dni,
+                                          String telefono, String email, String domicilio) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacío");
+        }
+        if (apellido == null || apellido.trim().isEmpty()) {
+            throw new IllegalArgumentException("El apellido no puede estar vacío");
+        }
+        if (dni == null || dni.trim().isEmpty()) {
+            throw new IllegalArgumentException("El DNI no puede estar vacío");
+        }
+
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.dni = dni;
+        this.telefono = telefono;
+        this.email = email;
+        this.domicilio = domicilio;
+    }
+
+    /**
+     * Actualiza el nombre de usuario (login)
+     */
+    public void actualizarUsuario(String nuevoUsuario) {
+        if (nuevoUsuario == null || nuevoUsuario.trim().isEmpty()) {
+            throw new IllegalArgumentException("El usuario no puede estar vacío");
+        }
+        this.usuario = nuevoUsuario;
+    }
+
+    /**
+     * Asigna un rol al usuario
+     */
+    public void asignarRol(Rol rol) {
+        if (rol == null) {
+            throw new IllegalArgumentException("El rol no puede ser nulo");
+        }
+        this.rol = rol;
+    }
+
+    // ===== Consultas de Negocio =====
+
+    /**
+     * Verifica si el usuario está activo
+     */
+    public boolean estaActivo() {
+        return this.estado == UserStatus.ACTIVO;
+    }
+
+    /**
+     * Verifica si el usuario puede iniciar sesión
+     */
+    public boolean puedeIniciarSesion() {
+        return this.estado == UserStatus.ACTIVO;
+    }
+
+    /**
+     * Verifica si el usuario está suspendido
+     */
+    public boolean estaSuspendido() {
+        return this.estado == UserStatus.SUSPENDIDO;
+    }
+
+    /**
+     * Verifica si el usuario está registrado pero no activado
+     */
+    public boolean estaRegistrado() {
+        return this.estado == UserStatus.REGISTRADO;
+    }
+
+    /**
+     * Obtiene el nombre completo del usuario
+     */
+    public String getNombreCompleto() {
+        return this.nombre + " " + this.apellido;
+    }
 }

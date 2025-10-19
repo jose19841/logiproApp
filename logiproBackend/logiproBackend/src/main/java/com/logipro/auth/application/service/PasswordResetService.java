@@ -25,7 +25,7 @@ public class PasswordResetService {
     private final JpaPasswordResetTokenRepository tokenRepository;
     private final MailService mailService;
     private final UsuarioService usuarioService;
-    private final UsuarioRepository usuarioRepository; // ✅ agregado
+    private final UsuarioRepository usuarioRepository;
 
     @Value("${app.frontend.reset-url:http://localhost:5173/reset}")
     private String frontendResetUrl;
@@ -38,7 +38,7 @@ public class PasswordResetService {
      */
     @Transactional
     public void solicitarReset(String identifier, String ip, String ua) {
-        // ✅ Buscar por usuario O email sin revelar existencia
+
         Optional<Usuario> userOpt = usuarioRepository.findByUsuarioOrEmail(identifier, identifier);
         if (userOpt.isEmpty()) {
             // Importante: no revelar si existe o no
@@ -77,9 +77,7 @@ public class PasswordResetService {
         mailService.sendPasswordResetLink(user.getEmail(), resetUrl);
     }
 
-    /**
-     * Paso 2: confirmar reset (token crudo + nueva clave).
-     */
+
     @Transactional
     public void confirmarReset(String rawToken, String nuevaClave) {
         String tokenHash = sha256(rawToken);

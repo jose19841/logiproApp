@@ -28,22 +28,28 @@ public class ActualizarUsuarioService implements ActualizarUsuarioUsecase {
         if (id == null) return Optional.empty();
 
         return usuarioRepository.findById(id).map(u -> {
-            // Actualizamos campos SOLO si vienen informados en el DTO
-            if (dto.getNombre() != null)     u.setNombre(dto.getNombre());
-            if (dto.getApellido() != null)   u.setApellido(dto.getApellido());
-            if (dto.getDni() != null)        u.setDni(dto.getDni());
-            if (dto.getTelefono() != null)   u.setTelefono(dto.getTelefono());
-            if (dto.getEmail() != null)      u.setEmail(dto.getEmail());
-            if (dto.getDomicilio() != null)  u.setDomicilio(dto.getDomicilio());
-            if (dto.getUsuario() != null)    u.setUsuario(dto.getUsuario());
+            // ✅ USAR MÉTODOS DE DOMINIO en vez de setters directos
+            // Actualizar datos personales
+            u.actualizarDatosPersonales(
+                    dto.getNombre() != null ? dto.getNombre() : u.getNombre(),
+                    dto.getApellido() != null ? dto.getApellido() : u.getApellido(),
+                    dto.getDni() != null ? dto.getDni() : u.getDni(),
+                    dto.getTelefono() != null ? dto.getTelefono() : u.getTelefono(),
+                    dto.getEmail() != null ? dto.getEmail() : u.getEmail(),
+                    dto.getDomicilio() != null ? dto.getDomicilio() : u.getDomicilio()
+            );
 
-            // Rol por nombre (String) → entidad Rol
+            // Actualizar usuario (login)
+            if (dto.getUsuario() != null) {
+                u.actualizarUsuario(dto.getUsuario());
+            }
+
+            // Asignar rol usando método de dominio
             if (dto.getRol() != null) {
                 var rol = rolRepository.findByNombre(dto.getRol())
                         .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + dto.getRol()));
-                u.setRol(rol);
+                u.asignarRol(rol);
             }
-
 
             return usuarioRepository.save(u);
         });

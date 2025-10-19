@@ -7,10 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * ========== REQUEST DTO: Crear Proveedor ==========
- * Representa los datos necesarios para registrar un nuevo proveedor.
- */
+
 @Getter
 @Setter
 @NoArgsConstructor
