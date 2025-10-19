@@ -39,60 +39,93 @@ export default function InventoryList({ data, loading, error, onView, onEdit, on
                 <th>ID</th>
                 <th>Sector</th>
                 <th>Material</th>
-                <th>Cantidad Mínima</th>
-                <th>Cantidad Máxima</th>
+                <th className="text-center">Cantidad Actual</th>
+                <th className="text-center">Mínimo</th>
+                <th className="text-center">Máximo</th>
+                <th className="text-center">Estado</th>
                 <th className="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((inventario) => (
-                <tr key={inventario.id}>
-                  <td>
-                    <span className="badge bg-secondary">#{inventario.id}</span>
-                  </td>
-                  <td>
-                    <strong>{inventario.sectorNombre}</strong>
-                    <br />
-                    <small className="text-muted">ID: {inventario.sectorId}</small>
-                  </td>
-                  <td>
-                    <strong>{inventario.materialNombre}</strong>
-                    <br />
-                    <small className="text-muted">ID: {inventario.materialId}</small>
-                  </td>
-                  <td>
-                    <span className="badge bg-info">{inventario.cantidadMinima}</span>
-                  </td>
-                  <td>
-                    <span className="badge bg-success">{inventario.cantidadMaxima}</span>
-                  </td>
-                  <td className="text-center">
-                    <div className="btn-group btn-group-sm" role="group">
-                      <button
-                        className="btn btn-outline-primary"
-                        onClick={() => onView?.(inventario)}
-                        title="Ver detalle"
-                      >
-                        <i className="bi bi-eye"></i>
-                      </button>
-                      <button
-                        className="btn btn-outline-warning"
-                        onClick={() => onEdit?.(inventario)}
-                        title="Editar"
-                      >
-                        <i className="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        className="btn btn-outline-danger"
-                        onClick={() => onDelete?.(inventario)}
-                        title="Eliminar"
-                      >
-                        <i className="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {data.map((inventario) => {
+                // Calcular estado basado en cantidad actual vs mínima
+                const actual = inventario.cantidadActual || 0;
+                const min = inventario.cantidadMinima || 0;
+
+                let estadoBadge = "success";
+                let estadoTexto = "OK";
+                let estadoIcon = "check-circle";
+
+                if (actual < min) {
+                  estadoBadge = "danger";
+                  estadoTexto = "Crítico";
+                  estadoIcon = "exclamation-triangle";
+                } else if (actual <= min * 1.2) {
+                  estadoBadge = "warning";
+                  estadoTexto = "Bajo";
+                  estadoIcon = "exclamation-circle";
+                }
+
+                return (
+                  <tr key={inventario.id}>
+                    <td>
+                      <span className="badge bg-secondary">#{inventario.id}</span>
+                    </td>
+                    <td>
+                      <strong>{inventario.sectorNombre}</strong>
+                      <br />
+                      <small className="opacity-75">ID: {inventario.sectorId}</small>
+                    </td>
+                    <td>
+                      <strong>{inventario.materialNombre}</strong>
+                      <br />
+                      <small className="opacity-75">ID: {inventario.materialId}</small>
+                    </td>
+                    <td className="text-center">
+                      <span className={`badge bg-${estadoBadge} fs-6`}>
+                        {actual}
+                      </span>
+                    </td>
+                    <td className="text-center">
+                      <span className="badge bg-info">{inventario.cantidadMinima}</span>
+                    </td>
+                    <td className="text-center">
+                      <span className="badge bg-success">{inventario.cantidadMaxima}</span>
+                    </td>
+                    <td className="text-center">
+                      <span className={`badge bg-${estadoBadge}`}>
+                        <i className={`bi bi-${estadoIcon} me-1`}></i>
+                        {estadoTexto}
+                      </span>
+                    </td>
+                    <td className="text-center">
+                      <div className="btn-group btn-group-sm" role="group">
+                        <button
+                          className="btn btn-outline-primary"
+                          onClick={() => onView?.(inventario)}
+                          title="Ver detalle"
+                        >
+                          <i className="bi bi-eye"></i>
+                        </button>
+                        <button
+                          className="btn btn-outline-warning"
+                          onClick={() => onEdit?.(inventario)}
+                          title="Editar"
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </button>
+                        <button
+                          className="btn btn-outline-danger"
+                          onClick={() => onDelete?.(inventario)}
+                          title="Eliminar"
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

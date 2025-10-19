@@ -14,6 +14,7 @@ public class InventarioResponseDTO {
     private Long id;
     private Integer cantidadMinima;
     private Integer cantidadMaxima;
+    private Integer cantidadActual; // Stock actual del material
     private Long sectorId;
     private String sectorNombre;
     private Long materialId;

@@ -2,10 +2,15 @@
 
 .theme-controlroom .sidebar {
   width: 280px;
+  min-width: 280px;
+  max-width: 280px;
   background: linear-gradient(180deg, #12161c, #0f1318);
   border-right: 1px solid rgba(124,146,168,.18);
   box-shadow: 12px 0 40px rgba(0,0,0,.45);
   color: #cfd7e2;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 68px); /* Ajustar según altura del header */
 }
 
 /* Header del sidebar */

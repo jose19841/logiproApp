@@ -32,10 +32,14 @@ public class InventarioMapper {
                 && inv.getMaterial().getTipoMaterial() != null)
                 ? inv.getMaterial().getTipoMaterial().getNombre() : null;
 
+        // ✅ Obtener la cantidad actual del material
+        Integer cantidadActual = inv.getMaterial() != null ? inv.getMaterial().getCantidad() : null;
+
         return new InventarioResponseDTO(
                 inv.getId(),
                 inv.getCantidadMinima(),
                 inv.getCantidadMaxima(),
+                cantidadActual, // ✅ Agregado
                 sectorId,
                 sectorNombre,
                 materialId,

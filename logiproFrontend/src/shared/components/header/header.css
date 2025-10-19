@@ -14,12 +14,66 @@
   padding-bottom: .5rem;
 }
 
-/* Logo responsivo (alto fijo, sin deformar) */
+/* ========== Logo y Branding ========== */
+
+.theme-controlroom .logo-container {
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+
+.theme-controlroom .logo-container:hover {
+  transform: translateY(-1px);
+}
+
 .theme-controlroom .app-logo {
-  height: 56px;
+  height: 48px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,.35));
+  filter: drop-shadow(0 4px 12px rgba(33, 150, 243, 0.35));
+  transition: filter .2s ease;
+}
+
+.theme-controlroom .logo-container:hover .app-logo {
+  filter: drop-shadow(0 6px 16px rgba(33, 150, 243, 0.55));
+}
+
+/* Texto del branding */
+.theme-controlroom .brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.theme-controlroom .brand-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2196f3, #00bcd4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.theme-controlroom .brand-tagline {
+  font-size: 0.7rem;
+  color: rgba(231, 236, 242, 0.65);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Responsive: ocultar tagline en pantallas pequeñas */
+@media (max-width: 768px) {
+  .theme-controlroom .brand-tagline {
+    display: none;
+  }
+
+  .theme-controlroom .brand-name {
+    font-size: 1.25rem;
+  }
 }
 
 /* ========== User menu (toggle) ========== */
