@@ -165,7 +165,7 @@ public class PedidoController {
             }
     )
     @GetMapping
-    
+
     public ResponseEntity<List<PedidoResponseDTO>> listar(
             @Valid FiltroPedidosRequestDTO filtros,
             @RequestParam(defaultValue = "0") int page,

@@ -1,8 +1,8 @@
 // src/features/orders/components/OrderForm.jsx
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { listSuppliers } from "@/features/suppliers/services/suppliersApi";
 import { listMaterials } from "@/features/materials/services/materialsApi";
-import { useAuth } from "@/features/auth/context/AuthContext";
 
 /**
  * Componente de formulario reutilizable para crear/editar pedidos
@@ -21,15 +21,12 @@ export default function OrderForm({
   submitLabel = "Guardar",
   isEdit = false
 }) {
-  const { user } = useAuth();
   const [suppliers, setSuppliers] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
 
   const [form, setForm] = useState({
     proveedorId: "",
-    fechaPedido: "",
-    fechaEntregaEstimada: "",
     observaciones: "",
     detalles: []
   });
@@ -60,8 +57,6 @@ export default function OrderForm({
     if (initialValues && Object.keys(initialValues).length > 0) {
       setForm({
         proveedorId: initialValues.proveedorId?.toString() || "",
-        fechaPedido: initialValues.fechaPedido || "",
-        fechaEntregaEstimada: initialValues.fechaEntregaEstimada || "",
         observaciones: initialValues.observaciones || "",
         detalles: initialValues.detalles?.map(d => ({
           materialId: d.materialId?.toString() || "",
@@ -118,55 +113,62 @@ export default function OrderForm({
     }, 0);
   };
 
-  // Validaciones
-  const errors = {};
+  // Validación previa al submit
+  const validateForm = () => {
+    // Validar proveedor
+    if (!form.proveedorId) {
+      Swal.fire('Proveedor', 'Seleccione un proveedor', 'warning');
+      return false;
+    }
 
-  if (!form.proveedorId) {
-    errors.proveedorId = "El proveedor es obligatorio";
-  }
+    // Validar observaciones
+    if (form.observaciones && form.observaciones.length > 500) {
+      Swal.fire('Observaciones', 'Las observaciones no pueden superar los 500 caracteres', 'warning');
+      return false;
+    }
 
-  if (!form.fechaPedido) {
-    errors.fechaPedido = "La fecha de pedido es obligatoria";
-  }
+    // Validar que haya al menos 1 ítem
+    if (form.detalles.length === 0) {
+      Swal.fire('Ítems', 'Debe agregar al menos un ítem al pedido', 'warning');
+      return false;
+    }
 
-  if (form.detalles.length === 0) {
-    errors.detalles = "Debe agregar al menos un ítem al pedido";
-  } else {
     // Validar cada ítem
-    form.detalles.forEach((item, index) => {
-      if (!item.materialId) {
-        errors[`detalle_${index}_materialId`] = "Debe seleccionar un material";
-      }
-      if (!item.cantidadSolicitada || parseFloat(item.cantidadSolicitada) <= 0) {
-        errors[`detalle_${index}_cantidadSolicitada`] = "La cantidad debe ser mayor a 0";
-      }
-      if (!item.precioUnitario || parseFloat(item.precioUnitario) < 0) {
-        errors[`detalle_${index}_precioUnitario`] = "El precio no puede ser negativo";
-      }
-    });
-  }
+    for (let i = 0; i < form.detalles.length; i++) {
+      const item = form.detalles[i];
 
-  const isFormValid = Object.keys(errors).length === 0;
+      if (!item.materialId) {
+        Swal.fire('Ítems', 'Revise material, cantidad y precio', 'warning');
+        return false;
+      }
+
+      const cantidad = parseFloat(item.cantidadSolicitada);
+      if (!item.cantidadSolicitada || isNaN(cantidad) || cantidad <= 0) {
+        Swal.fire('Ítems', 'Revise material, cantidad y precio', 'warning');
+        return false;
+      }
+
+      const precio = parseFloat(item.precioUnitario);
+      if (!item.precioUnitario || isNaN(precio) || precio < 0.01) {
+        Swal.fire('Ítems', 'Revise material, cantidad y precio', 'warning');
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Marcar todos los campos como touched
-    setTouched({
-      proveedorId: true,
-      fechaPedido: true,
-      fechaEntregaEstimada: true,
-      observaciones: true
-    });
-
-    if (!isFormValid) {
+    // Validar formulario
+    if (!validateForm()) {
       return;
     }
 
+    // Construir payload solo con los campos requeridos
     const dto = {
       proveedorId: parseInt(form.proveedorId, 10),
-      fechaPedido: form.fechaPedido,
-      fechaEntregaEstimada: form.fechaEntregaEstimada || null,
       observaciones: form.observaciones || null,
       detalles: form.detalles.map(item => ({
         materialId: parseInt(item.materialId, 10),
@@ -174,11 +176,6 @@ export default function OrderForm({
         precioUnitario: parseFloat(item.precioUnitario)
       }))
     };
-
-    // Solo agregar usuarioId al crear (no al editar)
-    if (!isEdit && user?.id) {
-      dto.usuarioId = user.id;
-    }
 
     onSubmit?.(dto);
   };
@@ -205,10 +202,9 @@ export default function OrderForm({
           <select
             id="proveedorId"
             name="proveedorId"
-            className={`form-select ${touched.proveedorId && errors.proveedorId ? 'is-invalid' : ''}`}
+            className="form-select"
             value={form.proveedorId}
             onChange={handleChange}
-            onBlur={() => handleBlur("proveedorId")}
             disabled={loading}
           >
             <option value="">-- Seleccione un proveedor --</option>
@@ -218,46 +214,14 @@ export default function OrderForm({
               </option>
             ))}
           </select>
-          {touched.proveedorId && errors.proveedorId && (
-            <div className="invalid-feedback">{errors.proveedorId}</div>
-          )}
         </div>
 
-        {/* Fecha de Pedido */}
-        <div className="col-md-3">
-          <label htmlFor="fechaPedido" className="form-label">
-            Fecha de Pedido <span className="text-danger">*</span>
-          </label>
-          <input
-            type="date"
-            id="fechaPedido"
-            name="fechaPedido"
-            className={`form-control ${touched.fechaPedido && errors.fechaPedido ? 'is-invalid' : ''}`}
-            value={form.fechaPedido}
-            onChange={handleChange}
-            onBlur={() => handleBlur("fechaPedido")}
-            disabled={loading}
-          />
-          {touched.fechaPedido && errors.fechaPedido && (
-            <div className="invalid-feedback">{errors.fechaPedido}</div>
-          )}
-        </div>
-
-        {/* Fecha de Entrega Estimada */}
-        <div className="col-md-3">
-          <label htmlFor="fechaEntregaEstimada" className="form-label">
-            Entrega Estimada
-          </label>
-          <input
-            type="date"
-            id="fechaEntregaEstimada"
-            name="fechaEntregaEstimada"
-            className="form-control"
-            value={form.fechaEntregaEstimada}
-            onChange={handleChange}
-            onBlur={() => handleBlur("fechaEntregaEstimada")}
-            disabled={loading}
-          />
+        {/* Info: Fecha estimada */}
+        <div className="col-md-6">
+          <label className="form-label">Fecha de Entrega Estimada</label>
+          <div className="form-control-plaintext">
+            <small className="text-white">La fecha estimada la define el proveedor o el sistema más adelante.</small>
+          </div>
         </div>
 
         {/* Observaciones */}
@@ -322,7 +286,7 @@ export default function OrderForm({
                         <tr key={index}>
                           <td>
                             <select
-                              className={`form-select form-select-sm ${errors[`detalle_${index}_materialId`] ? 'is-invalid' : ''}`}
+                              className="form-select form-select-sm"
                               value={item.materialId}
                               onChange={(e) => handleItemChange(index, "materialId", e.target.value)}
                               disabled={loading}
@@ -330,7 +294,7 @@ export default function OrderForm({
                               <option value="">-- Seleccione --</option>
                               {materials.map((material) => (
                                 <option key={material.id} value={material.id}>
-                                  {material.tipoMaterialNombre || `Material #${material.id}`}
+                                  {material.nombreTipoMaterial || `Material #${material.id}`}
                                 </option>
                               ))}
                             </select>
@@ -338,7 +302,7 @@ export default function OrderForm({
                           <td>
                             <input
                               type="number"
-                              className={`form-control form-control-sm ${errors[`detalle_${index}_cantidadSolicitada`] ? 'is-invalid' : ''}`}
+                              className="form-control form-control-sm"
                               placeholder="Cantidad"
                               value={item.cantidadSolicitada}
                               onChange={(e) => handleItemChange(index, "cantidadSolicitada", e.target.value)}
@@ -349,12 +313,12 @@ export default function OrderForm({
                           <td>
                             <input
                               type="number"
-                              className={`form-control form-control-sm ${errors[`detalle_${index}_precioUnitario`] ? 'is-invalid' : ''}`}
+                              className="form-control form-control-sm"
                               placeholder="Precio"
                               value={item.precioUnitario}
                               onChange={(e) => handleItemChange(index, "precioUnitario", e.target.value)}
                               disabled={loading}
-                              min="0"
+                              min="0.01"
                               step="0.01"
                             />
                           </td>
@@ -389,13 +353,6 @@ export default function OrderForm({
                   </table>
                 </div>
               )}
-
-              {errors.detalles && (
-                <div className="text-danger small mt-2">
-                  <i className="bi bi-exclamation-circle me-1"></i>
-                  {errors.detalles}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -406,7 +363,7 @@ export default function OrderForm({
         <button
           type="submit"
           className="btn btn-primary"
-          disabled={loading || !isFormValid}
+          disabled={loading}
         >
           {loading ? (
             <>

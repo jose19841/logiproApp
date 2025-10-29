@@ -16,15 +16,6 @@ export default function OrderList({ data = [], loading = false, error = "", onVi
   const columns = useMemo(
     () => [
       {
-        key: "id",
-        label: "ID",
-        sortable: true,
-        align: "center",
-        render: (value) => (
-          <code className="bg-light px-2 py-1 rounded">{value}</code>
-        )
-      },
-      {
         key: "numeroPedido",
         label: "Número Pedido",
         sortable: true,
@@ -52,15 +43,11 @@ export default function OrderList({ data = [], loading = false, error = "", onVi
         }) : "-"
       },
       {
-        key: "fechaEntregaEstimada",
-        label: "Entrega Estimada",
+        key: "usuarioNombre",
+        label: "Usuario Creador",
         sortable: true,
-        align: "center",
-        render: (value) => value ? new Date(value).toLocaleDateString('es-AR', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        }) : "-"
+        align: "left",
+        render: (value) => value || "-"
       },
       {
         key: "estado",
@@ -85,7 +72,7 @@ export default function OrderList({ data = [], loading = false, error = "", onVi
               break;
           }
           const label = value.replace(/_/g, " ");
-          return <span className={`badge bg-${badgeClass}`}>{label}</span>;
+          return <span className={`badge bg-${badgeClass} text-nowrap`}>{label}</span>;
         }
       },
       {

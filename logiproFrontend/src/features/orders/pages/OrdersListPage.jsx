@@ -1,7 +1,8 @@
 // src/features/orders/pages/OrdersListPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess, alertInput } from "@shared/components/alerts/swal";
+import Swal from "sweetalert2";
+import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
 import useOrders from "@/features/orders/hooks/useOrders";
 import useDeleteOrder from "@/features/orders/hooks/useDeleteOrder";
 import useChangeOrderStatus from "@/features/orders/hooks/useChangeOrderStatus";
@@ -58,19 +59,27 @@ export default function OrdersListPage() {
     }
 
     // Mostrar opciones de estado
-    const result = await alertInput({
-      title: "Cambiar estado del pedido",
-      text: `Pedido: ${order.numeroPedido} - Estado actual: ${order.estado}`,
+    const result = await Swal.fire({
+      title: "Cambiar estado",
+      html: `<p>Pedido: <strong>${order.numeroPedido}</strong></p><p>Estado actual: <strong>${order.estado}</strong></p>`,
       input: "select",
       inputOptions: {
         "PENDIENTE": "Pendiente",
         "EN_PROCESO": "En Proceso",
+        "RECIBIDO": "Recibido",
         "CANCELADO": "Cancelado"
       },
       inputPlaceholder: "Seleccione el nuevo estado",
       showCancelButton: true,
       confirmButtonText: "Cambiar",
-      cancelButtonText: "Cancelar"
+      cancelButtonText: "Cancelar",
+      didOpen: () => {
+        const select = Swal.getInput();
+        if (select) {
+          select.style.width = '95%';
+          select.style.margin = '0 auto';
+        }
+      }
     });
 
     if (!result.isConfirmed || !result.value) return;

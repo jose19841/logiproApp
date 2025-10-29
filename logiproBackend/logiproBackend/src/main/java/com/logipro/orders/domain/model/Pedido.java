@@ -80,7 +80,7 @@ public class Pedido {
         if(detalle == null) return;
         detalle.setPedido(this);
         this.detalles.add(detalle);
-        recalcularTotales();
+        // No recalcular aquí - se hará explícitamente después de agregar todos los detalles
     }
 
     public void quitarDetalle(DetallePedido detalle) {

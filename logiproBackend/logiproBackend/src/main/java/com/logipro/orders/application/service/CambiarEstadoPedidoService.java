@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -37,8 +39,14 @@ public class CambiarEstadoPedidoService implements CambiarEstadoPedidoUseCase {
         if (pedido.getEstado() == EstadoPedido.RECIBIDO || pedido.getEstado() == EstadoPedido.CANCELADO) {
             throw new IllegalArgumentException("No se puede cambair de estado un pedido finalizado");
         }
-        // Actualziar estado
+
+        // Actualizar estado
         pedido.setEstado(estado);
+
+        // Si el nuevo estado es RECIBIDO, asignar la fecha de entrega real
+        if (estado == EstadoPedido.RECIBIDO) {
+            pedido.setFechaEntregaReal(LocalDate.now());
+        }
 
         // Guardar cambios
         Pedido actualizado = pedidoRepository.save(pedido);

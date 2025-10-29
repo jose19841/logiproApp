@@ -128,7 +128,7 @@ export default function OrderFilters({ filters = {}, onFilterChange, onClearFilt
               <option value="">Todos</option>
               {materials.map((material) => (
                 <option key={material.id} value={material.id}>
-                  {material.tipoMaterialNombre || `Material #${material.id}`}
+                  {material.nombreTipoMaterial || `Material #${material.id}`}
                 </option>
               ))}
             </select>

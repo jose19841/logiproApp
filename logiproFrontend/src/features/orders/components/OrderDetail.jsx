@@ -60,23 +60,17 @@ export default function OrderDetail({ order, onClose, onEdit }) {
                       Información General
                     </h6>
                     <div className="row g-3">
-                      <div className="col-md-3">
-                        <label className="form-label small mb-1">ID</label>
-                        <p className="fw-semibold mb-0">
-                          <code className="bg-white px-2 py-1 rounded">{order.id}</code>
-                        </p>
-                      </div>
-                      <div className="col-md-3">
+                      <div className="col-md-4">
                         <label className="form-label small mb-1">Número de Pedido</label>
                         <p className="fw-semibold mb-0">{order.numeroPedido || 'No especificado'}</p>
                       </div>
-                      <div className="col-md-3">
+                      <div className="col-md-4">
                         <label className="form-label small mb-1">Estado</label>
                         <p className="fw-semibold mb-0">
                           {getEstadoBadge(order.estado)}
                         </p>
                       </div>
-                      <div className="col-md-3">
+                      <div className="col-md-4">
                         <label className="form-label small mb-1">Monto Total</label>
                         <p className="fw-semibold mb-0 text-success">
                           ${order.montoTotal ? parseFloat(order.montoTotal).toFixed(2) : '0.00'}
@@ -185,7 +179,6 @@ export default function OrderDetail({ order, onClose, onEdit }) {
                         <table className="table table-sm table-hover">
                           <thead className="table-light">
                             <tr>
-                              <th>ID</th>
                               <th>Material</th>
                               <th className="text-center">Cant. Solicitada</th>
                               <th className="text-center">Cant. Recibida</th>
@@ -196,7 +189,6 @@ export default function OrderDetail({ order, onClose, onEdit }) {
                           <tbody>
                             {order.detalles.map((detalle) => (
                               <tr key={detalle.id}>
-                                <td><code>{detalle.id}</code></td>
                                 <td>{detalle.materialNombre || `Material #${detalle.materialId}`}</td>
                                 <td className="text-center">{detalle.cantidadSolicitada || 0}</td>
                                 <td className="text-center">
@@ -215,7 +207,7 @@ export default function OrderDetail({ order, onClose, onEdit }) {
                           </tbody>
                           <tfoot className="table-light">
                             <tr>
-                              <td colSpan="5" className="text-end fw-bold">Total:</td>
+                              <td colSpan="4" className="text-end fw-bold">Total:</td>
                               <td className="text-end fw-bold text-success">
                                 ${order.montoTotal ? parseFloat(order.montoTotal).toFixed(2) : '0.00'}
                               </td>
