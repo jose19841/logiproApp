@@ -11,6 +11,7 @@ export default function Sidebar() {
   const [openClaims, setOpenClaims] = useState(false);
   const [openMaterials, setOpenMaterials] = useState(false);
   const [openInventory, setOpenInventory] = useState(false);
+  const [openOrders, setOpenOrders] = useState(false);
 
   // Verificar si el usuario es ADMIN
   const isAdmin = user?.rol === "ADMIN" || user?.rol?.nombre === "ADMIN";
@@ -230,6 +231,45 @@ export default function Sidebar() {
               }
             >
               ➕ Nuevo Inventario
+            </NavLink>
+          </div>
+        )}
+
+        {/* Orders - Toggle */}
+        <button
+          type="button"
+          onClick={() => setOpenOrders(!openOrders)}
+          className={
+            "list-group-item list-group-item-action d-flex justify-content-between align-items-center" +
+            (openOrders ? " active" : "")
+          }
+        >
+          <span>
+            <span className="me-2">📋</span> Pedidos
+          </span>
+          <span>{openOrders ? "▾" : "▸"}</span>
+        </button>
+
+        {/* Submenú Orders */}
+        {openOrders && (
+          <div className="submenu">
+            <NavLink
+              to="/orders"
+              className={({ isActive }) =>
+                "list-group-item list-group-item-action" +
+                (isActive ? " active" : "")
+              }
+            >
+              📋 Listado de Pedidos
+            </NavLink>
+            <NavLink
+              to="/orders/new"
+              className={({ isActive }) =>
+                "list-group-item list-group-item-action" +
+                (isActive ? " active" : "")
+              }
+            >
+              ➕ Nuevo Pedido
             </NavLink>
           </div>
         )}

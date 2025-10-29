@@ -1,6 +1,7 @@
 // src/features/claims/pages/ClaimsListPage.jsx
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
 import DataTable from "@shared/components/DataTable";
 import useListClaims from "@/features/claims/hooks/useListClaims";
@@ -41,38 +42,58 @@ export default function ClaimsListPage() {
     return filtered;
   }, [rows, estadoFilter, searchTerm]);
 
-  const handleChangeState = async (claim) => {
-    const ok = await alertConfirm(
-      "¿Cambiar estado?",
-      `El reclamo #${claim.numReclamo} está actualmente en estado ${ESTADOS[claim.estado]?.label || claim.estado}. ¿Desea cambiarlo?`
-    );
-    if (!ok.isConfirmed) return;
-
-    // Mostrar selector de estado
+  const handleChangeStateClick = async (claim) => {
+    // Preparar opciones de estado
     const estadoOptions = Object.entries(ESTADOS).reduce((acc, [key, value]) => {
       acc[key] = value.label;
       return acc;
     }, {});
 
-    const { value: newEstado, isConfirmed } = await alertConfirm(
-      `Seleccione el nuevo estado`,
-      "",
-      "Cambiar"
-    ).then(() => {
-      return window.Swal.fire({
-        title: `Seleccione el nuevo estado`,
-        input: 'select',
-        inputOptions: estadoOptions,
-        inputValue: claim.estado,
-        showCancelButton: true,
-        confirmButtonText: 'Cambiar',
-        cancelButtonText: 'Cancelar',
-        inputValidator: (value) => {
-          if (!value) {
-            return 'Por favor seleccione un estado';
-          }
+    // Mostrar selector de estado directamente usando Swal
+    const { value: newEstado, isConfirmed } = await Swal.fire({
+      title: 'Cambiar Estado del Reclamo',
+      html: `
+        <div style="text-align: left; padding: 0 0.5rem; margin-bottom: 1rem;">
+          <p class="mb-2"><strong>Reclamo:</strong> #${claim.numReclamo}</p>
+          <p class="mb-0"><strong>Estado actual:</strong> <span class="badge bg-${ESTADOS[claim.estado]?.variant}">${ESTADOS[claim.estado]?.label || claim.estado}</span></p>
+        </div>
+      `,
+      input: 'select',
+      inputOptions: estadoOptions,
+      inputValue: claim.estado,
+      showCancelButton: true,
+      confirmButtonText: 'Cambiar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        htmlContainer: 'swal-html-container-custom'
+      },
+      width: '500px',
+      padding: '1.5rem',
+      didOpen: () => {
+        // Aplicar estilos al select para evitar desborde
+        const selectInput = Swal.getInput();
+        if (selectInput) {
+          selectInput.style.width = 'calc(100% - 2rem)';
+          selectInput.style.maxWidth = 'calc(100% - 2rem)';
+          selectInput.style.margin = '0 1rem';
+          selectInput.style.padding = '0.5rem';
+          selectInput.style.boxSizing = 'border-box';
+          selectInput.style.fontSize = '1rem';
         }
-      });
+
+        // Ajustar el contenedor del input
+        const inputContainer = Swal.getHtmlContainer();
+        if (inputContainer) {
+          inputContainer.style.overflow = 'visible';
+          inputContainer.style.padding = '0';
+          inputContainer.style.margin = '0';
+        }
+      },
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Por favor seleccione un estado';
+        }
+      }
     });
 
     if (isConfirmed && newEstado && newEstado !== claim.estado) {
@@ -136,7 +157,7 @@ export default function ClaimsListPage() {
             </button>
             <button
               className="btn btn-outline-info"
-              onClick={() => handleChangeState(row)}
+              onClick={() => handleChangeStateClick(row)}
               title="Cambiar estado"
             >
               <i className="bi bi-arrow-repeat"></i>
@@ -145,7 +166,7 @@ export default function ClaimsListPage() {
         ),
       },
     ],
-    [handleChangeState]
+    []
   );
 
   const closeModal = () => setSelectedClaim(null);
@@ -356,7 +377,7 @@ export default function ClaimsListPage() {
                   className="btn btn-outline-primary"
                   onClick={() => {
                     closeModal();
-                    handleChangeState(selectedClaim);
+                    handleChangeStateClick(selectedClaim);
                   }}
                 >
                   <i className="bi bi-arrow-repeat me-2"></i>

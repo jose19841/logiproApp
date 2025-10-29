@@ -40,6 +40,11 @@ import InventoryCreatePage from "@/features/inventory/pages/InventoryCreatePage"
 import InventoryEditPage from "@/features/inventory/pages/InventoryEditPage";
 import InventoryListPage from "@/features/inventory/pages/InventoryListPage";
 
+// Orders
+import OrdersListPage from "@/features/orders/pages/OrdersListPage";
+import OrderCreatePage from "@/features/orders/pages/OrderCreatePage";
+import OrderEditPage from "@/features/orders/pages/OrderEditPage";
+
 // Inline Protected Route Guard
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -120,6 +125,11 @@ export default function AppRouter() {
         <Route path="inventory" element={<InventoryListPage />} />
         <Route path="inventory/new" element={<InventoryCreatePage />} />
         <Route path="inventory/:id/edit" element={<InventoryEditPage />} />
+
+        {/* Orders */}
+        <Route path="orders" element={<OrdersListPage />} />
+        <Route path="orders/new" element={<OrderCreatePage />} />
+        <Route path="orders/:id/edit" element={<OrderEditPage />} />
 
         {/* Cuenta / Seguridad */}
         <Route path="cambiar-clave" element={<ChangePasswordPage />} />
