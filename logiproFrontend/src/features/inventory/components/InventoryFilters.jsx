@@ -24,7 +24,17 @@ export default function InventoryFilters({ filters, onFilterChange, onClearFilte
         ]);
 
         setSectores(sectoresData || []);
-        setMateriales(materialesData || []);
+
+        // Agrupar materiales por tipo para evitar duplicados en el dropdown
+        const materialesPorTipo = new Map();
+        materialesData.forEach(material => {
+          const tipoId = material.tipoMaterialId;
+          if (!materialesPorTipo.has(tipoId)) {
+            materialesPorTipo.set(tipoId, material);
+          }
+        });
+
+        setMateriales(Array.from(materialesPorTipo.values()));
       } catch (error) {
         console.error("Error loading filter data:", error);
       } finally {
@@ -122,7 +132,7 @@ export default function InventoryFilters({ filters, onFilterChange, onClearFilte
           </div>
 
           <div className="col-md-3">
-            <label htmlFor="materialId" className="form-label">Material</label>
+            <label htmlFor="materialId" className="form-label">Tipo de Material</label>
             <select
               id="materialId"
               name="materialId"
@@ -133,7 +143,7 @@ export default function InventoryFilters({ filters, onFilterChange, onClearFilte
               <option value="">-- Todos --</option>
               {materiales.map((material) => (
                 <option key={material.id} value={material.id}>
-                  Material #{material.id}
+                  {material.nombreTipoMaterial || `Material #${material.id}`}
                 </option>
               ))}
             </select>

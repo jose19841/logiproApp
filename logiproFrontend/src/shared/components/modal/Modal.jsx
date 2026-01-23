@@ -1,8 +1,8 @@
-
+import { createPortal } from "react-dom";
 import PropTypes from "prop-types";
 
 export default function Modal({ id, title, children, onClose, footer }) {
-  return (
+  const modalContent = (
     <div
       className="modal fade"
       id={id}
@@ -35,6 +35,8 @@ export default function Modal({ id, title, children, onClose, footer }) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 
 Modal.propTypes = {

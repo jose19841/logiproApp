@@ -3,32 +3,37 @@ import useListSuppliers from "@/features/suppliers/hooks/useListSuppliers";
 import DataTable from "@shared/components/DataTable";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { changeSupplierStatus } from "@/features/suppliers/services/suppliersApi";
 
 export default function SuppliersListPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { rows, loading, err, reload } = useListSuppliers();
   const [selectedSupplier, setSelectedSupplier] = useState(null);
 
   const handleChangeStatus = async (supplier) => {
     const action = supplier.habilitado ? "inhabilitar" : "habilitar";
-    const ok = await alertConfirm(
+
+    // Confirmación con modal elegante
+    const confirmed = await toast.showConfirm(
       `¿${action.charAt(0).toUpperCase() + action.slice(1)} proveedor?`,
-      `¿Está seguro de que desea ${action} al proveedor "${supplier.nombre}"?`
+      `¿Está seguro de que desea ${action} al proveedor "${supplier.nombre}"?`,
+      action === "habilitar" ? "Habilitar" : "Inhabilitar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       await changeSupplierStatus(supplier.id, !supplier.habilitado);
-      await alertSuccess(
+      toast.showSuccess(
         "Estado actualizado",
         `El proveedor "${supplier.nombre}" ha sido ${action === "habilitar" ? "habilitado" : "inhabilitado"}.`
       );
       reload();
     } catch (error) {
       console.error("Error changing supplier status:", error);
-      alertError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo cambiar el estado");
+      toast.showError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo cambiar el estado");
     }
   };
 
@@ -39,6 +44,18 @@ export default function SuppliersListPage() {
       {
         key: "descripcion",
         label: "Descripción",
+        sortable: true,
+        render: (value) => value || "-"
+      },
+      {
+        key: "direccion",
+        label: "Dirección",
+        sortable: true,
+        render: (value) => value || "-"
+      },
+      {
+        key: "telefono",
+        label: "Teléfono",
         sortable: true,
         render: (value) => value || "-"
       },
@@ -163,7 +180,15 @@ export default function SuppliersListPage() {
                           </div>
                           <div className="col-12">
                             <label className="form-label small">Descripción</label>
-                            <p className="fw-semibold mb-0">{selectedSupplier.descripcion || 'No especificado'}</p>
+                            <p className="fw-semibold mb-2">{selectedSupplier.descripcion || 'No especificado'}</p>
+                          </div>
+                          <div className="col-md-8">
+                            <label className="form-label small">Dirección</label>
+                            <p className="fw-semibold mb-2">{selectedSupplier.direccion || 'No especificado'}</p>
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label small">Teléfono</label>
+                            <p className="fw-semibold mb-0">{selectedSupplier.telefono || 'No especificado'}</p>
                           </div>
                         </div>
                       </div>

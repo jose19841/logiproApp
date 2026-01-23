@@ -1,7 +1,7 @@
 // src/features/claims/pages/ClaimCreatePage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { createClaim } from "@/features/claims/services/claimsApi";
 import { listSuppliers } from "@/features/suppliers/services/suppliersApi";
 
@@ -14,6 +14,7 @@ const ESTADOS = {
 
 export default function ClaimCreatePage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [suppliers, setSuppliers] = useState([]);
   const [loadingSuppliers, setLoadingSuppliers] = useState(true);
@@ -30,13 +31,13 @@ export default function ClaimCreatePage() {
         setSuppliers(data || []);
       } catch (error) {
         console.error("Error loading suppliers:", error);
-        alertError("Error", "No se pudo cargar la lista de proveedores");
+        toast.showError("Error", "No se pudo cargar la lista de proveedores");
       } finally {
         setLoadingSuppliers(false);
       }
     };
     fetchSuppliers();
-  }, []);
+  }, [toast]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,15 +62,17 @@ export default function ClaimCreatePage() {
     if (loading) return;
 
     if (!isFormValid) {
-      alertError("Error de Validación", "Por favor corrija los errores en el formulario");
+      toast.showError("Error de Validación", "Por favor corrija los errores en el formulario");
       return;
     }
 
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Crear reclamo?",
-      "Se creará un nuevo reclamo con estado En Proceso."
+      "Se creará un nuevo reclamo con estado En Proceso.",
+      "Crear",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     setLoading(true);
 
@@ -89,12 +92,12 @@ export default function ClaimCreatePage() {
 
       const response = await createClaim(dto);
 
-      await alertSuccess("Reclamo creado", `El reclamo #${response.numReclamo} ha sido creado exitosamente.`);
+      toast.showSuccess("Reclamo creado", `El reclamo #${response.numReclamo} ha sido creado exitosamente.`);
 
       navigate("/claims");
     } catch (error) {
       console.error("Error creating claim:", error);
-      alertError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo crear el reclamo");
+      toast.showError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo crear el reclamo");
     } finally {
       setLoading(false);
     }

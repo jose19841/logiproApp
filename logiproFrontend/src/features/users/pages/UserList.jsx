@@ -26,6 +26,7 @@ export default function UserList() {
       { key: "usuario", label: "Usuario", sortable: true },
       { key: "nombreCompleto", label: "Nombre", sortable: true },
       { key: "email", label: "Email", sortable: true },
+      { key: "telefono", label: "Teléfono", sortable: true },
       { key: "rol", label: "Rol", sortable: true, align: "center" },
       {
         key: "estado",

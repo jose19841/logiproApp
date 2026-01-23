@@ -16,7 +16,6 @@ import java.util.List;
 @Builder
 public class ActualizarPedidoRequestDTO {
 
-    @NotNull(message = "La fecha del pedido es obligatoria")
     private LocalDate fechaPedido;
 
     @FutureOrPresent(message = "La fecha de entrega estimada debe ser hoy a futura")

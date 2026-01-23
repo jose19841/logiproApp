@@ -17,4 +17,10 @@ public class ActualizarProveedorRequestDTO {
 
     @Size(max = 255, message = "la descripcion no puede superar los 255 caracteres")
     private String descripcion;
+
+    @Size(max = 200, message = "La dirección no puede superar los 200 caracteres")
+    private String direccion;
+
+    @Size(max = 20, message = "El teléfono no puede superar los 20 caracteres")
+    private String telefono;
 }

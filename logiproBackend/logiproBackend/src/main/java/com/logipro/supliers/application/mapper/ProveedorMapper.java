@@ -17,6 +17,8 @@ public class ProveedorMapper {
                 .id(proveedor.getId())
                 .nombre(proveedor.getNombre())
                 .descripcion(proveedor.getDescripcion())
+                .direccion(proveedor.getDireccion())
+                .telefono(proveedor.getTelefono())
                 .habilitado(proveedor.getHabilitado())
                 .build();
     }

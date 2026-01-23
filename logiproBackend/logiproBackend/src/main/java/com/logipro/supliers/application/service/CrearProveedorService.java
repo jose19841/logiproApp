@@ -29,7 +29,9 @@ public class CrearProveedorService implements CrearProveedorUseCase {
         // El constructor ya hace trim y validaciones
         Proveedor proveedor = new Proveedor(
             request.getNombre(),
-            request.getDescripcion()
+            request.getDescripcion(),
+            request.getDireccion(),
+            request.getTelefono()
         );
         Proveedor guardado = proveedorRepository.save(proveedor);
 

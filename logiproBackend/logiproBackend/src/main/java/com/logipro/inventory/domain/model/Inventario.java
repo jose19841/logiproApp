@@ -1,6 +1,7 @@
 package com.logipro.inventory.domain.model;
 
 import com.logipro.materials.domain.model.Material;
+import com.logipro.materials.domain.model.TipoMaterial;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,10 @@ public class Inventario {
     @JoinColumn(name = "id_material", nullable = false)
     private Material material;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_tipo_material")
+    private TipoMaterial tipoMaterial;
+
     // ===== Lógica de Negocio (DDD) =====
 
 
@@ -59,6 +64,7 @@ public class Inventario {
         }
         this.sector = sector;
         this.material = material;
+        this.tipoMaterial = material.getTipoMaterial();
     }
 
 

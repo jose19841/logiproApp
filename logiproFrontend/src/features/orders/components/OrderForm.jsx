@@ -41,7 +41,9 @@ export default function OrderForm({
           listMaterials().catch(() => [])
         ]);
 
-        setSuppliers(suppliersData || []);
+        // Filtrar solo proveedores habilitados
+        const activeSuppliers = (suppliersData || []).filter(supplier => supplier.habilitado === true);
+        setSuppliers(activeSuppliers);
         // Si materials devuelve un objeto paginado
         setMaterials(materialsData?.content || materialsData || []);
       } catch (error) {

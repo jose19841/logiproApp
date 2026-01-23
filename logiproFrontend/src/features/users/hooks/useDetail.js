@@ -1,9 +1,10 @@
 // src/features/users/hooks/useDetail.js
 import { useEffect, useState } from "react";
-import { alertError, alertWarning } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { fetchUserById } from "@/features/users/services/userList";
 
 export default function useDetail(id) {
+  const toast = useToast();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -13,12 +14,12 @@ export default function useDetail(id) {
         setLoading(true);
         const data = await fetchUserById(id);
         if (!data) {
-          alertWarning("Usuario no encontrado");
+          toast.showWarning("Usuario no encontrado", "No se pudo encontrar el usuario solicitado.");
         }
         setUser(data);
       } catch (e) {
         console.error(e);
-        alertError("No se pudo cargar el usuario");
+        toast.showError("Error", "No se pudo cargar el usuario");
       } finally {
         setLoading(false);
       }

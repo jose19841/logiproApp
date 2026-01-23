@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useOrders from "@/features/orders/hooks/useOrders";
 import useDeleteOrder from "@/features/orders/hooks/useDeleteOrder";
 import useChangeOrderStatus from "@/features/orders/hooks/useChangeOrderStatus";
@@ -12,6 +12,7 @@ import OrderDetail from "@/features/orders/components/OrderDetail";
 
 export default function OrdersListPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [filters, setFilters] = useState({});
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -36,25 +37,27 @@ export default function OrdersListPage() {
   };
 
   const handleDelete = async (order) => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Eliminar pedido?",
-      `¿Está seguro que desea eliminar el pedido #${order.numeroPedido}? Esta acción no se puede deshacer.`
+      `¿Está seguro que desea eliminar el pedido #${order.numeroPedido}? Esta acción no se puede deshacer.`,
+      "Eliminar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       await deleteOrderFn(order.id);
-      await alertSuccess("Pedido eliminado", `El pedido #${order.numeroPedido} ha sido eliminado exitosamente.`);
+      toast.showSuccess("Pedido eliminado", `El pedido #${order.numeroPedido} ha sido eliminado exitosamente.`);
       reload();
     } catch (err) {
-      alertError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo eliminar el pedido");
+      toast.showError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo eliminar el pedido");
     }
   };
 
   const handleChangeStatus = async (order) => {
     // Validar si puede cambiar de estado
     if (order.estado === "RECIBIDO" || order.estado === "CANCELADO") {
-      alertError("No disponible", "No se puede cambiar el estado de un pedido recibido o cancelado.");
+      toast.showError("No disponible", "No se puede cambiar el estado de un pedido recibido o cancelado.");
       return;
     }
 
@@ -86,10 +89,10 @@ export default function OrdersListPage() {
 
     try {
       await changeStatusFn(order.id, result.value);
-      await alertSuccess("Estado actualizado", `El estado del pedido ha sido actualizado a: ${result.value.replace(/_/g, " ")}`);
+      toast.showSuccess("Estado actualizado", `El estado del pedido ha sido actualizado a: ${result.value.replace(/_/g, " ")}`);
       reload();
     } catch (err) {
-      alertError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo cambiar el estado del pedido");
+      toast.showError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo cambiar el estado del pedido");
     }
   };
 

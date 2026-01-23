@@ -1,6 +1,6 @@
 // src/features/users/hooks/useList.js
 import { useCallback, useEffect, useState } from "react";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { changeUserState, fetchUsers } from "@/features/users/services/userList";
 
 /**
@@ -8,6 +8,7 @@ import { changeUserState, fetchUsers } from "@/features/users/services/userList"
  * Encapsula: carga, mapeo de filas, errores, refresh, cambio de estado y UI states.
  */
 export default function useList() {
+  const toast = useToast();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -54,25 +55,27 @@ export default function useList() {
       // Validación rápida contra el enum real del backend
       const ALLOWED = new Set(["REGISTRADO", "ACTIVO", "INACTIVO", "SUSPENDIDO"]);
       if (!ALLOWED.has(nuevoEstado)) {
-        alertError("Estado inválido", `Valor no permitido: ${nuevoEstado}`);
+        toast.showError("Estado inválido", `Valor no permitido: ${nuevoEstado}`);
         return;
       }
 
-      const ok = await alertConfirm(
+      const confirmed = await toast.showConfirm(
         "¿Cambiar estado?",
-        `El usuario "${row.usuario}" pasará a ${nuevoEstado}.`
+        `El usuario "${row.usuario}" pasará a ${nuevoEstado}.`,
+        "Cambiar",
+        "Cancelar"
       );
-      if (!ok.isConfirmed) return;
+      if (!confirmed) return;
 
       try {
         await changeUserState(row.id, nuevoEstado);
-        await alertSuccess("Estado actualizado", `El usuario ahora está ${nuevoEstado}.`);
+        toast.showSuccess("Estado actualizado", `El usuario ahora está ${nuevoEstado}.`);
         loadData();
         // Cerrar el menú después del cambio
         setShowStatesFor(null);
       } catch (e) {
         console.error(e);
-        alertError("No se pudo cambiar el estado.");
+        toast.showError("Error", "No se pudo cambiar el estado.");
       }
     },
     [loadData]

@@ -22,4 +22,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByFechaPedidoBetween(LocalDate desde, LocalDate hasta);
 
     List<Pedido> findByEstadoIn(List<EstadoPedido> estados);
+
+    // Buscar último pedido del año (para generar correlativo)
+    Optional<Pedido> findFirstByNumeroPedidoStartingWithOrderByNumeroPedidoDesc(String prefix);
 }

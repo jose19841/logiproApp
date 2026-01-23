@@ -1,11 +1,6 @@
 // src/features/users/hooks/useEdit.js
 import { useCallback, useEffect, useState } from "react";
-import {
-  alertConfirm,
-  alertError,
-  alertSuccess,
-  alertWarning,
-} from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { fetchUserById, updateUser, changeUserState } from "@/features/users/services/userList";
 
 /**
@@ -14,6 +9,7 @@ import { fetchUserById, updateUser, changeUserState } from "@/features/users/ser
  * const { form, onChange, setField, load, submit, loading, saving, notFound } = useEdit(id);
  */
 export default function useEdit(userId) {
+  const toast = useToast();
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
@@ -56,7 +52,7 @@ export default function useEdit(userId) {
       const data = await fetchUserById(userId);
       if (!data) {
         setNotFound(true);
-        alertWarning("Usuario no encontrado");
+        toast.showWarning("Usuario no encontrado", "No se pudo encontrar el usuario solicitado.");
         return;
       }
       const mappedData = mapFromApi(data);
@@ -64,7 +60,7 @@ export default function useEdit(userId) {
       setInitialState(mappedData.estado); // Guardar estado inicial
     } catch (e) {
       console.error("❌ Error al cargar usuario:", e);
-      alertError("No se pudo cargar el usuario");
+      toast.showError("Error", "No se pudo cargar el usuario");
     } finally {
       setLoading(false);
     }
@@ -87,11 +83,13 @@ export default function useEdit(userId) {
   );
 
   const submit = useCallback(async () => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Guardar cambios?",
-      `Se actualizarán los datos de "${form.usuario}".`
+      `Se actualizarán los datos de "${form.usuario}".`,
+      "Guardar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return false;
+    if (!confirmed) return false;
 
     try {
       setSaving(true);
@@ -121,13 +119,13 @@ export default function useEdit(userId) {
         await changeUserState(userId, form.estado);
       }
 
-      await alertSuccess("Actualizado", "Los datos del usuario fueron guardados.");
+      toast.showSuccess("Actualizado", "Los datos del usuario fueron guardados.");
       return true;
     } catch (e) {
       console.error("❌ Error completo:", e);
       console.error("❌ Response data:", e.response?.data);
       console.error("❌ Response status:", e.response?.status);
-      alertError("No se pudo actualizar el usuario");
+      toast.showError("Error", "No se pudo actualizar el usuario");
       return false;
     } finally {
       setSaving(false);

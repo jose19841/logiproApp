@@ -1,6 +1,6 @@
 // src/features/users/components/ChangePasswordModal.jsx
 import { useState } from "react";
-import { alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import Modal from "@shared/components/modal/Modal";
 import { useChangePassword } from "@/features/users/hooks/useChangePassword";
 
@@ -8,6 +8,7 @@ const PASS_RE = /^.{8,}$/; // mínimo 8
 
 export default function ChangePasswordModal({ id = "changePasswordModal", title = "Cambiar contraseña", onDone }) {
   const { changePassword, loading } = useChangePassword();
+  const toast = useToast();
   const [actual, setActual] = useState("");
   const [nueva, setNueva] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -31,19 +32,28 @@ export default function ChangePasswordModal({ id = "changePasswordModal", title 
   };
 
   const submit = async () => {
-    if (!actual || !nueva || !confirm) return alertError("Datos incompletos", "Completá todos los campos.");
-    if (!PASS_RE.test(nueva))         return alertError("Contraseña inválida", "Mínimo 8 caracteres.");
-    if (nueva !== confirm)            return alertError("No coinciden", "La confirmación no coincide.");
+    if (!actual || !nueva || !confirm) {
+      toast.showError("Datos incompletos", "Completá todos los campos.");
+      return;
+    }
+    if (!PASS_RE.test(nueva)) {
+      toast.showError("Contraseña inválida", "Mínimo 8 caracteres.");
+      return;
+    }
+    if (nueva !== confirm) {
+      toast.showError("No coinciden", "La confirmación no coincide.");
+      return;
+    }
 
     try {
       await changePassword({ claveActual: actual, nuevaClave: nueva, confirmarClave: confirm });
-      await alertSuccess("Listo", "Tu contraseña fue cambiada correctamente.");
+      toast.showSuccess("Listo", "Tu contraseña fue cambiada correctamente.");
 
       closeModal();   // ⬅️ cerramos el modal (y backdrop) antes de redirigir
       reset();
       onDone?.();     // el padre hace navigate("/login", { replace: true })
     } catch (e) {
-      alertError("Error", e?.message || "No se pudo cambiar la clave.");
+      toast.showError("Error", e?.message || "No se pudo cambiar la clave.");
     }
   };
 

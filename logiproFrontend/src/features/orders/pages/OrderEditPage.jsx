@@ -1,12 +1,13 @@
 // src/features/orders/pages/OrderEditPage.jsx
 import { useNavigate, useParams } from "react-router-dom";
-import { alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useOrderById from "@/features/orders/hooks/useOrderById";
 import useUpdateOrder from "@/features/orders/hooks/useUpdateOrder";
 import OrderForm from "@/features/orders/components/OrderForm";
 
 export default function OrderEditPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { id } = useParams();
   const { data: order, loading: loadingOrder, error } = useOrderById(id);
   const { updateOrderFn, loading: updating } = useUpdateOrder();
@@ -14,13 +15,13 @@ export default function OrderEditPage() {
   const handleSubmit = async (dto) => {
     try {
       const response = await updateOrderFn(id, dto);
-      await alertSuccess(
+      toast.showSuccess(
         "Pedido actualizado",
         `El pedido #${response.numeroPedido} ha sido actualizado exitosamente.`
       );
       navigate("/orders");
     } catch (err) {
-      alertError(
+      toast.showError(
         "Error",
         err?.response?.data?.mensaje || err?.message || "No se pudo actualizar el pedido"
       );

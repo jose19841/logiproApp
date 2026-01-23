@@ -1,26 +1,29 @@
 // src/features/materials/pages/MaterialCreatePage.jsx
 import { useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useCreateMaterial from "@/features/materials/hooks/useCreateMaterial";
 import MaterialForm from "@/features/materials/components/MaterialForm";
 
 export default function MaterialCreatePage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { createMaterialFn, loading } = useCreateMaterial();
 
   const handleSubmit = async (dto) => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Crear material?",
-      "Se creará un nuevo material con los datos ingresados."
+      "Se creará un nuevo material con los datos ingresados.",
+      "Crear",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       const response = await createMaterialFn(dto);
-      await alertSuccess("Material creado", `El material #${response.id} ha sido creado exitosamente.`);
+      toast.showSuccess("Material creado", `El material #${response.id} ha sido creado exitosamente.`);
       navigate("/materials");
     } catch (error) {
-      alertError(
+      toast.showError(
         "Error al crear material",
         error?.response?.data?.mensaje || error?.message || "No se pudo crear el material"
       );

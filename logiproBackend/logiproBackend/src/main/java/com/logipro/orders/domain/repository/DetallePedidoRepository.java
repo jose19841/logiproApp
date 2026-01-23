@@ -12,4 +12,6 @@ public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Lo
     List<DetallePedido> findByMaterial_id(Long materialId);
 
     DetallePedido findByPedido_idAndMaterial_id(Long pedidoId, Long materialId);
+
+    long countByMaterial_id(Long materialId);
 }

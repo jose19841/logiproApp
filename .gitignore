@@ -1,2 +1,4 @@
-nul
+# Claude (local AI settings)
+.claude/
+# Windows reserved files
 NUL

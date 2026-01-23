@@ -23,12 +23,20 @@ public class Proveedor {
     @Column(name = "descripcion", length = 255)
     private String descripcion;
 
+    @Column(name = "direccion", length = 200)
+    private String direccion;
+
+    @Column(name = "telefono", length = 20)
+    private String telefono;
+
     @Column(name = "habilitado", nullable = false)
     private Boolean habilitado = true;
 
-    public Proveedor(String nombre, String descripcion){
+    public Proveedor(String nombre, String descripcion, String direccion, String telefono){
         establecerNombre(nombre);
         actualizarDescripcion(descripcion);
+        actualizarDireccion(direccion);
+        actualizarTelefono(telefono);
         this.habilitado = true;
     }
 
@@ -57,6 +65,26 @@ public class Proveedor {
         }
         this.descripcion = (descripcion != null && !descripcion.trim().isEmpty())
                 ? descripcion.trim()
+                : null;
+    }
+
+
+    public void actualizarDireccion(String direccion) {
+        if (direccion != null && direccion.trim().length() > 200) {
+            throw new IllegalArgumentException("La dirección no puede exceder 200 caracteres");
+        }
+        this.direccion = (direccion != null && !direccion.trim().isEmpty())
+                ? direccion.trim()
+                : null;
+    }
+
+
+    public void actualizarTelefono(String telefono) {
+        if (telefono != null && telefono.trim().length() > 20) {
+            throw new IllegalArgumentException("El teléfono no puede exceder 20 caracteres");
+        }
+        this.telefono = (telefono != null && !telefono.trim().isEmpty())
+                ? telefono.trim()
                 : null;
     }
 

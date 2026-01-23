@@ -1,9 +1,10 @@
 import { useCallback, useState } from "react";
-import { alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { registerUser } from "@/features/users/services/userApi";
 
 export default function useRegister() {
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   const submit = useCallback(async (form) => {
     setLoading(true);
@@ -26,7 +27,7 @@ export default function useRegister() {
       // Enviar al backend con todos los campos
       const created = await registerUser(form);
 
-      await alertSuccess(
+      toast.showSuccess(
         "Usuario creado",
         `Se creó ${created.usuario} con rol ${created.rol} (estado: ${created.estado}).`
       );
@@ -37,7 +38,7 @@ export default function useRegister() {
         err?.response?.data?.message ||
         err?.message ||
         "No se pudo registrar el usuario.";
-      await alertError("Error", msg);
+      toast.showError("Error", msg);
       return { ok: false, error: msg };
     } finally {
       setLoading(false);

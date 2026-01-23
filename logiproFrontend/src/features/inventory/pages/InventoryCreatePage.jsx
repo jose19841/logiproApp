@@ -1,26 +1,29 @@
 // src/features/inventory/pages/InventoryCreatePage.jsx
 import { useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useCreateInventory from "@/features/inventory/hooks/useCreateInventory";
 import InventoryForm from "@/features/inventory/components/InventoryForm";
 
 export default function InventoryCreatePage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { createInventarioFn, loading } = useCreateInventory();
 
   const handleSubmit = async (dto) => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Crear inventario?",
-      "Se creará un nuevo registro de inventario con los datos ingresados."
+      "Se creará un nuevo registro de inventario con los datos ingresados.",
+      "Crear",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       const response = await createInventarioFn(dto);
-      await alertSuccess("Inventario creado", `El inventario #${response.id} ha sido creado exitosamente.`);
+      toast.showSuccess("Inventario creado", `El inventario #${response.id} ha sido creado exitosamente.`);
       navigate("/inventory");
     } catch (error) {
-      alertError(
+      toast.showError(
         "Error al crear inventario",
         error?.response?.data?.mensaje || error?.message || "No se pudo crear el inventario"
       );

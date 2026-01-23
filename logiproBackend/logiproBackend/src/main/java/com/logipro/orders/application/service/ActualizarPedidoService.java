@@ -60,24 +60,25 @@ public class ActualizarPedidoService implements ActualizarPedidoUseCase {
                 Material material = materialRepository.findById(item.getMaterialId())
                         .orElseThrow(() -> new IllegalArgumentException("Material no encontrado: id" + item.getMaterialId()));
 
-                DetallePedido detalle = DetallePedido.builder()
-                        .pedido(pedido)
-                        .material(material)
-                        .cantidadSolicitada(item.getCantidadSolicitada())
-                        .cantidadRecibida(null) // actualziacion no registra recepcion
-                        .precioUnitario(item.getPrecioUnitario())
-                        .subtotal(BigDecimal.ZERO)
-                        .build();
+                // Usar setters para que se calcule el subtotal automáticamente
+                DetallePedido detalle = new DetallePedido();
+                detalle.setMaterial(material);
+                detalle.setCantidadSolicitada(item.getCantidadSolicitada());
+                detalle.setCantidadRecibida(null);
+                detalle.setPrecioUnitario(item.getPrecioUnitario());
 
                 pedido.agregarDetalle(detalle);
             }
         }
 
-        // 5) recalcular y persistir
-        pedido.recalcularTotales();
+        // 5) Persistir primero (para que @PrePersist calcule los subtotales)
         Pedido guardado = pedidoRepository.save(pedido);
 
-        // 6) respuesta
+        // 6) Recalcular totales después de persistir (ahora los subtotales están calculados)
+        guardado.recalcularTotales();
+        guardado = pedidoRepository.save(guardado);
+
+        // 7) respuesta
         return pedidoMapper.toResponseDTO(guardado);
     }
 

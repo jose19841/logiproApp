@@ -32,6 +32,17 @@ export default function OrderList({ data = [], loading = false, error = "", onVi
         render: (value) => value || "-"
       },
       {
+        key: "cantidadTotal",
+        label: "Cantidad Total",
+        sortable: true,
+        align: "center",
+        render: (value, row) => {
+          if (!row.detalles || row.detalles.length === 0) return "0";
+          const total = row.detalles.reduce((sum, detalle) => sum + (detalle.cantidadSolicitada || 0), 0);
+          return <span className="fw-semibold">{total}</span>;
+        }
+      },
+      {
         key: "fechaPedido",
         label: "Fecha Pedido",
         sortable: true,

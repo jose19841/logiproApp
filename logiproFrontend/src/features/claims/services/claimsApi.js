@@ -46,3 +46,12 @@ export async function listClaimsByEstado(estado) {
   const { data } = await apiClient.get(`${BASE_PATH}/estado/${estado}`);
   return data;
 }
+
+/**
+ * DELETE /api/reclamos/{id}
+ * @param {number} id - Claim ID
+ */
+export async function deleteClaim(id) {
+  const { data } = await apiClient.delete(`${BASE_PATH}/${id}`);
+  return data;
+}

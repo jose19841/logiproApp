@@ -42,7 +42,9 @@ export default function MaterialForm({
           apiClient.get("/api/materiales/tipos-material").then(res => res.data).catch(() => [])
         ]);
 
-        setSuppliers(suppliersData || []);
+        // Filtrar solo proveedores habilitados
+        const activeSuppliers = (suppliersData || []).filter(supplier => supplier.habilitado === true);
+        setSuppliers(activeSuppliers);
         setTiposMaterial(tiposMaterialData || []);
       } catch (error) {
         console.error("Error loading form data:", error);

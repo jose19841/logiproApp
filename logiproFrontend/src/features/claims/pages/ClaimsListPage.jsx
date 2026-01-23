@@ -1,11 +1,12 @@
 // src/features/claims/pages/ClaimsListPage.jsx
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import DataTable from "@shared/components/DataTable";
 import useListClaims from "@/features/claims/hooks/useListClaims";
-import { changeClaimState } from "@/features/claims/services/claimsApi";
+import { changeClaimState, deleteClaim } from "@/features/claims/services/claimsApi";
+import { listSuppliers } from "@/features/suppliers/services/suppliersApi";
 
 const ESTADOS = {
   PENDIENTE: { label: "Pendiente", variant: "warning" },
@@ -16,10 +17,27 @@ const ESTADOS = {
 
 export default function ClaimsListPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { rows, loading, err, reload } = useListClaims();
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [estadoFilter, setEstadoFilter] = useState("");
+  const [proveedorFilter, setProveedorFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
+  const [suppliers, setSuppliers] = useState([]);
+
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const data = await listSuppliers();
+        setSuppliers(data || []);
+      } catch (error) {
+        console.error("Error loading suppliers:", error);
+      }
+    };
+    fetchSuppliers();
+  }, []);
 
   // Client-side filtering
   const filteredRows = useMemo(() => {
@@ -28,6 +46,25 @@ export default function ClaimsListPage() {
     // Filter by estado
     if (estadoFilter) {
       filtered = filtered.filter(row => row.estado === estadoFilter);
+    }
+
+    // Filter by proveedor
+    if (proveedorFilter) {
+      filtered = filtered.filter(row => row.proveedorId === parseInt(proveedorFilter));
+    }
+
+    // Filter by fechas
+    if (fechaDesde) {
+      filtered = filtered.filter(row => {
+        if (!row.fechaCreacion) return false;
+        return new Date(row.fechaCreacion) >= new Date(fechaDesde);
+      });
+    }
+    if (fechaHasta) {
+      filtered = filtered.filter(row => {
+        if (!row.fechaCreacion) return false;
+        return new Date(row.fechaCreacion) <= new Date(fechaHasta);
+      });
     }
 
     // Search by numReclamo or descripcion
@@ -40,7 +77,30 @@ export default function ClaimsListPage() {
     }
 
     return filtered;
-  }, [rows, estadoFilter, searchTerm]);
+  }, [rows, estadoFilter, proveedorFilter, searchTerm, fechaDesde, fechaHasta]);
+
+  const handleEdit = (claim) => {
+    navigate(`/claims/${claim.id}/edit`);
+  };
+
+  const handleDelete = async (claim) => {
+    const confirmed = await toast.showConfirm(
+      "¿Eliminar reclamo?",
+      `¿Está seguro que desea eliminar el reclamo #${claim.numReclamo}?`,
+      "Eliminar",
+      "Cancelar"
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteClaim(claim.id);
+      toast.showSuccess("Reclamo eliminado", `El reclamo #${claim.numReclamo} ha sido eliminado.`);
+      reload();
+    } catch (error) {
+      console.error("Error deleting claim:", error);
+      toast.showError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo eliminar el reclamo");
+    }
+  };
 
   const handleChangeStateClick = async (claim) => {
     // Preparar opciones de estado
@@ -99,11 +159,11 @@ export default function ClaimsListPage() {
     if (isConfirmed && newEstado && newEstado !== claim.estado) {
       try {
         await changeClaimState(claim.id, newEstado);
-        await alertSuccess("Estado actualizado", `El reclamo #${claim.numReclamo} ahora está ${ESTADOS[newEstado].label}.`);
+        toast.showSuccess("Estado actualizado", `El reclamo #${claim.numReclamo} ahora está ${ESTADOS[newEstado].label}.`);
         reload();
       } catch (error) {
         console.error("Error changing claim state:", error);
-        alertError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo cambiar el estado");
+        toast.showError("Error", error?.response?.data?.mensaje || error?.message || "No se pudo cambiar el estado");
       }
     }
   };
@@ -156,11 +216,25 @@ export default function ClaimsListPage() {
               <i className="bi bi-eye"></i>
             </button>
             <button
+              className="btn btn-outline-warning"
+              onClick={() => handleEdit(row)}
+              title="Editar"
+            >
+              <i className="bi bi-pencil"></i>
+            </button>
+            <button
               className="btn btn-outline-info"
               onClick={() => handleChangeStateClick(row)}
               title="Cambiar estado"
             >
               <i className="bi bi-arrow-repeat"></i>
+            </button>
+            <button
+              className="btn btn-outline-danger"
+              onClick={() => handleDelete(row)}
+              title="Eliminar"
+            >
+              <i className="bi bi-trash"></i>
             </button>
           </div>
         ),
@@ -196,9 +270,40 @@ export default function ClaimsListPage() {
       <div className="card mb-3">
         <div className="card-body">
           <div className="row g-3">
-            <div className="col-md-4">
+            <div className="col-md-3">
+              <label htmlFor="searchTerm" className="form-label small">
+                N° Reclamo / Descripción
+              </label>
+              <input
+                id="searchTerm"
+                type="text"
+                className="form-control"
+                placeholder="Buscar..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="col-md-3">
+              <label htmlFor="proveedorFilter" className="form-label small">
+                Proveedor
+              </label>
+              <select
+                id="proveedorFilter"
+                className="form-select"
+                value={proveedorFilter}
+                onChange={(e) => setProveedorFilter(e.target.value)}
+              >
+                <option value="">Todos</option>
+                {suppliers.map((supplier) => (
+                  <option key={supplier.id} value={supplier.id}>
+                    {supplier.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-2">
               <label htmlFor="estadoFilter" className="form-label small">
-                Filtrar por Estado
+                Estado
               </label>
               <select
                 id="estadoFilter"
@@ -206,7 +311,7 @@ export default function ClaimsListPage() {
                 value={estadoFilter}
                 onChange={(e) => setEstadoFilter(e.target.value)}
               >
-                <option value="">Todos los Estados</option>
+                <option value="">Todos</option>
                 {Object.entries(ESTADOS).map(([key, value]) => (
                   <option key={key} value={key}>
                     {value.label}
@@ -214,36 +319,48 @@ export default function ClaimsListPage() {
                 ))}
               </select>
             </div>
-            <div className="col-md-8">
-              <label htmlFor="searchTerm" className="form-label small">
-                Buscar por N° Reclamo o Descripción
+            <div className="col-md-2">
+              <label htmlFor="fechaDesde" className="form-label small">
+                Fecha Desde
               </label>
               <input
-                id="searchTerm"
-                type="text"
+                id="fechaDesde"
+                type="date"
                 className="form-control"
-                placeholder="Ingrese número de reclamo o descripción..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={fechaDesde}
+                onChange={(e) => setFechaDesde(e.target.value)}
+              />
+            </div>
+            <div className="col-md-2">
+              <label htmlFor="fechaHasta" className="form-label small">
+                Fecha Hasta
+              </label>
+              <input
+                id="fechaHasta"
+                type="date"
+                className="form-control"
+                value={fechaHasta}
+                onChange={(e) => setFechaHasta(e.target.value)}
               />
             </div>
           </div>
-          {(estadoFilter || searchTerm) && (
+          {(estadoFilter || proveedorFilter || searchTerm || fechaDesde || fechaHasta) && (
             <div className="mt-2">
               <small className="text-muted">
                 Mostrando {filteredRows.length} de {rows.length} reclamos
               </small>
-              {(estadoFilter || searchTerm) && (
-                <button
-                  className="btn btn-link btn-sm ms-2 p-0"
-                  onClick={() => {
-                    setEstadoFilter("");
-                    setSearchTerm("");
-                  }}
-                >
-                  Limpiar filtros
-                </button>
-              )}
+              <button
+                className="btn btn-link btn-sm ms-2 p-0"
+                onClick={() => {
+                  setEstadoFilter("");
+                  setProveedorFilter("");
+                  setSearchTerm("");
+                  setFechaDesde("");
+                  setFechaHasta("");
+                }}
+              >
+                Limpiar filtros
+              </button>
             </div>
           )}
         </div>

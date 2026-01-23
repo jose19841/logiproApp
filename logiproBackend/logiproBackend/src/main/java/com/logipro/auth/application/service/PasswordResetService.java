@@ -39,7 +39,12 @@ public class PasswordResetService {
     @Transactional
     public void solicitarReset(String identifier, String ip, String ua) {
 
-        Optional<Usuario> userOpt = usuarioRepository.findByUsuarioOrEmail(identifier, identifier);
+        // Buscar primero por usuario, si no existe buscar por email (usando findFirst para evitar duplicados)
+        Optional<Usuario> userOpt = usuarioRepository.findByUsuario(identifier);
+        if (userOpt.isEmpty()) {
+            userOpt = usuarioRepository.findFirstByEmail(identifier);
+        }
+
         if (userOpt.isEmpty()) {
             // Importante: no revelar si existe o no
             return;

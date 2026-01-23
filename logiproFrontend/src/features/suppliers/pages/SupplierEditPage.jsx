@@ -1,21 +1,26 @@
 // src/features/suppliers/pages/SupplierEditPage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { getSupplierById, updateSupplier } from "@/features/suppliers/services/suppliersApi";
 
 export default function SupplierEditPage() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
+    direccion: "",
+    telefono: "",
   });
   const [touched, setTouched] = useState({
     nombre: false,
     descripcion: false,
+    direccion: false,
+    telefono: false,
   });
 
   // Cargar datos del proveedor
@@ -27,10 +32,12 @@ export default function SupplierEditPage() {
         setForm({
           nombre: data.nombre || "",
           descripcion: data.descripcion || "",
+          direccion: data.direccion || "",
+          telefono: data.telefono || "",
         });
       } catch (error) {
         console.error("Error loading supplier:", error);
-        alertError("Error", "No se pudo cargar el proveedor");
+        toast.showError("Error", "No se pudo cargar el proveedor");
         navigate("/suppliers");
       } finally {
         setLoadingData(false);
@@ -52,7 +59,15 @@ export default function SupplierEditPage() {
     ? "La descripción no puede exceder 255 caracteres"
     : "";
 
-  const isFormValid = !nombreError && !descripcionError;
+  const direccionError = form.direccion.length > 200
+    ? "La dirección no puede exceder 200 caracteres"
+    : "";
+
+  const telefonoError = form.telefono.length > 20
+    ? "El teléfono no puede exceder 20 caracteres"
+    : "";
+
+  const isFormValid = !nombreError && !descripcionError && !direccionError && !telefonoError;
 
   const handleChange = (field) => (e) => {
     setForm({ ...form, [field]: e.target.value });
@@ -72,18 +87,21 @@ export default function SupplierEditPage() {
     if (loading) return;
 
     // Mark all fields as touched
-    setTouched({ nombre: true, descripcion: true });
+    setTouched({ nombre: true, descripcion: true, direccion: true, telefono: true });
 
     if (!isFormValid) {
-      alertError("Datos inválidos", "Por favor corrija los errores en el formulario");
+      toast.showError("Datos inválidos", "Por favor corrija los errores en el formulario");
       return;
     }
 
-    const ok = await alertConfirm(
+    // Confirmación con modal elegante
+    const confirmed = await toast.showConfirm(
       "¿Actualizar proveedor?",
-      `Se actualizarán los datos del proveedor.`
+      "Se actualizarán los datos del proveedor.",
+      "Actualizar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     setLoading(true);
     try {
@@ -91,11 +109,13 @@ export default function SupplierEditPage() {
       const dto = {
         nombre: form.nombre.trim(),
         descripcion: form.descripcion.trim(),
+        direccion: form.direccion.trim(),
+        telefono: form.telefono.trim(),
       };
 
       const response = await updateSupplier(id, dto);
 
-      await alertSuccess(
+      toast.showSuccess(
         "Proveedor actualizado",
         `El proveedor "${response.nombre}" ha sido actualizado exitosamente.`
       );
@@ -106,15 +126,15 @@ export default function SupplierEditPage() {
       const message = err?.response?.data?.mensaje || err?.response?.data?.message || err.message;
 
       if (status === 400) {
-        await alertError("Error de validación", message || "Datos inválidos proporcionados");
+        toast.showError("Error de validación", message || "Datos inválidos proporcionados");
       } else if (status === 401) {
-        await alertError("No autorizado", "Su sesión ha expirado. Por favor inicie sesión nuevamente.");
+        toast.showError("No autorizado", "Su sesión ha expirado. Por favor inicie sesión nuevamente.");
         navigate("/login");
       } else if (status === 404) {
-        await alertError("No encontrado", "El proveedor no existe");
+        toast.showError("No encontrado", "El proveedor no existe");
         navigate("/suppliers");
       } else {
-        await alertError("Error", message || "No se pudo actualizar el proveedor");
+        toast.showError("Error", message || "No se pudo actualizar el proveedor");
       }
     } finally {
       setLoading(false);
@@ -196,6 +216,58 @@ export default function SupplierEditPage() {
                   )}
                   <small className="text-muted">
                     {form.descripcion.length}/255 caracteres
+                  </small>
+                </div>
+
+                {/* Direccion Field */}
+                <div className="mb-3">
+                  <label htmlFor="direccion" className="form-label">
+                    Dirección
+                  </label>
+                  <input
+                    id="direccion"
+                    type="text"
+                    className={`form-control ${
+                      touched.direccion && direccionError ? "is-invalid" : ""
+                    }`}
+                    placeholder="Ingrese dirección del proveedor"
+                    value={form.direccion}
+                    onChange={handleChange("direccion")}
+                    onBlur={handleBlur("direccion")}
+                    maxLength={200}
+                    disabled={loading}
+                  />
+                  {touched.direccion && direccionError && (
+                    <div className="invalid-feedback">{direccionError}</div>
+                  )}
+                  <small className="text-muted">
+                    {form.direccion.length}/200 caracteres
+                  </small>
+                </div>
+
+                {/* Telefono Field */}
+                <div className="mb-3">
+                  <label htmlFor="telefono" className="form-label">
+                    Teléfono
+                  </label>
+                  <input
+                    id="telefono"
+                    type="tel"
+                    className={`form-control ${
+                      touched.telefono && telefonoError ? "is-invalid" : ""
+                    }`}
+                    placeholder="Ingrese teléfono del proveedor"
+                    value={form.telefono}
+                    onChange={handleChange("telefono")}
+                    onBlur={handleBlur("telefono")}
+                    maxLength={20}
+                    disabled={loading}
+                  />
+                  {touched.telefono && telefonoError && (
+                    <div className="invalid-feedback">{telefonoError}</div>
+                  )}
+                  <small className="text-muted">
+                    {form.telefono.length}/20 caracteres
                   </small>
                 </div>
 

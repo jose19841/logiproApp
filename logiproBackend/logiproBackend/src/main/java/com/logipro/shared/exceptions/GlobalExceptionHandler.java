@@ -43,6 +43,13 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "PETICION_INVALIDA", ex.getMessage(), req.getRequestURI(), null);
     }
 
+    // 409 Conflict – operaciones no permitidas por estado del sistema (ej: eliminar con dependencias)
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException ex,
+                                                                  HttpServletRequest req) {
+        return build(HttpStatus.CONFLICT, "OPERACION_NO_PERMITIDA", ex.getMessage(), req.getRequestURI(), null);
+    }
+
     // 404 Not Found – entidad no encontrada
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(EntityNotFoundException ex,

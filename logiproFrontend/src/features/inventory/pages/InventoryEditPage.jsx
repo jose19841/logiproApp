@@ -1,6 +1,6 @@
 // src/features/inventory/pages/InventoryEditPage.jsx
 import { useParams, useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useInventoryDetail from "@/features/inventory/hooks/useInventoryDetail";
 import useUpdateInventory from "@/features/inventory/hooks/useUpdateInventory";
 import InventoryForm from "@/features/inventory/components/InventoryForm";
@@ -8,23 +8,26 @@ import InventoryForm from "@/features/inventory/components/InventoryForm";
 export default function InventoryEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const { inventario, loading: loadingDetail, error: errorDetail } = useInventoryDetail(id);
   const { updateInventarioFn, loading: updating } = useUpdateInventory();
 
   const handleSubmit = async (dto) => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Actualizar inventario?",
-      "Se actualizará el inventario con los datos ingresados."
+      "Se actualizará el inventario con los datos ingresados.",
+      "Actualizar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       const response = await updateInventarioFn(id, dto);
-      await alertSuccess("Inventario actualizado", `El inventario #${response.id} ha sido actualizado exitosamente.`);
+      toast.showSuccess("Inventario actualizado", `El inventario #${response.id} ha sido actualizado exitosamente.`);
       navigate("/inventory");
     } catch (error) {
-      alertError(
+      toast.showError(
         "Error al actualizar inventario",
         error?.response?.data?.mensaje || error?.message || "No se pudo actualizar el inventario"
       );

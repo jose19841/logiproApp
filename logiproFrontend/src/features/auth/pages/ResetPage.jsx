@@ -1,7 +1,7 @@
 // src/features/auth/pages/ResetPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { resetPassword } from "@shared/services/auth.api";
 import "@/features/auth/styles/login.css";
 
@@ -38,6 +38,7 @@ const PasswordField = ({ id, label, placeholder, value, onChange, onBlur, show, 
 
 export default function ResetPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [searchParams] = useSearchParams();
   const tokenFromUrl = useMemo(() => searchParams.get("token") || "", [searchParams]);
   const [token, setToken] = useState(tokenFromUrl);
@@ -66,22 +67,22 @@ export default function ResetPage() {
     e.preventDefault();
     setTouched({ nueva: true, repetir: true });
     if (!isValid) {
-      await alertWarning("Datos inválidos", "Revisá los campos marcados en rojo.");
+      toast.showWarning("Datos inválidos", "Revisá los campos marcados en rojo.");
       return;
     }
     try {
       setSubmitting(true);
       await resetPassword(token.trim(), form.nueva);
-      await alertSuccess("Contraseña actualizada", "Ya podés iniciar sesión con tu nueva clave.");
+      toast.showSuccess("Contraseña actualizada", "Ya podés iniciar sesión con tu nueva clave.");
       navigate("/login");
     } catch (err) {
       const status = err?.response?.status;
       const msg = (err?.response?.data?.mensaje || err?.response?.data?.message || "No se pudo restablecer la contraseña").toString();
       if (status === 400) {
-        await alertWarning("No se pudo restablecer", msg || "Token inválido o expirado.");
+        toast.showWarning("No se pudo restablecer", msg || "Token inválido o expirado.");
         return;
       }
-      await alertError("Error", msg);
+      toast.showError("Error", msg);
     } finally {
       setSubmitting(false);
     }

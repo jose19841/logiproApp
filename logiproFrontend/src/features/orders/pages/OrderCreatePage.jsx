@@ -1,23 +1,24 @@
 // src/features/orders/pages/OrderCreatePage.jsx
 import { useNavigate } from "react-router-dom";
-import { alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useCreateOrder from "@/features/orders/hooks/useCreateOrder";
 import OrderForm from "@/features/orders/components/OrderForm";
 
 export default function OrderCreatePage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { createOrderFn, loading } = useCreateOrder();
 
   const handleSubmit = async (dto) => {
     try {
       const response = await createOrderFn(dto);
-      await alertSuccess(
+      toast.showSuccess(
         "Pedido creado",
         `El pedido #${response.numeroPedido} ha sido creado exitosamente.`
       );
       navigate("/orders");
     } catch (err) {
-      alertError(
+      toast.showError(
         "Error",
         err?.response?.data?.mensaje || err?.message || "No se pudo crear el pedido"
       );

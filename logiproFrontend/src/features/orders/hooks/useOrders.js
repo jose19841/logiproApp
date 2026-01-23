@@ -1,5 +1,5 @@
 // src/features/orders/hooks/useOrders.js
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { listOrders } from "@/features/orders/services/ordersApi";
 
 /**
@@ -16,6 +16,7 @@ export default function useOrders(filters = {}) {
     totalElements: 0,
     totalPages: 0
   });
+  const debounceTimer = useRef(null);
 
   const load = async () => {
     setLoading(true);
@@ -47,7 +48,15 @@ export default function useOrders(filters = {}) {
 
   useEffect(() => {
     load();
-  }, [JSON.stringify(filters)]);
+  }, [
+    filters.proveedorId,
+    filters.estado,
+    filters.fechaDesde,
+    filters.fechaHasta,
+    filters.materialId,
+    filters.numeroPedido,
+    filters.usuarioId
+  ]);
 
   const reload = () => load();
 

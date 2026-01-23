@@ -1,7 +1,7 @@
 // src/features/materials/pages/MaterialsListPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useMaterials from "@/features/materials/hooks/useMaterials";
 import useDeleteMaterial from "@/features/materials/hooks/useDeleteMaterial";
 import MaterialFilters from "@/features/materials/components/MaterialFilters";
@@ -10,6 +10,7 @@ import MaterialDetail from "@/features/materials/components/MaterialDetail";
 
 export default function MaterialsListPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [filters, setFilters] = useState({});
   const [selectedMaterial, setSelectedMaterial] = useState(null);
 
@@ -33,18 +34,20 @@ export default function MaterialsListPage() {
   };
 
   const handleDelete = async (material) => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Eliminar material?",
-      `¿Está seguro que desea eliminar el material #${material.id}? Esta acción no se puede deshacer.`
+      `¿Está seguro que desea eliminar el material #${material.id}? Esta acción no se puede deshacer.`,
+      "Eliminar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       await deleteMaterialFn(material.id);
-      await alertSuccess("Material eliminado", `El material #${material.id} ha sido eliminado exitosamente.`);
+      toast.showSuccess("Material eliminado", `El material #${material.id} ha sido eliminado exitosamente.`);
       reload();
     } catch (err) {
-      alertError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo eliminar el material");
+      toast.showError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo eliminar el material");
     }
   };
 

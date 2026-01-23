@@ -1,6 +1,6 @@
 // src/features/materials/pages/MaterialEditPage.jsx
 import { useNavigate, useParams } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useMaterialDetail from "@/features/materials/hooks/useMaterialDetail";
 import useUpdateMaterial from "@/features/materials/hooks/useUpdateMaterial";
 import MaterialForm from "@/features/materials/components/MaterialForm";
@@ -8,23 +8,26 @@ import MaterialForm from "@/features/materials/components/MaterialForm";
 export default function MaterialEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const { material, loading: loadingMaterial, error: errorMaterial } = useMaterialDetail(id);
   const { updateMaterialFn, loading: updating } = useUpdateMaterial();
 
   const handleSubmit = async (dto) => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Actualizar material?",
-      `Se actualizará el material #${id} con los nuevos datos.`
+      `Se actualizará el material #${id} con los nuevos datos.`,
+      "Actualizar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       await updateMaterialFn(id, dto);
-      await alertSuccess("Material actualizado", `El material #${id} ha sido actualizado exitosamente.`);
+      toast.showSuccess("Material actualizado", `El material #${id} ha sido actualizado exitosamente.`);
       navigate("/materials");
     } catch (error) {
-      alertError(
+      toast.showError(
         "Error al actualizar material",
         error?.response?.data?.mensaje || error?.message || "No se pudo actualizar el material"
       );

@@ -1,7 +1,7 @@
 // src/features/inventory/pages/InventoryListPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alertConfirm, alertError, alertSuccess } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useInventory from "@/features/inventory/hooks/useInventory";
 import useDeleteInventory from "@/features/inventory/hooks/useDeleteInventory";
 import InventoryFilters from "@/features/inventory/components/InventoryFilters";
@@ -10,6 +10,7 @@ import InventoryDetail from "@/features/inventory/components/InventoryDetail";
 
 export default function InventoryListPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [filters, setFilters] = useState({});
   const [selectedInventario, setSelectedInventario] = useState(null);
 
@@ -33,18 +34,20 @@ export default function InventoryListPage() {
   };
 
   const handleDelete = async (inventario) => {
-    const ok = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Eliminar inventario?",
-      `¿Está seguro que desea eliminar el inventario #${inventario.id}? Esta acción no se puede deshacer.`
+      `¿Está seguro que desea eliminar el inventario #${inventario.id}? Esta acción no se puede deshacer.`,
+      "Eliminar",
+      "Cancelar"
     );
-    if (!ok.isConfirmed) return;
+    if (!confirmed) return;
 
     try {
       await deleteInventarioFn(inventario.id);
-      await alertSuccess("Inventario eliminado", `El inventario #${inventario.id} ha sido eliminado exitosamente.`);
+      toast.showSuccess("Inventario eliminado", `El inventario #${inventario.id} ha sido eliminado exitosamente.`);
       reload();
     } catch (err) {
-      alertError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo eliminar el inventario");
+      toast.showError("Error", err?.response?.data?.mensaje || err?.message || "No se pudo eliminar el inventario");
     }
   };
 

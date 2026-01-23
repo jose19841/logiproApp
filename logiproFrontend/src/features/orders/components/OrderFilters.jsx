@@ -13,6 +13,8 @@ export default function OrderFilters({ filters = {}, onFilterChange, onClearFilt
   const [suppliers, setSuppliers] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [localNumeroPedido, setLocalNumeroPedido] = useState("");
+  const [lastSubmitted, setLastSubmitted] = useState("");
 
   const estados = [
     { value: "PENDIENTE", label: "Pendiente" },
@@ -45,6 +47,22 @@ export default function OrderFilters({ filters = {}, onFilterChange, onClearFilt
     onFilterChange?.({ ...filters, [field]: value });
   };
 
+  const handleNumeroPedidoSubmit = () => {
+    const trimmed = localNumeroPedido.trim();
+    if (trimmed !== lastSubmitted) {
+      setLastSubmitted(trimmed);
+      handleChange("numeroPedido", trimmed);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleNumeroPedidoSubmit();
+      e.target.blur();
+    }
+  };
+
   const hasActiveFilters =
     filters.proveedorId ||
     filters.estado ||
@@ -66,9 +84,11 @@ export default function OrderFilters({ filters = {}, onFilterChange, onClearFilt
               type="text"
               id="filter-numeroPedido"
               className="form-control"
-              placeholder="Ej: PED-2025-001"
-              value={filters.numeroPedido || ""}
-              onChange={(e) => handleChange("numeroPedido", e.target.value)}
+              placeholder="Ej: PED-2025-001 (presioná Enter)"
+              value={localNumeroPedido}
+              onChange={(e) => setLocalNumeroPedido(e.target.value)}
+              onKeyPress={handleKeyPress}
+              onBlur={handleNumeroPedidoSubmit}
             />
           </div>
 

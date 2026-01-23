@@ -31,6 +31,12 @@ public class ActualizarProveedorService implements ActualizarProveedorUseCase {
             if (request.getDescripcion() != null) {
                 proveedor.actualizarDescripcion(request.getDescripcion());
             }
+            if (request.getDireccion() != null) {
+                proveedor.actualizarDireccion(request.getDireccion());
+            }
+            if (request.getTelefono() != null) {
+                proveedor.actualizarTelefono(request.getTelefono());
+            }
 
             Proveedor guardado = proveedorRepository.save(proveedor);
             return proveedorMapper.toResponseDTO(guardado);

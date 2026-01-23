@@ -1,7 +1,7 @@
 // src/features/auth/pages/ChangePasswordPage.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { changePassword } from "@shared/services/auth.api";
 import "@/features/auth/styles/login.css";
 
@@ -38,6 +38,7 @@ const PasswordField = ({ id, label, placeholder, value, onChange, onBlur, show, 
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [actual, setActual] = useState("");
   const [nueva, setNueva] = useState("");
   const [repetir, setRepetir] = useState("");
@@ -60,27 +61,27 @@ export default function ChangePasswordPage() {
     setTouchedN(true);
     setTouchedR(true);
     if (!isValid) {
-      await alertWarning("Datos inválidos", "Revisá los campos marcados en rojo.");
+      toast.showWarning("Datos inválidos", "Revisá los campos marcados en rojo.");
       return;
     }
     try {
       setSubmitting(true);
       await changePassword({ actualClave: actual, nuevaClave: nueva, repetirClave: repetir });
-      await alertSuccess("Contraseña actualizada", "Volvé a iniciar sesión con tu nueva clave.");
+      toast.showSuccess("Contraseña actualizada", "Volvé a iniciar sesión con tu nueva clave.");
       navigate("/login");
     } catch (err) {
       const status = err?.response?.status;
       const msg = (err?.response?.data?.mensaje || err?.response?.data?.message || "No se pudo cambiar la contraseña").toString();
       if (status === 401) {
-        await alertError("Sesión expirada", "Tenés que iniciar sesión nuevamente.");
+        toast.showError("Sesión expirada", "Tenés que iniciar sesión nuevamente.");
         navigate("/login");
         return;
       }
       if (status === 400 || status === 403) {
-        await alertWarning("No se pudo cambiar la contraseña", msg);
+        toast.showWarning("No se pudo cambiar la contraseña", msg);
         return;
       }
-      await alertError("Error", msg);
+      toast.showError("Error", msg);
     } finally {
       setSubmitting(false);
     }

@@ -1,7 +1,7 @@
 // src/features/users/components/UserCreateForm.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alertConfirm } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import useRegister from "@/features/users/hooks/useRegister";
 
 const INITIAL_FORM = {
@@ -66,6 +66,7 @@ export default function UserCreateForm({
 }) {
   const { submit, loading } = useRegister();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [form, setForm] = useState({ ...INITIAL_FORM, ...(initialValues || {}) });
 
@@ -76,11 +77,13 @@ export default function UserCreateForm({
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const resConfirm = await alertConfirm(
+    const confirmed = await toast.showConfirm(
       "¿Crear usuario?",
-      `Se creará el usuario "${form.usuario}" con rol ${form.rol}.`
+      `Se creará el usuario "${form.usuario}" con rol ${form.rol}.`,
+      "Crear",
+      "Cancelar"
     );
-    if (!resConfirm.isConfirmed) return;
+    if (!confirmed) return;
 
     const res = await submit(form);
     if (res.ok) {

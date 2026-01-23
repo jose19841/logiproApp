@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -95,8 +96,22 @@ public class CrearPedidoService implements CrearPedidoUseCase {
     }
     // genera un numero de pedido legible y unico
     private String generarNumeroPedido() {
-        long correlativo = pedidoRepository.count() + 1;
         String year = String.valueOf(LocalDate.now().getYear());
+        String prefix = "PED-" + year + "-";
+
+        // Buscar el último pedido del año
+        Optional<Pedido> ultimoPedido = pedidoRepository.findFirstByNumeroPedidoStartingWithOrderByNumeroPedidoDesc(prefix);
+
+        long correlativo = 1;
+        if (ultimoPedido.isPresent()) {
+            // Extraer el número del último pedido (ej: "PED-2025-0003" -> 3)
+            String ultimoNumero = ultimoPedido.get().getNumeroPedido();
+            String[] partes = ultimoNumero.split("-");
+            if (partes.length == 3) {
+                correlativo = Long.parseLong(partes[2]) + 1;
+            }
+        }
+
         return String.format("PED-%s-%04d", year, correlativo);
     }
 

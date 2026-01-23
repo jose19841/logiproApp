@@ -41,7 +41,17 @@ export default function InventoryForm({
         ]);
 
         setSectores(sectoresData || []);
-        setMateriales(materialesData || []);
+
+        // Agrupar materiales por tipo para evitar duplicados en el dropdown
+        const materialesPorTipo = new Map();
+        materialesData.forEach(material => {
+          const tipoId = material.tipoMaterialId;
+          if (!materialesPorTipo.has(tipoId)) {
+            materialesPorTipo.set(tipoId, material);
+          }
+        });
+
+        setMateriales(Array.from(materialesPorTipo.values()));
       } catch (error) {
         console.error("Error loading form data:", error);
       } finally {
@@ -175,10 +185,10 @@ export default function InventoryForm({
           )}
         </div>
 
-        {/* Material */}
+        {/* Tipo de Material */}
         <div className="col-md-6">
           <label htmlFor="materialId" className="form-label">
-            Material <span className="text-danger">*</span>
+            Tipo de Material <span className="text-danger">*</span>
           </label>
           <select
             id="materialId"
@@ -189,10 +199,10 @@ export default function InventoryForm({
             onBlur={() => handleBlur("materialId")}
             disabled={loading}
           >
-            <option value="">-- Seleccione un material --</option>
+            <option value="">-- Seleccione un tipo de material --</option>
             {materiales.map((material) => (
               <option key={material.id} value={material.id}>
-                {material.nombreTipoMaterial || `Material #${material.id}`} - Cantidad disponible: {material.cantidad} - Proveedor: {material.proveedorDescripcion || 'N/A'}
+                {material.nombreTipoMaterial || `Material #${material.id}`}
               </option>
             ))}
           </select>

@@ -2,17 +2,18 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/context/AuthContext";
-import { alertWarning } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import UserList from "@/features/users/pages/UserList";
 
 export default function UserPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { user } = useAuth();
   const isAdmin = user?.rol === "ADMIN";
 
   useEffect(() => {
     if (!isAdmin) {
-      alertWarning(
+      toast.showWarning(
         "Acceso denegado",
         "Necesitás permisos de ADMIN para ver usuarios."
       );

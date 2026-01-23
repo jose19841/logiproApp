@@ -1,7 +1,7 @@
 // src/features/auth/pages/LoginPage.jsx
 import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { alertError, alertSuccess, alertWarning } from "@shared/components/alerts/swal";
+import useToast from "@shared/hooks/useToast";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import "@shared/styles/theme-controlroom.css";
 import "@/features/auth/styles/login.css";
@@ -17,6 +17,7 @@ const clearSession = () => {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -42,7 +43,7 @@ export default function LoginPage() {
     setTouched({ usuario: true, clave: true });
     setFormError("");
     if (!isFormValid) {
-      await alertError("Datos inválidos", "Corregí los campos marcados en rojo.");
+      toast.showError("Datos inválidos", "Corregí los campos marcados en rojo.");
       return;
     }
     setLoading(true);
@@ -50,11 +51,11 @@ export default function LoginPage() {
       const data = await login({ username: form.usuario, password: form.clave });
       const estado = data?.user?.estado || data?.user?.status;
       if (estado && estado !== "ACTIVO") {
-        await alertWarning("Usuario inactivo", `El usuario "${form.usuario}" se encuentra ${estado}.`);
+        toast.showWarning("Usuario inactivo", `El usuario "${form.usuario}" se encuentra ${estado}.`);
         clearSession();
         return;
       }
-      await alertSuccess("Bienvenido", `hola, ${data?.user?.usuario ?? form.usuario}`);
+      toast.showSuccess("Bienvenido", `hola, ${data?.user?.usuario ?? form.usuario}`);
       navigate("/");
     } catch (err) {
       if (err?.code === "USER_INACTIVE") {
@@ -62,7 +63,7 @@ export default function LoginPage() {
         const mensaje = err?.message || "";
         const match = mensaje.match(/(INACTIVO|SUSPENDIDO|REGISTRADO)/i);
         const estado = match ? match[1].toLowerCase() : "inactivo";
-        await alertWarning(
+        toast.showWarning(
           `Usuario ${estado}`,
           `El usuario "${err.usuario || form.usuario}" se encuentra ${estado} y no puede iniciar sesión.`
         );
@@ -70,17 +71,17 @@ export default function LoginPage() {
         return;
       }
       if (err?.code === "BAD_CREDENTIALS") {
-        await alertError("Credenciales inválidas", "Usuario o contraseña incorrectos.");
+        toast.showError("Credenciales inválidas", "Usuario o contraseña incorrectos.");
         return;
       }
       const status = err?.status || err?.response?.status;
       if (status >= 400 && status < 500) {
-        await alertWarning("Error de validación", "Hubo un error en la solicitud.");
+        toast.showWarning("Error de validación", "Hubo un error en la solicitud.");
         return;
       }
       const msg = (err?.response?.data?.mensaje || err?.response?.data?.message || "Error de conexión").toString();
       setFormError(msg);
-      alertError("Error", msg);
+      toast.showError("Error", msg);
     } finally {
       setLoading(false);
     }
